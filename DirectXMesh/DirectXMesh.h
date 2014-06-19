@@ -27,7 +27,13 @@
 #include <string>
 #include <vector>
 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#include <d3d11_x.h>
+#define DCOMMON_H_INCLUDED
+#else
 #include <d3d11_1.h>
+#endif
+
 #include <directxmath.h>
 
 #define DIRECTX_MESH_VERSION 100

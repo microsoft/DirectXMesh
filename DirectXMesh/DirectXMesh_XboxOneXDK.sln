@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXMesh", "DirectXMesh_XboxOneXDK.vcxproj", "{ED42EEE0-E8E0-49E4-AACA-5482FD6D324E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Durango = Debug|Durango
+		Profile|Durango = Profile|Durango
+		Release|Durango = Release|Durango
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED42EEE0-E8E0-49E4-AACA-5482FD6D324E}.Debug|Durango.ActiveCfg = Debug|Durango
+		{ED42EEE0-E8E0-49E4-AACA-5482FD6D324E}.Debug|Durango.Build.0 = Debug|Durango
+		{ED42EEE0-E8E0-49E4-AACA-5482FD6D324E}.Profile|Durango.ActiveCfg = Profile|Durango
+		{ED42EEE0-E8E0-49E4-AACA-5482FD6D324E}.Profile|Durango.Build.0 = Profile|Durango
+		{ED42EEE0-E8E0-49E4-AACA-5482FD6D324E}.Release|Durango.ActiveCfg = Release|Durango
+		{ED42EEE0-E8E0-49E4-AACA-5482FD6D324E}.Release|Durango.Build.0 = Release|Durango
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
