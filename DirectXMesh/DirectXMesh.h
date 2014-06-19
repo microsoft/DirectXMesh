@@ -30,7 +30,7 @@
 #include <d3d11_1.h>
 #include <directxmath.h>
 
-#define DIRECTX_MESH_VERSION 001
+#define DIRECTX_MESH_VERSION 100
 
 namespace DirectX
 {
@@ -54,6 +54,14 @@ namespace DirectX
         // Returns a list of face offset,counts for attribute groups
 
     //---------------------------------------------------------------------------------
+    // Mesh Optimization Utilities
+    void ComputeVertexCacheMissRate( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
+                                     _In_ size_t cacheSize, _Out_ float& acmr, _Out_ float& atvr );
+    void ComputeVertexCacheMissRate( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
+                                     _In_ size_t cacheSize, _Out_ float& acmr, _Out_ float& atvr );
+        // Compute the average cache miss ratio and average triangle vertex reuse for the post-transform vertex cache
+
+    //---------------------------------------------------------------------------------
     // Vertex Buffer Reader/Writer
 
     class VBReader
@@ -72,6 +80,12 @@ namespace DirectX
 
         HRESULT Read( _Out_writes_(count) XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
             // Extracts data elements from vertex buffer
+
+        HRESULT Read( _Out_writes_(count) float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT Read( _Out_writes_(count) XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT Read( _Out_writes_(count) XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT Read( _Out_writes_(count) XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+            // Helpers for data extraction
 
         void Release();
 
@@ -102,6 +116,12 @@ namespace DirectX
 
         HRESULT Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
             // Inserts data elements into vertex buffer
+
+        HRESULT Write( _In_reads_(count) const float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT Write( _In_reads_(count) const XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT Write( _In_reads_(count) const XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT Write( _In_reads_(count) const XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+            // Helpers for data insertion
 
         void Release();
 
@@ -179,54 +199,29 @@ namespace DirectX
                             _Out_writes_(nVerts) XMFLOAT3* normals );
         // Computes vertex normals
 
-    enum CTF_FLAGS
-    {
-        CTF_DEFAULT                     = 0x0,
-            // Default is to compute normals using weight-by-angle
-
-        CTF_WEIGHT_BY_AREA              = 0x1,
-            // Computes normals using weight-by-area
-
-        CTF_WEIGHT_EQUAL                = 0x2,
-            // Compute normals with equal weights
-
-        CTF_WIND_CW                     = 0x4,
-            // Vertices are clock-wise (defaults to CCW)
-
-        CTF_DONT_ORTHOGONALIZE          = 0x10,
-        CTF_ORTHOGONALIZE_FROM_U        = 0x20,
-        CTF_ORTHOGONALIZE_FROM_V        = 0x40,
-    };
-
     HRESULT ComputeTangentFrame( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces,
                                  _In_reads_(nVerts) const XMFLOAT3* positions,
                                  _In_reads_(nVerts) const XMFLOAT3* normals,
-                                 _In_reads_(nVerts) const XMFLOAT2* txtcoords, _In_ size_t nVerts, 
-                                 _In_ DWORD flags,
+                                 _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts, 
                                  _Out_writes_opt_(nVerts) XMFLOAT3* tangents,
-                                 _Out_writes_opt_(nVerts) XMFLOAT3* binormals );
+                                 _Out_writes_opt_(nVerts) XMFLOAT3* bitangents );
     HRESULT ComputeTangentFrame( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces,
                                  _In_reads_(nVerts) const XMFLOAT3* positions,
                                  _In_reads_(nVerts) const XMFLOAT3* normals,
-                                 _In_reads_(nVerts) const XMFLOAT2* txtcoords, _In_ size_t nVerts, 
-                                 _In_ DWORD flags,
+                                 _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts, 
                                  _Out_writes_opt_(nVerts) XMFLOAT3* tangents,
-                                 _Out_writes_opt_(nVerts) XMFLOAT3* binormals );
+                                 _Out_writes_opt_(nVerts) XMFLOAT3* bitangents );
     HRESULT ComputeTangentFrame( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces,
                                  _In_reads_(nVerts) const XMFLOAT3* positions,
                                  _In_reads_(nVerts) const XMFLOAT3* normals,
-                                 _In_reads_(nVerts) const XMFLOAT2* txtcoords, _In_ size_t nVerts, 
-                                 _In_ DWORD flags,
-                                 _Out_writes_opt_(nVerts) XMFLOAT4* tangents,
-                                 _Out_writes_opt_(nVerts) XMFLOAT4* binormals );
+                                 _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts, 
+                                 _Out_writes_(nVerts) XMFLOAT4* tangents );
     HRESULT ComputeTangentFrame( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces,
                                  _In_reads_(nVerts) const XMFLOAT3* positions,
                                  _In_reads_(nVerts) const XMFLOAT3* normals,
-                                 _In_reads_(nVerts) const XMFLOAT2* txtcoords, _In_ size_t nVerts, 
-                                 _In_ DWORD flags,
-                                 _Out_writes_opt_(nVerts) XMFLOAT4* tangents,
-                                 _Out_writes_opt_(nVerts) XMFLOAT4* binormals );
-        // Computes tangents and/or bi-normals (optionally with handedness stored in .w)
+                                 _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts, 
+                                 _Out_writes_(nVerts) XMFLOAT4* tangents );
+        // Computes tangents and/or bi-tangents (optionally with handedness stored in .w)
 
     //---------------------------------------------------------------------------------
     // Mesh clean-up and validation
