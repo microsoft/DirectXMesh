@@ -536,7 +536,7 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
 
                 while( current != 0 )
                 {
-                    if ( ( current->face == foundFace ) && ( current->v2 == va ) && ( current->v1 == vb ) )
+                    if ( ( current->face == uint32_t( face ) ) && ( current->v2 == va ) && ( current->v1 == vb ) )
                     {
                         // trim edge from hash table
                         if ( prev != 0 )

@@ -248,4 +248,22 @@ namespace DirectX
         bool            m_stopOnBoundary;
     };
 
+
+    //-------------------------------------------------------------------------------------
+    template<class index_t>
+    inline uint32_t find_edge( _In_reads_(3) const index_t* indices, index_t search )
+    {
+        assert( indices != 0 );
+
+        uint32_t edge = 0;
+
+        for( ; edge < 3; ++edge )
+        {
+            if ( indices[ edge ] == search )
+                break;
+        }
+
+        return edge;
+    }
+
 }; // namespace

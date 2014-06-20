@@ -40,6 +40,7 @@ HRESULT ValidateIndices( _In_reads_(nFaces*3) const index_t* indices, _In_ size_
 
     for( size_t face = 0; face < nFaces; ++face )
     {
+        // Check for values in-range
         for( size_t point = 0; point < 3; ++point )
         {
             index_t i = indices[ face*3 + point ];
@@ -104,6 +105,30 @@ HRESULT ValidateIndices( _In_reads_(nFaces*3) const index_t* indices, _In_ size_
             continue;
         }
 
+        // Check for symmetric neighbhors
+        if ( adjacency )
+        {
+            for( size_t point = 0; point < 3; ++point )
+            {
+                uint32_t k = adjacency[ face*3 + point ];
+                if ( k == UNUSED32 )
+                    continue;
+
+                uint32_t edge = find_edge<uint32_t>( &adjacency[ k * 3 ], uint32_t( face ) );
+                if ( edge >= 3 )
+                {
+                    if ( !msgs )
+                        return E_FAIL;
+
+                    result = false;
+
+                    wchar_t buff[ 256 ];
+                    swprintf_s( buff, L"A neighbor triangle (%u) does not reference back to this face (%Iu) as expected\n", k, face );
+                    *msgs += buff;
+                }
+            }
+        }
+
         // Check for duplicate neighbor
         if ( ( flags & VALIDATE_BACKFACING ) && adjacency )
         {
@@ -112,8 +137,8 @@ HRESULT ValidateIndices( _In_reads_(nFaces*3) const index_t* indices, _In_ size_
             uint32_t j2 = adjacency[ face*3 + 2 ];
 
             if ( ( j0 == j1 && j0 != UNUSED32 )
-                    || ( j0 == j2 && j0 != UNUSED32 )
-                    || ( j1 == j2 && j1 != UNUSED32 ) )
+                 || ( j0 == j2 && j0 != UNUSED32 )
+                 || ( j1 == j2 && j1 != UNUSED32 ) )
             {
                 if ( !msgs )
                     return E_FAIL;
