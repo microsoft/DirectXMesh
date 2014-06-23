@@ -133,7 +133,23 @@ HRESULT _ComputeTangentFrame( _In_reads_(nFaces*3) const index_t* indices, size_
             else
             {
                 // Reset both tangent and bi-tangent from normal
-                XMVECTOR axis = ( XMVector3Less( XMVector3Dot( g_XMIdentityR0, b0 ), XMVector3Dot( g_XMIdentityR1, b0 ) ) ) ? g_XMIdentityR0 : g_XMIdentityR1;
+                XMVECTOR axis;
+
+                float d0 = fabs( XMVectorGetX( XMVector3Dot( g_XMIdentityR0, b0 ) ) );
+                float d1 = fabs( XMVectorGetX( XMVector3Dot( g_XMIdentityR1, b0 ) ) );
+                float d2 = fabs( XMVectorGetX( XMVector3Dot( g_XMIdentityR2, b0 ) ) );
+                if ( d0 < d1 )
+                {
+                    axis = ( d0 < d2 ) ? g_XMIdentityR0 : g_XMIdentityR2;
+                }
+                else if ( d1 < d2 )
+                {
+                    axis = g_XMIdentityR1;
+                }
+                else
+                {
+                    axis = g_XMIdentityR2;
+                }
 
                 b1 = XMVector3Cross( b0, axis );
                 b2 = XMVector3Cross( b0, b1 );
