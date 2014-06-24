@@ -313,7 +313,10 @@ void _ComputeVertexCacheMissRate( _In_reads_(nFaces*3) const index_t* indices, s
     if ( !indices || !nFaces || !nVerts || !cacheSize )
         return;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
+        return;
+
+    if ( nVerts >= index_t(-1) )
         return;
 
     size_t misses = 0;

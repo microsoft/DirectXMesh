@@ -126,13 +126,14 @@ HRESULT VBWriter::Impl::AddStream( void* vb, size_t nVerts, size_t inputSlot, si
     if ( !vb || !nVerts )
         return E_INVALIDARG;
 
+    if ( nVerts >= UINT32_MAX )
+        return E_INVALIDARG;
+
     if ( inputSlot >= D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT )
         return E_INVALIDARG;
 
-#ifdef _M_X64
-    if ( stride > 0xFFFFFFFF )
+    if ( stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES )
         return E_INVALIDARG;
-#endif
 
     mStrides[ inputSlot ] = ( stride > 0 ) ? uint32_t( stride ) : mDefaultStrides[ inputSlot ];
     mBuffers[ inputSlot ] = vb;

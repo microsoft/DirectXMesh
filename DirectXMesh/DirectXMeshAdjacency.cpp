@@ -143,11 +143,15 @@ HRESULT GeneratePointReps( _In_reads_(nFaces*3) const index_t* indices, size_t n
     memset( vertexToCorner, 0xff, sizeof(uint32_t) * nVerts );
     memset( vertexCornerList, 0xff, sizeof(uint32_t) * nFaces * 3 );
 
+    // build initial lists and validate indices
     for( size_t j = 0; j < (nFaces * 3); ++j )
     {
         index_t k = indices[ j ];
-        if ( k >= nVerts )
+        if ( k == index_t(-1) )
             continue;
+
+        if ( k >= nVerts )
+            return E_UNEXPECTED;
 
         vertexCornerList[ j ] = vertexToCorner[ k ];
         vertexToCorner[ k ] = uint32_t( j );
@@ -346,17 +350,22 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
 
     uint32_t freeEntry = 0;
 
-    // add face edges to hash table
+    // add face edges to hash table and validate indices
     for( size_t face = 0; face < nFaces; ++face )
     {
         index_t i0 = indices[ face*3 ];
         index_t i1 = indices[ face*3 + 1 ];
         index_t i2 = indices[ face*3 + 2 ];
 
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
+            continue;
+
         if ( i0 >= nVerts
              || i1 >= nVerts
              || i2 >= nVerts )
-            continue;
+            return E_UNEXPECTED;
 
         uint32_t v1 = pointRep[ i0 ];
         uint32_t v2 = pointRep[ i1 ];
@@ -399,10 +408,19 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
         index_t i1 = indices[ face*3 + 1 ];
         index_t i2 = indices[ face*3 + 2 ];
 
-        if ( i0 >= nVerts
-             || i1 >= nVerts
-             || i2 >= nVerts )
+        // filter out unused triangles
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
             continue;
+
+        assert( i0 < nVerts );
+        assert( i1 < nVerts );
+        assert( i2 < nVerts );
+
+        _Analysis_assume_( i0 < nVerts );
+        _Analysis_assume_( i1 < nVerts );
+        _Analysis_assume_( i2 < nVerts );
 
         uint32_t v1 = pointRep[ i0 ];
         uint32_t v2 = pointRep[ i1 ];
@@ -410,12 +428,7 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
 
         // filter out degenerate triangles
         if ( v1 == v2 || v1 == v3 || v2 == v3 )
-        {
-            adjacency[ face * 3 ] = UNUSED32;
-            adjacency[ face * 3 + 1 ] = UNUSED32;
-            adjacency[ face * 3 + 2 ] = UNUSED32;
             continue;
-        }
 
         for( uint32_t point = 0; point < 3; ++point )
         {
@@ -573,8 +586,11 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
                     for( ; point2 < 3; ++point2 )
                     {
                         index_t k = indices[ foundFace * 3 + point2 ];
-                        if ( k >= nVerts )
+                        if ( k == index_t(-1) )
                             continue;
+
+                        assert( k < nVerts );
+                        _Analysis_assume_( k < nVerts );
 
                         if ( pointRep[ k ] == va )
                             break;
@@ -622,12 +638,10 @@ HRESULT GenerateAdjacencyAndPointReps( const uint16_t* indices, size_t nFaces,
     if ( !pointRep && !adjacency )
         return E_INVALIDARG;
 
-#ifdef _M_X64
-    if ( nVerts > 0xFFFFFFFF )
+    if ( nVerts >= UINT16_MAX )
         return E_INVALIDARG;
-#endif
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     std::unique_ptr<uint32_t[]> temp;
@@ -662,12 +676,10 @@ HRESULT GenerateAdjacencyAndPointReps( const uint32_t* indices, size_t nFaces,
     if ( !pointRep && !adjacency )
         return E_INVALIDARG;
 
-#ifdef _M_X64
-    if ( nVerts > 0xFFFFFFFF )
+    if ( nVerts >= UINT32_MAX )
         return E_INVALIDARG;
-#endif
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
     
     std::unique_ptr<uint32_t[]> temp;
@@ -701,12 +713,10 @@ HRESULT ConvertPointRepsToAdjacency( const uint16_t* indices, size_t nFaces,
     if ( !indices || !nFaces || !positions || !nVerts || !adjacency )
         return E_INVALIDARG;
 
-#ifdef _M_X64
-    if ( nVerts > 0xFFFFFFFF )
+    if ( nVerts >= UINT16_MAX )
         return E_INVALIDARG;
-#endif
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     std::unique_ptr<uint32_t[]> temp;
@@ -736,12 +746,10 @@ HRESULT ConvertPointRepsToAdjacency( const uint32_t* indices, size_t nFaces,
     if ( !indices || !nFaces || !positions || !nVerts || !adjacency )
         return E_INVALIDARG;
 
-#ifdef _M_X64
-    if ( nVerts > 0xFFFFFFFF )
+    if ( nVerts >= UINT32_MAX )
         return E_INVALIDARG;
-#endif
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     std::unique_ptr<uint32_t[]> temp;

@@ -38,16 +38,18 @@ HRESULT ComputeNormalsEqualWeight( _In_reads_(nFaces*3) const index_t* indices, 
     for( size_t face = 0; face < nFaces; ++face )
     {
         index_t i0 = indices[ face*3 ];
-        assert( i0 < nVerts );
-        _Analysis_assume_( i0 < nVerts );
-
         index_t i1 = indices[ face*3 + 1 ];
-        assert( i1 < nVerts );
-        _Analysis_assume_( i1 < nVerts );
-
         index_t i2 = indices[ face*3 + 2 ];
-        assert( i2 < nVerts );
-        _Analysis_assume_( i2 < nVerts );
+
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
+            continue;
+
+        if ( i0 >= nVerts
+             || i1 >= nVerts
+             || i2 >= nVerts )
+             return E_UNEXPECTED;
 
         XMVECTOR p1 = XMLoadFloat3( &positions[ i0 ] );
         XMVECTOR p2 = XMLoadFloat3( &positions[ i1 ] );
@@ -104,16 +106,18 @@ HRESULT ComputeNormalsWeightedByAngle( _In_reads_(nFaces*3) const index_t* indic
     for( size_t face = 0; face < nFaces; ++face )
     {
         index_t i0 = indices[ face*3 ];
-        assert( i0 < nVerts );
-        _Analysis_assume_( i0 < nVerts );
-
         index_t i1 = indices[ face*3 + 1 ];
-        assert( i1 < nVerts );
-        _Analysis_assume_( i1 < nVerts );
-
         index_t i2 = indices[ face*3 + 2 ];
-        assert( i2 < nVerts );
-        _Analysis_assume_( i2 < nVerts );
+
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
+            continue;
+
+        if ( i0 >= nVerts
+             || i1 >= nVerts
+             || i2 >= nVerts )
+             return E_UNEXPECTED;
 
         XMVECTOR p0 = XMLoadFloat3( &positions[ i0 ] );
         XMVECTOR p1 = XMLoadFloat3( &positions[ i1 ] );
@@ -191,16 +195,18 @@ HRESULT ComputeNormalsWeightedByArea( _In_reads_(nFaces*3) const index_t* indice
     for( size_t face = 0; face < nFaces; ++face )
     {
         index_t i0 = indices[ face*3 ];
-        assert( i0 < nVerts );
-        _Analysis_assume_( i0 < nVerts );
-
         index_t i1 = indices[ face*3 + 1 ];
-        assert( i1 < nVerts );
-        _Analysis_assume_( i1 < nVerts );
-
         index_t i2 = indices[ face*3 + 2 ];
-        assert( i2 < nVerts );
-        _Analysis_assume_( i2 < nVerts );
+
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
+            continue;
+
+        if ( i0 >= nVerts
+             || i1 >= nVerts
+             || i2 >= nVerts )
+             return E_UNEXPECTED;
 
         XMVECTOR p0 = XMLoadFloat3( &positions[ i0 ] );
         XMVECTOR p1 = XMLoadFloat3( &positions[ i1 ] );
@@ -273,6 +279,12 @@ HRESULT ComputeNormals( const uint16_t* indices, size_t nFaces,
     if ( !indices || !positions || !nFaces || !nVerts || !normals )
         return E_INVALIDARG;
 
+    if ( nVerts >= UINT16_MAX )
+        return E_INVALIDARG;
+
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
+        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
+
     bool cw = (flags & CNORM_WIND_CW) ? true : false;
 
     if ( flags & CNORM_WEIGHT_BY_AREA )
@@ -297,6 +309,12 @@ HRESULT ComputeNormals( const uint32_t* indices, size_t nFaces,
 {
     if ( !indices || !positions || !nFaces || !nVerts || !normals )
         return E_INVALIDARG;
+
+    if ( nVerts >= UINT32_MAX )
+        return E_INVALIDARG;
+
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
+        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     bool cw = (flags & CNORM_WIND_CW) ? true : false;
 

@@ -55,7 +55,7 @@ public:
 
         for( auto it = subsets.cbegin(); it != subsets.cend(); ++it )
         {
-            if ( ( uint64_t(it->first) + uint64_t(it->second) ) > 0xFFFFFFFF )
+            if ( ( uint64_t(it->first) + uint64_t(it->second) ) >= UINT32_MAX )
                 return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
             if ( it->second > mMaxSubset )
@@ -125,7 +125,7 @@ public:
         if ( !mListElements )
             return E_POINTER;
 
-        if ( ( uint64_t(faceOffset) + uint64_t(faceCount) ) > 0xFFFFFFFF )
+        if ( ( uint64_t(faceOffset) + uint64_t(faceCount) ) >= UINT32_MAX )
             return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
         uint32_t faceMax = uint32_t( faceOffset + faceCount );
@@ -701,12 +701,10 @@ HRESULT _OptimizeVertices( const index_t* indices, size_t nFaces, size_t nVerts,
     if ( !indices || !nFaces || !nVerts || !vertexRemap )
         return E_INVALIDARG;
 
-#ifdef _M_X64
-    if ( nVerts > 0xFFFFFFFF )
+    if ( nVerts >= index_t(-1) )
         return E_INVALIDARG;
-#endif
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     std::unique_ptr<uint32_t[]> tempRemap( new (std::nothrow) uint32_t[ nVerts ] );
@@ -719,6 +717,12 @@ HRESULT _OptimizeVertices( const index_t* indices, size_t nFaces, size_t nVerts,
     for( size_t j = 0; j < (nFaces * 3); ++j )
     {
         index_t curindex = indices[ j ];
+        if ( curindex == index_t(-1) )
+            continue;
+
+        if ( curindex >= nVerts )
+            return E_UNEXPECTED;
+
         if ( tempRemap[ curindex ] == UNUSED32 )
         {
             tempRemap[ curindex ] = curvertex;
@@ -757,10 +761,8 @@ HRESULT AttributeSort( size_t nFaces, uint32_t* attributes, uint32_t* faceRemap 
     if ( !nFaces || !attributes || !faceRemap )
         return E_INVALIDARG;
 
-#ifdef _M_X64
-    if ( nFaces > 0xFFFFFFFF )
-        return E_INVALIDARG;
-#endif
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
+        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     typedef std::pair<uint32_t,uint32_t> intpair_t;
 
@@ -795,7 +797,7 @@ HRESULT OptimizeFaces( const uint16_t* indices, size_t nFaces, const uint32_t* a
     if ( !indices || !nFaces || !adjacency || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if( vertexCache == OPTFACES_V_STRIPORDER )
@@ -818,7 +820,7 @@ HRESULT OptimizeFaces( const uint32_t* indices, size_t nFaces, const uint32_t* a
     if ( !indices || !nFaces || !adjacency || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if( vertexCache == OPTFACES_V_STRIPORDER )
@@ -843,7 +845,7 @@ HRESULT OptimizeFacesEx( const uint16_t* indices, size_t nFaces, const uint32_t*
     if ( !indices || !nFaces || !adjacency || !attributes || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if( vertexCache == OPTFACES_V_STRIPORDER )
@@ -866,7 +868,7 @@ HRESULT OptimizeFacesEx( const uint32_t* indices, size_t nFaces, const uint32_t*
     if ( !indices || !nFaces || !adjacency || !attributes || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if( vertexCache == OPTFACES_V_STRIPORDER )

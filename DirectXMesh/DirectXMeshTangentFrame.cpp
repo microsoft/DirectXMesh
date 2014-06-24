@@ -33,7 +33,14 @@ HRESULT _ComputeTangentFrame( _In_reads_(nFaces*3) const index_t* indices, size_
                               _Out_writes_opt_(nVerts) XMFLOAT4* tangents4,
                               _Out_writes_opt_(nVerts) XMFLOAT3* bitangents )
 {
-    assert( indices != 0 && positions != 0 && normals != 0 && texcoords != 0 );
+    if ( !indices || !nFaces || !positions || !normals || !texcoords || !nVerts )
+        return E_INVALIDARG;
+
+    if ( nVerts >= index_t(-1) )
+        return E_INVALIDARG;
+   
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
+        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     static const float EPSILON = 0.0001f;
     static const XMVECTORF32 s_flips = { 1.f, -1.f, -1.f, 1.f };
@@ -50,16 +57,18 @@ HRESULT _ComputeTangentFrame( _In_reads_(nFaces*3) const index_t* indices, size_
     for( size_t face = 0; face < nFaces; ++face )
     {
         index_t i0 = indices[ face*3 ];
-        assert( i0 < nVerts );
-        _Analysis_assume_( i0 < nVerts );
-
         index_t i1 = indices[ face*3 + 1 ];
-        assert( i1 < nVerts );
-        _Analysis_assume_( i1 < nVerts );
-
         index_t i2 = indices[ face*3 + 2 ];
-        assert( i2 < nVerts );
-        _Analysis_assume_( i2 < nVerts );
+
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
+             continue;
+
+        if ( i0 >= nVerts
+             || i1 >= nVerts
+             || i2 >= nVerts )
+             return E_UNEXPECTED;
 
         XMVECTOR t0 = XMLoadFloat2( &texcoords[ i0 ] );
         XMVECTOR t1 = XMLoadFloat2( &texcoords[ i1 ] );
@@ -194,9 +203,6 @@ HRESULT ComputeTangentFrame( const uint16_t* indices, size_t nFaces,
                              const XMFLOAT3* positions, const XMFLOAT3* normals, const XMFLOAT2* texcoords,
                              size_t nVerts, XMFLOAT3* tangents, XMFLOAT3* bitangents )
 {
-    if ( !indices || !nFaces || !positions || !normals || !texcoords || !nVerts )
-        return E_INVALIDARG;
-
     if ( !tangents && !bitangents )
         return E_INVALIDARG;
 
@@ -210,9 +216,6 @@ HRESULT ComputeTangentFrame( const uint32_t* indices, size_t nFaces,
                              const XMFLOAT3* positions, const XMFLOAT3* normals, const XMFLOAT2* texcoords,
                              size_t nVerts, XMFLOAT3* tangents, XMFLOAT3* bitangents )
 {
-    if ( !indices || !nFaces || !positions || !normals || !texcoords || !nVerts )
-        return E_INVALIDARG;
-
     if ( !tangents && !bitangents )
         return E_INVALIDARG;
   
@@ -226,7 +229,7 @@ HRESULT ComputeTangentFrame( const uint16_t* indices, size_t nFaces,
                              const XMFLOAT3* positions, const XMFLOAT3* normals, const XMFLOAT2* texcoords,
                              size_t nVerts, XMFLOAT4* tangents )
 {
-    if ( !indices || !nFaces || !positions || !normals || !texcoords || !nVerts || !tangents )
+    if ( !tangents )
         return E_INVALIDARG;
 
     return _ComputeTangentFrame<uint16_t>( indices, nFaces, positions, normals, texcoords, nVerts, nullptr, tangents, nullptr );
@@ -239,7 +242,7 @@ HRESULT ComputeTangentFrame( const uint32_t* indices, size_t nFaces,
                              const XMFLOAT3* positions, const XMFLOAT3* normals, const XMFLOAT2* texcoords,
                              size_t nVerts, XMFLOAT4* tangents )
 {
-    if ( !indices || !nFaces || !positions || !normals || !texcoords || !nVerts || !tangents )
+    if ( !tangents )
         return E_INVALIDARG;
 
     return _ComputeTangentFrame<uint32_t>( indices, nFaces, positions, normals, texcoords, nVerts, nullptr, tangents, nullptr );

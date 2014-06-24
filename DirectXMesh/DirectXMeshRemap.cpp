@@ -58,7 +58,7 @@ HRESULT ReorderFaces( _In_reads_(nFaces*3) const index_t* ibin, _In_ size_t nFac
             }
         }
         else
-            E_FAIL;
+            return E_FAIL;
     }
     
     return S_OK;
@@ -157,6 +157,9 @@ HRESULT SwapVertices( _Inout_updates_bytes_all_(nVerts*stride) void* vb, size_t 
     if ( !vb || !stride || !nVerts || !vertexRemap )
         return E_INVALIDARG;
 
+    if ( stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES )
+        return E_INVALIDARG;
+
     std::unique_ptr<uint8_t[]> temp( new (std::nothrow) uint8_t[ ( sizeof(bool) * nVerts ) + stride ] );
     if ( !temp )
         return E_OUTOFMEMORY;
@@ -179,7 +182,7 @@ HRESULT SwapVertices( _Inout_updates_bytes_all_(nVerts*stride) void* vb, size_t 
             continue;
 
         if ( dest >= nVerts )
-            return E_FAIL;
+            return E_UNEXPECTED;
 
         bool next = false;
 
@@ -242,8 +245,11 @@ HRESULT _FinalizeIB( _In_reads_(nFaces*3) const index_t* ibin, size_t nFaces,
     if ( !ibin || !nFaces || !vertexRemap || !nVerts || !ibout )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
+
+    if ( nVerts >= index_t(-1) )
+        return E_INVALIDARG;
 
     for( size_t j = 0; j < ( nFaces * 3 ); ++j )
     {
@@ -255,7 +261,7 @@ HRESULT _FinalizeIB( _In_reads_(nFaces*3) const index_t* ibin, size_t nFaces,
         }
 
         if ( i >= nVerts )
-            return E_FAIL;
+            return E_UNEXPECTED;
 
         uint32_t dest = vertexRemap[ i ];
         if ( dest == UNUSED32 )
@@ -283,8 +289,11 @@ HRESULT _FinalizeIB( _In_reads_(nFaces*3) index_t* ib, size_t nFaces, _In_reads_
     if ( !ib || !nFaces || !vertexRemap || !nVerts )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
+
+    if ( nVerts >= index_t(-1) )
+        return E_INVALIDARG;
 
     for( size_t j = 0; j < ( nFaces * 3 ); ++j )
     {
@@ -293,7 +302,7 @@ HRESULT _FinalizeIB( _In_reads_(nFaces*3) index_t* ib, size_t nFaces, _In_reads_
             continue;
 
         if ( i >= nVerts )
-            return E_FAIL;
+            return E_UNEXPECTED;
 
         uint32_t dest = vertexRemap[ i ];
         if ( dest == UNUSED32 )
@@ -324,7 +333,7 @@ HRESULT ReorderIB( const uint16_t* ibin, size_t nFaces, const uint32_t* faceRema
     if ( !ibin || !nFaces || !faceRemap || !ibout )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( ibin == ibout )
@@ -339,7 +348,7 @@ HRESULT ReorderIB( uint16_t* ib, size_t nFaces, const uint32_t* faceRemap )
     if ( !ib || !nFaces || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     return SwapFaces<uint16_t>( ib, nFaces, nullptr, faceRemap );
@@ -353,7 +362,7 @@ HRESULT ReorderIB( const uint32_t* ibin, size_t nFaces, const uint32_t* faceRema
     if ( !ibin || !nFaces || !faceRemap || !ibout )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( ibin == ibout )
@@ -368,7 +377,7 @@ HRESULT ReorderIB( uint32_t* ib, size_t nFaces, const uint32_t* faceRemap )
     if ( !ib || !nFaces || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     return SwapFaces<uint32_t>( ib, nFaces, nullptr, faceRemap );
@@ -385,7 +394,7 @@ HRESULT ReorderIBAndAdjacency( const uint16_t* ibin, size_t nFaces, const uint32
     if ( !ibin || !nFaces || !adjin || !faceRemap || !ibout || !adjout )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( ( ibin == ibout ) || ( adjin == adjout ) )
@@ -400,7 +409,7 @@ HRESULT ReorderIBAndAdjacency( uint16_t* ib, size_t nFaces, uint32_t* adj, const
     if ( !ib || !nFaces || !adj || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     return SwapFaces<uint16_t>( ib, nFaces, adj, faceRemap );
@@ -415,7 +424,7 @@ HRESULT ReorderIBAndAdjacency( const uint32_t* ibin, size_t nFaces, const uint32
     if ( !ibin || !nFaces || !adjin || !faceRemap || !ibout || !adjout )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( ( ibin == ibout ) || ( adjin == adjout ) )
@@ -430,7 +439,7 @@ HRESULT ReorderIBAndAdjacency( uint32_t* ib, size_t nFaces, uint32_t* adj, const
     if ( !ib || !nFaces || !adj || !faceRemap )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     return SwapFaces<uint32_t>( ib, nFaces, adj, faceRemap );
@@ -490,7 +499,13 @@ HRESULT FinalizeVB( const void* vbin, size_t stride, size_t nVerts,
     if ( !dupVerts && nDupVerts > 0 )
         return E_INVALIDARG;
 
-    if ( (uint64_t(nVerts) + uint64_t(nDupVerts) ) > 0xFFFFFFFF )
+    if ( nVerts >= UINT32_MAX )
+        return E_INVALIDARG;
+
+    if ( stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES )
+        return E_INVALIDARG;
+
+    if ( (uint64_t(nVerts) + uint64_t(nDupVerts) ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( vbin == vbout )
@@ -552,6 +567,9 @@ HRESULT FinalizeVB( const void* vbin, size_t stride, size_t nVerts,
 _Use_decl_annotations_
 HRESULT FinalizeVB( void* vb, size_t stride, size_t nVerts, const uint32_t* vertexRemap )
 {
+    if ( nVerts >= UINT32_MAX )
+        return E_INVALIDARG;
+
     return SwapVertices( vb, stride, nVerts, nullptr, vertexRemap );
 }
 
@@ -580,7 +598,13 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
     if ( !dupVerts && nDupVerts > 0 )
         return E_INVALIDARG;
 
-    if ( (uint64_t(nVerts) + uint64_t(nDupVerts) ) > 0xFFFFFFFF )
+    if ( nVerts >= UINT32_MAX )
+        return E_INVALIDARG;
+
+    if ( stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES )
+        return E_INVALIDARG;
+
+    if ( (uint64_t(nVerts) + uint64_t(nDupVerts) ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( vbin == vbout )
@@ -685,6 +709,9 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
 _Use_decl_annotations_
 HRESULT FinalizeVBAndPointReps( void* vb, size_t stride, size_t nVerts, uint32_t* pointRep, const uint32_t* vertexRemap )
 {
+    if ( nVerts >= UINT32_MAX )
+        return E_INVALIDARG;
+
     if ( !pointRep || !vertexRemap )
         return E_INVALIDARG;
 

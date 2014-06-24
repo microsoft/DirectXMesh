@@ -292,7 +292,10 @@ HRESULT Validate( const uint16_t* indices, size_t nFaces, size_t nVerts,
     if ( !indices || !nFaces || !nVerts )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( nVerts >= UINT16_MAX )
+        return E_INVALIDARG;
+
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( msgs )
@@ -321,7 +324,10 @@ HRESULT Validate( const uint32_t* indices, size_t nFaces, size_t nVerts,
     if ( !indices || !nFaces || !nVerts )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( nVerts >= UINT32_MAX )
+        return E_INVALIDARG;
+
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( msgs )

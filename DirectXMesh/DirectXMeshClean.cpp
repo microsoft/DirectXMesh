@@ -30,7 +30,7 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
     if ( !adjacency && !attributes )
         return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     dupVerts.clear();
@@ -55,6 +55,15 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
             index_t i0 = indices[ face*3 ];
             index_t i1 = indices[ face*3 + 1 ];
             index_t i2 = indices[ face*3 + 2 ];
+
+            if ( i0 == index_t(-1)
+                 || i1 == index_t(-1)
+                 || i2 == index_t(-1) )
+                continue;
+
+            assert( i0 < nVerts );
+            assert( i1 < nVerts );
+            assert( i2 < nVerts );
 
             if ( i0 == i1
                  || i0 == i2
@@ -114,6 +123,15 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
             index_t i1 = indices[ face*3 + 1 ];
             index_t i2 = indices[ face*3 + 2 ];
 
+            if ( i0 == index_t(-1)
+                 || i1 == index_t(-1)
+                 || i2 == index_t(-1) )
+                continue;
+
+            assert( i0 < nVerts );
+            assert( i1 < nVerts );
+            assert( i2 < nVerts );
+
             if ( i0 == i1
                  || i0 == i2
                  || i1 == i2 )
@@ -133,8 +151,10 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
                 faceSeen[ face * 3 + point ] = true;
 
                 index_t i = indices[ face*3 + point ];
-                if ( i >= nVerts )
+                if ( i == index_t(-1) )
                     continue;
+
+                assert( i < nVerts );
 
                 ovi.initialize( face, i, orbit_iterator<index_t>::ALL );
                 ovi.moveToCCW();
@@ -155,8 +175,10 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
                     faceSeen[ curFace*3 + curPoint ] = true;
 
                     index_t j = indices[ curFace * 3 + curPoint ];
-                    if ( j >= nVerts )
+                    if ( j == index_t(-1) )
                         continue;
+
+                    assert ( j < nVerts );
 
                     if ( j == replaceVertex )
                     {
@@ -264,7 +286,7 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
 #endif
     }
 
-    if ( (uint64_t(nVerts) + uint64_t(dupVerts.size()) ) > 0xFFFFFFFF )
+    if ( (uint64_t(nVerts) + uint64_t(dupVerts.size()) ) >= index_t(-1) )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     if ( !dupVerts.empty() )

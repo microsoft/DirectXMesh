@@ -40,6 +40,12 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     const uint32_t UNUSED32 = uint32_t(-1);
 
+    static_assert( D3D11_16BIT_INDEX_STRIP_CUT_VALUE == uint16_t(-1), "Mismatch with Direct3D11" );
+    static_assert( D3D11_16BIT_INDEX_STRIP_CUT_VALUE == UINT16_MAX, "Mismatch with Direct3D11" );
+
+    static_assert( D3D11_32BIT_INDEX_STRIP_CUT_VALUE == uint32_t(-1), "Mismatch with Direct3D11" );
+    static_assert( D3D11_32BIT_INDEX_STRIP_CUT_VALUE == UINT32_MAX, "Mismatch with Direct3D11" );
+
     //---------------------------------------------------------------------------------
     // Utility for walking adjacency
     //---------------------------------------------------------------------------------

@@ -32,13 +32,16 @@ HRESULT _GenerateGSAdjacency( _In_reads_(nFaces*3) const index_t* indices, _In_ 
     if ( !indices || !nFaces || !pointRep || !adjacency || !nVerts || !indicesAdj )
         return E_INVALIDARG;
 
+    if ( nVerts >= index_t(-1) )
+        return E_INVALIDARG;
+
     if ( indices == indicesAdj )
     {
         // Does not support in-place conversion of the index buffer
         return HRESULT_FROM_WIN32( ERROR_NOT_SUPPORTED);
     }
 
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     size_t inputi = 0;
@@ -74,12 +77,11 @@ HRESULT _GenerateGSAdjacency( _In_reads_(nFaces*3) const index_t* indices, _In_ 
                 }
                 else
                 {
-                    assert( v1 < nVerts );
-                    _Analysis_assume_( v1 < nVerts );
+                    if ( v1 >= nVerts
+                         || v2 >= nVerts )
+                        return E_UNEXPECTED;
+
                     v1 = pointRep[ v1 ];
-                    
-                    assert( v2 < nVerts );
-                    _Analysis_assume_( v2 < nVerts );
                     v2 = pointRep[ v2 ];
 
                     uint32_t vOther = UNUSED32;
@@ -93,7 +95,9 @@ HRESULT _GenerateGSAdjacency( _In_reads_(nFaces*3) const index_t* indices, _In_ 
                         if ( ak == index_t(-1) )
                             break;
 
-                        assert( ak < nVerts );
+                        if ( ak >= nVerts )
+                            return E_UNEXPECTED;
+
                         if ( pointRep[ ak ] == v1 )
                             continue;
 
