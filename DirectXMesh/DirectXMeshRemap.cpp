@@ -193,7 +193,6 @@ HRESULT SwapVertices( _Inout_updates_bytes_all_(nVerts*stride) void* vb, size_t 
             if ( pointRep )
             {
                 std::swap( pointRep[ dest ], pointRep[ j ] );
-
                 // Remap
                 uint32_t pr = pointRep[ dest ];
                 if ( pr < nVerts )
@@ -228,6 +227,84 @@ HRESULT SwapVertices( _Inout_updates_bytes_all_(nVerts*stride) void* vb, size_t 
                 pointRep[ j ] = vertexRemap[ pr ];
             }
         }
+    }
+
+    return S_OK;
+}
+
+
+//-------------------------------------------------------------------------------------
+template<class index_t>
+HRESULT _FinalizeIB( _In_reads_(nFaces*3) const index_t* ibin, size_t nFaces,
+                     _In_reads_(nVerts) const uint32_t* vertexRemap, size_t nVerts,
+                     _Out_writes_(nFaces*3) index_t* ibout )
+{
+    if ( !ibin || !nFaces || !vertexRemap || !nVerts || !ibout )
+        return E_INVALIDARG;
+
+    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
+
+    for( size_t j = 0; j < ( nFaces * 3 ); ++j )
+    {
+        index_t i = ibin[ j ];
+        if ( i == index_t(-1) )
+        {
+            ibout[ j ] = index_t(-1);
+            continue;
+        }
+
+        if ( i >= nVerts )
+            return E_FAIL;
+
+        uint32_t dest = vertexRemap[ i ];
+        if ( dest == UNUSED32 )
+        {
+            ibout[ j ] = i;
+            continue;
+        }
+
+        if ( dest < nVerts )
+        {
+            ibout[ j ] = index_t( dest );
+        }
+        else
+            return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+
+//-------------------------------------------------------------------------------------
+template<class index_t>
+HRESULT _FinalizeIB( _In_reads_(nFaces*3) index_t* ib, size_t nFaces, _In_reads_(nVerts) const uint32_t* vertexRemap, size_t nVerts )
+{
+    if ( !ib || !nFaces || !vertexRemap || !nVerts )
+        return E_INVALIDARG;
+
+    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
+        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
+
+    for( size_t j = 0; j < ( nFaces * 3 ); ++j )
+    {
+        index_t i = ib[ j ];
+        if( i == index_t(-1) )
+            continue;
+
+        if ( i >= nVerts )
+            return E_FAIL;
+
+        uint32_t dest = vertexRemap[ i ];
+        if ( dest == UNUSED32 )
+            continue;
+
+        if ( dest < nVerts )
+        {
+            ib[ j ] = index_t( dest );
+        }
+        else
+            return E_FAIL;
     }
 
     return S_OK;
@@ -366,45 +443,13 @@ HRESULT ReorderIBAndAdjacency( uint32_t* ib, size_t nFaces, uint32_t* adj, const
 _Use_decl_annotations_
 HRESULT FinalizeIB( const uint16_t* ibin, size_t nFaces, const uint32_t* vertexRemap, size_t nVerts, uint16_t* ibout )
 {
-    if ( !ibin || !nFaces || !vertexRemap || !nVerts || !ibout )
-        return E_INVALIDARG;
-
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
-        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
-
-    for( size_t j = 0; j < ( nFaces * 3 ); ++j )
-    {
-        assert( ibin[ j ] < nVerts );
-        _Analysis_assume_( ibin[ j ] < nVerts );
-
-        assert( vertexRemap[ ibin[ j ] ] < 65535 );
-
-        ibout[ j ] = uint16_t( vertexRemap[ ibin[ j ] ] );
-    }
-
-    return S_OK;
+    return _FinalizeIB<uint16_t>( ibin, nFaces, vertexRemap, nVerts, ibout );
 }
 
 _Use_decl_annotations_
 HRESULT FinalizeIB( uint16_t* ib, size_t nFaces, const uint32_t* vertexRemap, size_t nVerts )
 {
-    if ( !ib || !nFaces || !vertexRemap || !nVerts )
-        return E_INVALIDARG;
-
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
-        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
-
-    for( size_t j = 0; j < ( nFaces * 3 ); ++j )
-    {
-        assert( ib[ j ] < nVerts );
-        _Analysis_assume_( ib[ j ] < nVerts );
-
-        assert( vertexRemap[ ib[ j ] ] < 65535 );
-
-        ib[ j ] = uint16_t( vertexRemap[ ib[ j ] ] );
-    }
-
-    return S_OK;
+    return _FinalizeIB<uint16_t>( ib, nFaces, vertexRemap, nVerts );
 }
 
 
@@ -412,40 +457,13 @@ HRESULT FinalizeIB( uint16_t* ib, size_t nFaces, const uint32_t* vertexRemap, si
 _Use_decl_annotations_
 HRESULT FinalizeIB( const uint32_t* ibin, size_t nFaces, const uint32_t* vertexRemap, size_t nVerts, uint32_t* ibout )
 {
-    if ( !ibin || !nFaces || !vertexRemap || !nVerts || !ibout )
-        return E_INVALIDARG;
-
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
-        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
-
-    for( size_t j = 0; j < ( nFaces * 3 ); ++j )
-    {
-        assert( ibin[ j ] < nVerts );
-        _Analysis_assume_( ibin[ j ] < nVerts );
-        ibout[ j ] = vertexRemap[ ibin[ j ] ];
-    }
-
-    return S_OK;
+    return _FinalizeIB<uint32_t>( ibin, nFaces, vertexRemap, nVerts, ibout );
 }
 
 _Use_decl_annotations_
 HRESULT FinalizeIB( uint32_t* ib, size_t nFaces, const uint32_t* vertexRemap, size_t nVerts )
 {
-    if ( !ib || !nFaces || !vertexRemap || !nVerts )
-        return E_INVALIDARG;
-
-    if ( ( uint64_t(nFaces) * 3 ) > 0xFFFFFFFF )
-        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
-
-    for( size_t j = 0; j < ( nFaces * 3 ); ++j )
-    {
-        assert( ib[ j ] < nVerts );
-        _Analysis_assume_( ib[ j ] < nVerts );
-
-        ib[ j ] = vertexRemap[ ib[ j ] ];
-    }
-
-    return S_OK;
+    return _FinalizeIB<uint32_t>( ib, nFaces, vertexRemap, nVerts );
 }
 
 
@@ -577,10 +595,11 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
     memset( vbout, 0, newVerts * stride );
 #endif
 
-    memcpy( prout, prin, sizeof(uint32_t) * nVerts );
+    std::unique_ptr<uint32_t> pointRep( new uint32_t[ nVerts + nDupVerts ] );
+    memcpy( pointRep.get(), prin, sizeof(uint32_t) * nVerts );
     for( size_t i = 0; i < nDupVerts; ++i )
     {
-        prout[ i + nVerts ] = prin[ dupVerts[ i ] ];
+        pointRep.get()[ i + nVerts ] = prin[ dupVerts[ i ] ];
     }
     
     if ( vertexRemap )
@@ -590,15 +609,15 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
         {
             if ( vertexRemap[ i ] != UNUSED32 )
             {
-                uint32_t old = prout[ i ];
+                uint32_t old = pointRep.get()[ i ];
                 if ( ( old != UNUSED32 ) && ( vertexRemap[old] == UNUSED32 ) )
                 {
-                    prout[ i ] = i;
+                    pointRep.get()[ i ] = i;
 
                     for( size_t k = (i+1); k < newVerts; ++k )
                     {
-                        if ( prout[ k ] == old )
-                            prout[ k ] = i;
+                        if ( pointRep.get()[ k ] == old )
+                            pointRep.get()[ k ] = i;
                     }
                 }
             }
@@ -619,9 +638,10 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
         {
             memcpy( dptr + dest * stride, sptr, stride ); 
 
-            if ( prout[ j ] < newVerts )
+            uint32_t pr = pointRep.get()[ j ];
+            if ( pr < newVerts )
             {
-                prout[ j ] = vertexRemap[ prout[ j ] ];
+                prout[ dest ] = ( vertexRemap ) ? vertexRemap[ pr ] : pr;
             }
         }
         else
@@ -645,18 +665,15 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
             {
                 sptr = reinterpret_cast<const uint8_t*>( vbin ) + dup * stride; 
                 memcpy( dptr + dest * stride, sptr, stride ); 
+
+                uint32_t pr = pointRep.get()[ nVerts + k ];
+                if (pr < (nVerts + nDupVerts) )
+                {
+                    prout[ dest ] = ( vertexRemap ) ? vertexRemap[ pr ] : pr;
+                }
             }
             else
                 return E_FAIL;
-        }
-
-        for (; j < (nVerts + nDupVerts); ++j)
-        {
-            uint32_t pr = prout[j];
-            if (pr < (nVerts + nDupVerts) )
-            {
-                prout[ j ] = vertexRemap[ pr ];
-            }
         }
     }
 
@@ -668,8 +685,27 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
 _Use_decl_annotations_
 HRESULT FinalizeVBAndPointReps( void* vb, size_t stride, size_t nVerts, uint32_t* pointRep, const uint32_t* vertexRemap )
 {
-    if ( !pointRep )
+    if ( !pointRep || !vertexRemap )
         return E_INVALIDARG;
+
+    // clean up point reps for any removed vertices
+    for( uint32_t i = 0; i < nVerts; ++i )
+    {
+        if ( vertexRemap[ i ] != UNUSED32 )
+        {
+            uint32_t old = pointRep[ i ];
+            if ( ( old != UNUSED32 ) && ( vertexRemap[old] == UNUSED32 ) )
+            {
+                pointRep[ i ] = i;
+
+                for( size_t k = (i+1); k < nVerts; ++k )
+                {
+                    if ( pointRep[ k ] == old )
+                        pointRep[ k ] = i;
+                }
+            }
+        }
+    }
 
     return SwapVertices( vb, stride, nVerts, pointRep, vertexRemap );
 }
