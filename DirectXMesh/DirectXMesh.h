@@ -244,6 +244,12 @@ namespace DirectX
 
         VALIDATE_DEGENERATE             = 0x4,
             // Check for degenerate triangles
+
+        VALIDATE_UNUSED                 = 0x8,
+            // Check for issues with 'unused' triangles
+
+        VALIDATE_ASYMMETRIC_ADJ         = 0x10,
+            // Checks that neighbors are symmetric (requires adjacency)
     };
 
     HRESULT Validate( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces,

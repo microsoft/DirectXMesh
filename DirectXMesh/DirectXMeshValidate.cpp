@@ -28,15 +28,29 @@ HRESULT ValidateIndices( _In_reads_(nFaces*3) const index_t* indices, _In_ size_
                          _In_ size_t nVerts, _In_reads_opt_(nFaces*3) const uint32_t* adjacency,
                          _In_ DWORD flags, _In_opt_ std::wstring* msgs )
 {
-    if ( ( flags & VALIDATE_BACKFACING ) && !adjacency )
-    {
-        if ( msgs )
-            *msgs += L"Missing adjacency information required to check for BACKFACING\n";
-
-        return E_INVALIDARG;
-    }
-
     bool result = true;
+
+    if ( !adjacency )
+    {
+        if ( flags & VALIDATE_BACKFACING )
+        {
+            if ( msgs )
+                *msgs += L"Missing adjacency information required to check for BACKFACING\n";
+
+            result = false;
+        }
+
+        if ( flags & VALIDATE_ASYMMETRIC_ADJ )
+        {
+            if ( msgs )
+                *msgs += L"Missing adjacency information required to check for ASYMMETRIC_ADJ\n";
+
+            result = false;
+        }
+
+        if ( !result )
+            return E_INVALIDARG;
+    }
 
     for( size_t face = 0; face < nFaces; ++face )
     {
@@ -73,11 +87,55 @@ HRESULT ValidateIndices( _In_reads_(nFaces*3) const index_t* indices, _In_ size_
             }
         }
 
-        // Check for degenerate triangles
+        // Check for unused faces
         index_t i0 = indices[ face*3 ];
         index_t i1 = indices[ face*3 + 1 ];
         index_t i2 = indices[ face*3 + 2 ];
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
+        {
+            if ( flags & VALIDATE_UNUSED )
+            {
+                if ( i0 != i1
+                     || i0 != i2
+                     || i1 != i2 )
+                {
+                    if ( !msgs )
+                        return E_FAIL;
 
+                    result = false;
+
+                    wchar_t buff[ 128 ];
+                    swprintf_s( buff, L"An unused face (%Iu) contains 'valid' but ignored vertices (%u,%u,%u)\n", face, i0, i1, i2 );
+                    *msgs += buff;
+                }
+
+                if ( adjacency )
+                {
+                    for( size_t point = 0; point < 3; ++point )
+                    {
+                        uint32_t k = adjacency[ face*3 + point ];
+                        if ( k != UNUSED32 )
+                        {
+                            if ( !msgs )
+                                return E_FAIL;
+
+                            result = false;
+
+                            wchar_t buff[ 128 ];
+                            swprintf_s( buff, L"An unused face (%Iu) has a neighbor %u\n", face, k );
+                            *msgs += buff;
+                        }
+                    }
+                }
+            }
+
+            // ignore unused triangles for remaining tests
+            continue;
+        }
+
+        // Check for degenerate triangles
         if ( i0 == i1
              || i0 == i2
              || i1 == i2 )
@@ -100,19 +158,41 @@ HRESULT ValidateIndices( _In_reads_(nFaces*3) const index_t* indices, _In_ size_
                 wchar_t buff[ 128 ];
                 swprintf_s( buff, L"A point (%u) was found more than once in triangle %Iu\n", bad, face );
                 *msgs += buff;
+
+                if ( adjacency )
+                {
+                    for( size_t point = 0; point < 3; ++point )
+                    {
+                        uint32_t k = adjacency[ face*3 + point ];
+                        if ( k != UNUSED32 )
+                        {
+                            if ( !msgs )
+                                return E_FAIL;
+
+                            result = false;
+
+                            wchar_t buff[ 128 ];
+                            swprintf_s( buff, L"A degenerate face (%Iu) has a neighbor %u\n", face, k );
+                            *msgs += buff;
+                        }
+                    }
+                }
             }
 
+            // ignore degenerate triangles for remaining tests
             continue;
         }
 
-        // Check for symmetric neighbhors
-        if ( adjacency )
+        // Check for symmetric neighbors
+        if ( ( flags & VALIDATE_ASYMMETRIC_ADJ ) && adjacency )
         {
             for( size_t point = 0; point < 3; ++point )
             {
                 uint32_t k = adjacency[ face*3 + point ];
                 if ( k == UNUSED32 )
                     continue;
+
+                assert( k < nFaces );
 
                 uint32_t edge = find_edge<uint32_t>( &adjacency[ k * 3 ], uint32_t( face ) );
                 if ( edge >= 3 )

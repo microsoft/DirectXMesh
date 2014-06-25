@@ -44,8 +44,108 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
     auto faceSeen = reinterpret_cast<bool*>( temp.get() );
     auto ids = reinterpret_cast<uint32_t*>( temp.get() + sizeof(bool) * nFaces * 3 );
 
-    auto indicesNew = reinterpret_cast<index_t*>( reinterpret_cast<uint8_t*>( ids ) + sizeof(uint32_t) * nVerts );
-    memcpy( indicesNew, indices, sizeof(index_t) * nFaces * 3 );
+    // UNUSED/DEGENERATE cleanup
+    for( uint32_t face = 0; face < nFaces; ++face )
+    {
+        index_t i0 = indices[ face*3 ];
+        index_t i1 = indices[ face*3 + 1 ];
+        index_t i2 = indices[ face*3 + 2 ];
+
+        if ( i0 == index_t(-1)
+             || i1 == index_t(-1)
+             || i2 == index_t(-1) )
+        {
+            // ensure all index entries in the unused face are 'unused'
+            indices[ face*3 ] =
+            indices[ face*3 + 1 ] =
+            indices[ face*3 + 2 ] = index_t(-1);
+
+            // ensure no neighbor references the unused face
+            if ( adjacency )
+            {
+                for( uint32_t point = 0; point < 3; ++point )
+                {
+                    uint32_t k = adjacency[ face*3 + point ];
+                    if ( k != UNUSED32 )
+                    {
+                        assert( k < nFaces );
+
+                        if ( adjacency[ k*3 ] == face )
+                            adjacency[ k*3 ] = UNUSED32;
+
+                        if ( adjacency[ k*3 + 1 ] == face )
+                            adjacency[ k*3 + 1 ] = UNUSED32;
+
+                        if ( adjacency[ k*3 + 2 ] == face )
+                            adjacency[ k*3 + 2 ] = UNUSED32;
+
+                        adjacency[ face*3 + point ] = UNUSED32;
+                    }
+                }
+            }
+        }
+        else if ( i0 == i1
+                  || i0 == i2
+                  || i1 == i2 )
+        {
+            // Clean doesn't trim out degenerates as most other functions ignore them
+
+            // ensure no neighbor references the degenerate face
+            if ( adjacency )
+            {
+                for( uint32_t point = 0; point < 3; ++point )
+                {
+                    uint32_t k = adjacency[ face*3 + point ];
+                    if ( k != UNUSED32 )
+                    {
+                        assert( k < nFaces );
+
+                        if ( adjacency[ k*3 ] == face )
+                            adjacency[ k*3 ] = UNUSED32;
+
+                        if ( adjacency[ k*3 + 1 ] == face )
+                            adjacency[ k*3 + 1 ] = UNUSED32;
+
+                        if ( adjacency[ k*3 + 2 ] == face )
+                            adjacency[ k*3 + 2 ] = UNUSED32;
+
+                        adjacency[ face*3 + point ] = UNUSED32;
+                    }
+                }
+            }
+        }
+    }
+
+    // ASYMMETRIC ADJ cleanup
+    if ( adjacency )
+    {
+        for(;;)
+        {
+            bool unlinked = false;
+
+            for( uint32_t face = 0; face < nFaces; ++face )
+            {
+                for( size_t point = 0; point < 3; ++point )
+                {
+                    uint32_t k = adjacency[ face*3 + point ];
+                    if ( k != UNUSED32 )
+                    {
+                        assert( k < nFaces );
+
+                        uint32_t edge = find_edge<uint32_t>( &adjacency[ k * 3 ], face );
+                        if ( edge >= 3 )
+                        {
+                            unlinked = true;
+                            adjacency[ face*3 + point ] = UNUSED32;
+                        }
+                    }
+                }
+            }
+
+            if ( !unlinked )
+                break;
+        }
+    }
 
     // BACKFACING cleanup
     if ( adjacency )
@@ -59,7 +159,10 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
             if ( i0 == index_t(-1)
                  || i1 == index_t(-1)
                  || i2 == index_t(-1) )
+            {
+                // ignore unused faces
                 continue;
+            }
 
             assert( i0 < nVerts );
             assert( i1 < nVerts );
@@ -109,6 +212,9 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
         }
     }
 
+    auto indicesNew = reinterpret_cast<index_t*>( reinterpret_cast<uint8_t*>( ids ) + sizeof(uint32_t) * nVerts );
+    memcpy( indicesNew, indices, sizeof(index_t) * nFaces * 3 );
+
     // BOWTIES cleanup
     if ( adjacency && breakBowties )
     {
@@ -126,7 +232,13 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
             if ( i0 == index_t(-1)
                  || i1 == index_t(-1)
                  || i2 == index_t(-1) )
+            {
+                // ignore unused faces
+                faceSeen[ face * 3 ] = true;
+                faceSeen[ face * 3 + 1 ] = true;
+                faceSeen[ face * 3 + 2 ] = true;
                 continue;
+            }
 
             assert( i0 < nVerts );
             assert( i1 < nVerts );
@@ -143,7 +255,7 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
                 continue;
             }
 
-            for( size_t point = 0; point < 3; ++point )
+            for( uint32_t point = 0; point < 3; ++point )
             {
                 if ( faceSeen[ face * 3 + point ] )
                     continue;
