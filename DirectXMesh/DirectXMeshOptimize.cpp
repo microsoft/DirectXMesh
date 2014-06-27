@@ -68,38 +68,84 @@ public:
 
             for( uint32_t face = faceOffset; face < faceMax; ++face )
             {
-                for( uint32_t n = 0; n < 3; ++n )
+                if ( face >= nFaces )
+                    return E_UNEXPECTED;
+
+                index_t i0 = indices[ face*3 ];
+                index_t i1 = indices[ face*3 + 1 ];
+                index_t i2 = indices[ face*3 + 2 ];
+
+                if ( i0 == index_t(-1)
+                     || i1 == index_t(-1)
+                     || i2 == index_t(-1)
+                     || i0 == i1
+                     || i0 == i2
+                     || i1 == i2 )
                 {
-                    uint32_t neighbor = adjacency[ face * 3 + n ];
-
-                    if ( neighbor != UNUSED32 )
+                    // unused and degenerate faces should not have neighbors
+                    for( uint32_t point = 0; point < 3; ++point )
                     {
-                        if ( ( neighbor < faceOffset ) || ( neighbor >= faceMax )
-                             || ( neighbor == adjacency[ face * 3 + ( ( n + 1 ) % 3 ) ] )
-                             || ( neighbor == adjacency[ face * 3 + ( ( n + 2 ) % 3 ) ] ) )
+                        uint32_t k = adjacency[ face * 3 + point ];
+
+                        if ( k != UNUSED32 )
                         {
-                            neighbor = UNUSED32;
+                            if ( k >= nFaces )
+                                return E_UNEXPECTED;
+ 
+                            if ( adjacency[ k*3 ] == face )
+                                mPhysicalNeighbors.get()[ k ].neighbors[ 0 ] = UNUSED32;
+
+                            if ( adjacency[ k*3 + 1 ] == face )
+                                mPhysicalNeighbors.get()[ k ].neighbors[ 1 ] = UNUSED32;
+
+                            if ( adjacency[ k*3 + 2 ] == face )
+                                mPhysicalNeighbors.get()[ k ].neighbors[ 2 ] = UNUSED32;
                         }
-                        else
+
+                        mPhysicalNeighbors.get()[ face ].neighbors[ point ] = UNUSED32;
+                    }
+                }
+                else
+                {
+                    for( uint32_t n = 0; n < 3; ++n )
+                    {
+                        uint32_t neighbor = adjacency[ face * 3 + n ];
+
+                        if ( neighbor != UNUSED32 )
                         {
-                            uint32_t edgeBack = find_edge<uint32_t>( &adjacency[ neighbor * 3 ], face );
-                            assert( edgeBack < 3 );
-
-                            index_t p1 = indices[ face * 3 + n ];
-                            index_t p2 = indices[ face * 3 + ( ( n + 1 ) % 3 ) ];
-
-                            index_t pn1 = indices[ neighbor * 3 + edgeBack ];
-                            index_t pn2 = indices[ neighbor * 3 + ( ( edgeBack + 1 ) % 3 ) ];
-
-                            // if wedge not identical on shared edge, drop link
-                            if ( ( p1 != pn2 ) || ( p2 != pn1 ) )
+                            if ( ( neighbor < faceOffset ) || ( neighbor >= faceMax )
+                                 || ( neighbor == adjacency[ face * 3 + ( ( n + 1 ) % 3 ) ] )
+                                 || ( neighbor == adjacency[ face * 3 + ( ( n + 2 ) % 3 ) ] ) )
                             {
+                                // Break links for any neighbors outside of our attribute set, and remove duplicate neighbors
                                 neighbor = UNUSED32;
                             }
-                        }
-                    }
+                            else
+                            {
+                                uint32_t edgeBack = find_edge<uint32_t>( &adjacency[ neighbor * 3 ], face );
+                                if ( edgeBack < 3 )
+                                {
+                                    index_t p1 = indices[ face * 3 + n ];
+                                    index_t p2 = indices[ face * 3 + ( ( n + 1 ) % 3 ) ];
 
-                    mPhysicalNeighbors.get()[ face ].neighbors[ n ] = neighbor;
+                                    index_t pn1 = indices[ neighbor * 3 + edgeBack ];
+                                    index_t pn2 = indices[ neighbor * 3 + ( ( edgeBack + 1 ) % 3 ) ];
+
+                                    // if wedge not identical on shared edge, drop link
+                                    if ( ( p1 != pn2 ) || ( p2 != pn1 ) )
+                                    {
+                                        neighbor = UNUSED32;
+                                    }
+                                }
+                                else
+                                {
+                                    neighbor = UNUSED32;
+                                }
+                            }
+                        }
+
+                        mPhysicalNeighbors.get()[ face ].neighbors[ n ] = neighbor;
+                    }
                 }
             }
         }
@@ -114,9 +160,9 @@ public:
         return S_OK;
     }
 
-    HRESULT setSubset( size_t faceOffset, size_t faceCount )
+    HRESULT setSubset( _In_reads_(nFaces*3) const index_t* indices, size_t nFaces, size_t faceOffset, size_t faceCount )
     {
-        if ( !faceCount )
+        if ( !faceCount || !indices || !nFaces )
             return E_INVALIDARG;
 
         if ( faceCount > mMaxSubset )
@@ -130,6 +176,9 @@ public:
 
         uint32_t faceMax = uint32_t( faceOffset + faceCount );
 
+        if ( faceMax > nFaces )
+            return E_UNEXPECTED;
+
         mFaceOffset = faceOffset;
         mFaceCount = faceCount;
 
@@ -140,6 +189,18 @@ public:
 
         for( uint32_t face = uint32_t( faceOffset ); face < faceMax; ++face )
         {
+            index_t i0 = indices[ face*3 ];
+            index_t i1 = indices[ face*3 + 1 ];
+            index_t i2 = indices[ face*3 + 2 ];
+
+            if ( i0 == index_t(-1)
+                 || i1 == index_t(-1)
+                 || i2 == index_t(-1) )
+            {
+                // filter out unused triangles
+                continue;
+            }
+
             uint32_t unprocessed = 0;
 
             for( uint32_t n = 0; n < 3; ++n )
@@ -378,9 +439,9 @@ inline facecorner_t counterclockwise_corner( facecorner_t corner, mesh_status<in
 {
     assert( corner.second != UNUSED32 );
     uint32_t edge = ( corner.second + 2 ) % 3;
-    uint32_t neighbhor = status.get_neighbors( corner.first, edge );
-    uint32_t point = ( neighbhor == UNUSED32 ) ? UNUSED32 : find_edge( status.get_neighborsPtr( neighbhor ), corner.first );
-    return facecorner_t( neighbhor, point );
+    uint32_t neighbor = status.get_neighbors( corner.first, edge );
+    uint32_t point = ( neighbor == UNUSED32 ) ? UNUSED32 : find_edge( status.get_neighborsPtr( neighbor ), corner.first );
+    return facecorner_t( neighbor, point );
 }
 
 
@@ -465,7 +526,7 @@ HRESULT _StripReorder( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t 
 
     for( auto it = subsets.cbegin(); it != subsets.cend(); ++it )
     {
-        hr = status.setSubset( it->first, it->second );
+        hr = status.setSubset( indices, nFaces, it->first, it->second );
         if ( FAILED(hr) )
             return hr;
 
@@ -483,6 +544,7 @@ HRESULT _StripReorder( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t 
 
             for(;;)
             {
+                assert( face != UNUSED32 );
                 faceRemapInverse.get()[ face ] = uint32_t( curface + it->first );
                 curface += 1;
 
@@ -497,8 +559,6 @@ HRESULT _StripReorder( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t 
                 next = status.find_next( face );
             }
         }
-
-        assert( curface == it->second );
     }
 
     // inverse remap
@@ -550,7 +610,7 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
 
     for( auto it = subsets.cbegin(); it != subsets.cend(); ++it )
     {
-        hr = status.setSubset( it->first, it->second );
+        hr = status.setSubset( indices, nFaces, it->first, it->second );
         if ( FAILED(hr) )
             return hr;
 
@@ -591,6 +651,7 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
             bool striprestart = false;
             for(;;)
             {
+                assert( curCorner.first != UNUSED32 );
                 assert( !status.isprocessed( curCorner.first ) );
 
                 // Decision: either add a ring of faces or restart strip
@@ -620,17 +681,21 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
 
                 for(;;)
                 {
+                    assert( curCorner.first != UNUSED32 );
                     status.mark( curCorner.first );
 
                     faceRemapInverse.get()[ curCorner.first ] = uint32_t( curface + it->first );
                     curface += 1;
 
+                    assert( indices[ curCorner.first * 3 ] != index_t(-1) );
                     if ( !vcache.access( indices[ curCorner.first * 3 ] ) )
                         locnext += 1;
 
+                    assert( indices[ curCorner.first * 3 + 1 ] != index_t(-1) );
                     if ( !vcache.access( indices[ curCorner.first * 3 + 1 ] ) )
                         locnext += 1;
 
+                    assert( indices[ curCorner.first * 3 + 2 ] != index_t(-1) );
                     if ( !vcache.access( indices[ curCorner.first * 3 + 2 ] ) )
                         locnext += 1;
 
@@ -674,8 +739,6 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
                     break;
             }
         }
-
-        assert( curface == it->second );
     }
 
     // inverse remap

@@ -69,6 +69,7 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
                     if ( k != UNUSED32 )
                     {
                         assert( k < nFaces );
+                        _Analysis_assume_( k < nFaces );
 
                         if ( adjacency[ k*3 ] == face )
                             adjacency[ k*3 ] = UNUSED32;
@@ -99,6 +100,7 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
                     if ( k != UNUSED32 )
                     {
                         assert( k < nFaces );
+                        _Analysis_assume_( k < nFaces );
 
                         if ( adjacency[ k*3 ] == face )
                             adjacency[ k*3 ] = UNUSED32;
@@ -131,6 +133,7 @@ HRESULT _Clean( _Inout_updates_all_(nFaces*3) index_t* indices,
                     if ( k != UNUSED32 )
                     {
                         assert( k < nFaces );
+                        _Analysis_assume_( k < nFaces );
 
                         uint32_t edge = find_edge<uint32_t>( &adjacency[ k * 3 ], face );
                         if ( edge >= 3 )

@@ -166,12 +166,8 @@ HRESULT ValidateIndices( _In_reads_(nFaces*3) const index_t* indices, _In_ size_
                         uint32_t k = adjacency[ face*3 + point ];
                         if ( k != UNUSED32 )
                         {
-                            if ( !msgs )
-                                return E_FAIL;
-
                             result = false;
 
-                            wchar_t buff[ 128 ];
                             swprintf_s( buff, L"A degenerate face (%Iu) has a neighbor %u\n", face, k );
                             *msgs += buff;
                         }
