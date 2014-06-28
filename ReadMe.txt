@@ -3,17 +3,20 @@ DIRECTX MESH LIBRARY (DirectXMesh)
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-July x, 2014
+June 27, 2014
 
 This package contains DirectXMesh, a shared source library for performing various geometry
-content processing operations including generating normals, index and vertex buffer
-optimization, and adjacency computations.
+content processing operations including generating normals and tangent frames, triangle
+adjacency computations, and vertex cache optimization.
 
 The source is written for Visual Studio 2010, 2012, or 2013. It is recommended that you
 make use of the Windows 8.1 SDK and Windows 7 Service Pack 1 or later.
 
 Details on using the Windows 8.1 SDK with VS 2010 are described on the Visual C++ Team Blog:
 <http://blogs.msdn.com/b/vcblog/archive/2012/11/23/using-the-windows-8-sdk-with-visual-studio-2010-configuring-multiple-projects.aspx>
+
+These components are designed to work without requiring any content from the DirectX SDK. For details,
+see "Where is the DirectX SDK?" <http://msdn.microsoft.com/en-us/library/ee663275.aspx>.
 
 DirectXMesh\
     This contains the DirectXMesh library.
@@ -30,6 +33,9 @@ Utilities\
 
 All content and source code for this package are bound to the Microsoft Public License (Ms-PL)
 <http://www.microsoft.com/en-us/openness/licenses.aspx#MPL>.
+
+For the latest version of DirectXMesh, more detailed documentation, discussion forums, bug
+reports and feature requests, please visit the Codeplex site.
 
 http://go.microsoft.com/fwlink/?LinkID=324981
 
@@ -269,5 +275,5 @@ Inserting vertex data:
 RELEASE HISTORY
 ---------------
 
-July x, 2014
+June 27, 2014
     Original release
