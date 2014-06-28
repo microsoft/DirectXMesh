@@ -294,7 +294,7 @@ public:
 
             for( uint32_t nt = 0; nt < 3; ++nt )
             {
-                uint32_t neighborTemp = mPhysicalNeighbors.get()[ face ].neighbors[ nt ];
+                uint32_t neighborTemp = mPhysicalNeighbors.get()[ neighbor ].neighbors[ nt ];
 
                 if( ( neighborTemp == UNUSED32 ) || isprocessed( neighborTemp ) )
                     continue;
@@ -549,10 +549,11 @@ HRESULT _StripReorder( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t 
                 curface += 1;
 
                 // if at end of strip, break out
-                if ( next == 3 )
+                if ( next >= 3 )
                     break;
 
                 face = status.get_neighbors( face, next );
+                assert( face != UNUSED32 );
 
                 status.mark( face );
 
