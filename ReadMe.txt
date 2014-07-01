@@ -81,22 +81,6 @@ functions for computing this from mesh triangles.
                                      tangents.get(), bitangents.get() ) ) )
       // Error
 
-Further reading:
-
-   Jin, S., Lewis, R., and West, D.; "A comparison of algorithms for vertex normal computation".
-   http://www.tricity.wsu.edu/~bobl/personal/mypubs/2003_vertnorm_tvc.pdf
-
-   Lengyel, E. "Computing Tangent Space Basis Vectors for an Arbitrary Mesh". Terathon Software 3D Graphics Library, 2001
-   http://www.terathon.com/code/tangent.html
-
-   Max, N., "Weights for Computing Vertex Normals from Facet Normals"
-   https://computing.llnl.gov/vis/images/pdf/max_jgt99.pdf
-
-   Mittring, M. "Triangle Mesh Tangent Space Calculation". Shader X^4 Advanced Rendering Techniques, 2006
-
-   Wagner, M., "Generating Vertex Normals"
-   http://www.emeyex.com/site/tuts/VertexNormals.pdf
-
 
 --------------
 Mesh adjacency

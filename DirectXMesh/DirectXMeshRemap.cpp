@@ -189,9 +189,12 @@ HRESULT SwapVertices( _Inout_updates_bytes_all_(nVerts*stride) void* vb, size_t 
         while( dest != j )
         {
             // Swap vertex
+            #pragma prefast(push)
+            #pragma prefast(disable : 26019, "PREfast noise: Esp:1307")
             memcpy( vbtemp, ptr + dest*stride, stride );
             memcpy( ptr + dest*stride, ptr + j*stride, stride );
             memcpy( ptr + j*stride, vbtemp, stride );
+            #pragma prefast(pop)
 
             if ( pointRep )
             {
