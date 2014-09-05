@@ -13,21 +13,19 @@
 // http://go.microsoft.com/fwlink/?LinkID=324981
 //-------------------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && (_MSC_VER > 1000)
 #pragma once
-#endif
 
 //=====================================================================================
 // DXGI Format Utilities
 //=====================================================================================
 _Use_decl_annotations_
-inline bool IsValidVB( DXGI_FORMAT fmt )
+inline bool __cdecl IsValidVB( DXGI_FORMAT fmt )
 {
     return BytesPerElement( fmt ) != 0;
 }
 
 _Use_decl_annotations_
-inline bool IsValidIB( DXGI_FORMAT fmt )
+inline bool __cdecl IsValidIB( DXGI_FORMAT fmt )
 {
     return ( fmt == DXGI_FORMAT_R32_UINT || fmt == DXGI_FORMAT_R16_UINT ) != 0;
 }
