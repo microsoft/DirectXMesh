@@ -15,7 +15,6 @@
 // http://go.microsoft.com/fwlink/?LinkID=324981
 //--------------------------------------------------------------------------------------
 
-#define NOMINMAX
 #include <windows.h>
 
 #include <algorithm>
@@ -223,16 +222,16 @@ public:
                 for( size_t j = 2; j < iFace; ++ j )
                 {
                     DWORD index = faceIndex[ j ];
-                    indices.push_back( static_cast<uint16_t>( i0 ) );
+                    indices.push_back( static_cast<index_t>( i0 ) );
                     if ( ccw )
                     {
-                        indices.push_back( static_cast<uint16_t>( i1 ) );
-                        indices.push_back( static_cast<uint16_t>( index ) );
+                        indices.push_back( static_cast<index_t>( i1 ) );
+                        indices.push_back( static_cast<index_t>( index ) );
                     }
                     else
                     {
-                        indices.push_back( static_cast<uint16_t>( index ) );
-                        indices.push_back( static_cast<uint16_t>( i1 ) );
+                        indices.push_back( static_cast<index_t>( index ) );
+                        indices.push_back( static_cast<index_t>( i1 ) );
                     }                        
                      
                     attributes.push_back( curSubset );
