@@ -40,6 +40,23 @@ public:
         mTempBuffer.reset();
     }
 
+    const D3D11_INPUT_ELEMENT_DESC* GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const
+    {
+        auto range = mSemantics.equal_range(semanticName);
+
+        auto it = range.first;
+        for (; it != range.second; ++it)
+        {
+            if (mInputDesc[it->second].SemanticIndex == semanticIndex)
+                break;
+        }
+
+        if (it == range.second)
+            return nullptr;
+
+        return &mInputDesc[it->second];
+    }
+
     XMVECTOR* GetTemporaryBuffer( size_t count ) const
     {
         if ( !mTempBuffer || ( mTempSize < count ) )
@@ -170,7 +187,7 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
     }
 
     if ( it == range.second )
-        return E_FAIL;
+        return HRESULT_FROM_WIN32( ERROR_INVALID_NAME );
 
     uint32_t inputSlot = mInputDesc[ it->second ].InputSlot;
 
@@ -622,6 +639,13 @@ HRESULT VBReader::Read( XMFLOAT4* buffer, LPCSTR semanticName, UINT semanticInde
 void VBReader::Release()
 {
     pImpl->Release();
+}
+
+
+//-------------------------------------------------------------------------------------
+const D3D11_INPUT_ELEMENT_DESC* VBReader::GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const
+{
+    return pImpl->GetElement( semanticName, semanticIndex );
 }
 
 } // namespace

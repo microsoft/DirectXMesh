@@ -93,6 +93,8 @@ namespace DirectX
 
         void __cdecl Release();
 
+        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const;
+
     private:
         // Private implementation.
         class Impl;
@@ -128,6 +130,8 @@ namespace DirectX
             // Helpers for data insertion
 
         void __cdecl Release();
+
+        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const;
 
     private:
         // Private implementation.
