@@ -321,7 +321,7 @@ void _ComputeVertexCacheMissRate( _In_reads_(nFaces*3) const index_t* indices, s
 
     size_t misses = 0;
 
-    std::unique_ptr<uint32_t> fifo( new uint32_t[ cacheSize ] );
+    std::unique_ptr<uint32_t[]> fifo( new uint32_t[ cacheSize ] );
     size_t tail = 0;
     
     memset( fifo.get(), 0xff, sizeof(uint32_t) * cacheSize );

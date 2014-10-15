@@ -58,23 +58,23 @@ functions for computing this from mesh triangles.
    size_t nFaces = mesh->indices.size() / 3;
    size_t nVerts = mesh->vertices.size();
 
-   std::unique_ptr<XMFLOAT3> pos( new XMFLOAT3[ nVerts ] );
+   std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
       pos.get()[ j ] = mesh->vertices[ j ].position;
 
-   std::unique_ptr<XMFLOAT3> normals( new XMFLOAT3[ nVerts ] );
+   std::unique_ptr<XMFLOAT3[]> normals( new XMFLOAT3[ nVerts ] );
    if ( FAILED( ComputeNormals( &mesh->indices.front(), nFaces, pos.get(), nVerts, CNORM_DEFAULT, normals.get() ) ) )
       // Error
 
    if ( !mesh->hasTexcoords )
       // Skip next computation
 
-   std::unique_ptr<XMFLOAT2> texcoords( new XMFLOAT2[ nVerts ] );
+   std::unique_ptr<XMFLOAT2[]> texcoords( new XMFLOAT2[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
       texcoords.get()[ j ] = mesh->vertices[ j ].textureCoordinate;
 
-   std::unique_ptr<XMFLOAT3> tangents( new XMFLOAT3[ nVerts ] );
-   std::unique_ptr<XMFLOAT3> bitangents( new XMFLOAT3[ nVerts ] );
+   std::unique_ptr<XMFLOAT3[]> tangents( new XMFLOAT3[ nVerts ] );
+   std::unique_ptr<XMFLOAT3[]> bitangents( new XMFLOAT3[ nVerts ] );
 
    if ( FAILED( ComputeTangentFrame( &mesh->indices.front(), nFaces,
                                      pos.get(), normals.get(), texcoords.get(), nVerts,
@@ -98,7 +98,7 @@ adjacency information to function.
    size_t nFaces = mesh->indices.size() / 3;
    size_t nVerts = mesh->vertices.size();
 
-   std::unique_ptr<XMFLOAT3> pos( new XMFLOAT3[ nVerts ] );
+   std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
       pos.get()[ j ] = mesh->vertices[ j ].position;
 
@@ -129,7 +129,7 @@ resolve such issues.
    if ( FAILED(hr) )
       // E_FAIL indicates that mesh failed validation
 
-   std::unique_ptr<XMFLOAT3> pos( new XMFLOAT3[ nVerts ] );
+   std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
       pos.get()[ j ] = mesh->vertices[ j ].position;
 
@@ -164,7 +164,7 @@ improved utilization of hardware resources.
    size_t nFaces = mesh->indices.size() / 3;
    size_t nVerts = mesh->vertices.size();
 
-   std::unique_ptr<XMFLOAT3> pos( new XMFLOAT3[ nVerts ] );
+   std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
       pos.get()[ j ] = mesh->vertices[ j ].position;
 
@@ -177,7 +177,7 @@ improved utilization of hardware resources.
    if ( FAILED( OptimizeFaces( &mesh->indices.front(), nFaces, adj.get(), faceRemap.get() ) ) )
       // Error
 
-   std::unique_ptr<uint16_t> newIndices( new uint16_t[ nFaces * 3 ] );
+   std::unique_ptr<uint16_t[]> newIndices( new uint16_t[ nFaces * 3 ] );
    if ( FAILED( ReorderIB( &mesh->indices.front(), nFaces, faceRemap.get(), newIndices.get() ) ) )
       // Error
 

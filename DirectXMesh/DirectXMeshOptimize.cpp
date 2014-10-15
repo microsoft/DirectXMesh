@@ -426,8 +426,8 @@ private:
     size_t                          mFaceCount;
     size_t                          mMaxSubset;
     size_t                          mTotalFaces;
-    std::unique_ptr<listElement>    mListElements;
-    std::unique_ptr<neighborInfo>   mPhysicalNeighbors;
+    std::unique_ptr<listElement[]>  mListElements;
+    std::unique_ptr<neighborInfo[]> mPhysicalNeighbors;
 };
 
 
@@ -498,7 +498,7 @@ public:
 private:
     uint32_t                    mTail;
     uint32_t                    mCacheSize;
-    std::unique_ptr<uint32_t>   mFIFO;
+    std::unique_ptr<uint32_t[]> mFIFO;
 };
 
 
@@ -518,7 +518,7 @@ HRESULT _StripReorder( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t 
     if ( FAILED(hr) )
         return hr;
 
-    std::unique_ptr<uint32_t> faceRemapInverse( new (std::nothrow) uint32_t[ nFaces ] );
+    std::unique_ptr<uint32_t[]> faceRemapInverse( new (std::nothrow) uint32_t[ nFaces ] );
     if ( !faceRemapInverse )
         return E_OUTOFMEMORY;
 
@@ -600,7 +600,7 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
     if ( FAILED(hr) )
         return hr;
 
-    std::unique_ptr<uint32_t> faceRemapInverse( new (std::nothrow) uint32_t[ nFaces ] );
+    std::unique_ptr<uint32_t[]> faceRemapInverse( new (std::nothrow) uint32_t[ nFaces ] );
     if ( !faceRemapInverse )
         return E_OUTOFMEMORY;
 

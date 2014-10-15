@@ -622,7 +622,7 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
     memset( vbout, 0, newVerts * stride );
 #endif
 
-    std::unique_ptr<uint32_t> pointRep( new uint32_t[ nVerts + nDupVerts ] );
+    std::unique_ptr<uint32_t[]> pointRep( new uint32_t[ nVerts + nDupVerts ] );
     memcpy( pointRep.get(), prin, sizeof(uint32_t) * nVerts );
     for( size_t i = 0; i < nDupVerts; ++i )
     {
