@@ -227,6 +227,32 @@ HRESULT ComputeTangentFrame( const uint32_t* indices, size_t nFaces,
 _Use_decl_annotations_
 HRESULT ComputeTangentFrame( const uint16_t* indices, size_t nFaces,
                              const XMFLOAT3* positions, const XMFLOAT3* normals, const XMFLOAT2* texcoords,
+                             size_t nVerts, XMFLOAT4* tangents, XMFLOAT3* bitangents )
+{
+    if ( !tangents && !bitangents )
+        return E_INVALIDARG;
+
+    return _ComputeTangentFrame<uint16_t>( indices, nFaces, positions, normals, texcoords, nVerts, nullptr, tangents, bitangents );
+}
+
+
+//-------------------------------------------------------------------------------------
+_Use_decl_annotations_
+HRESULT ComputeTangentFrame( const uint32_t* indices, size_t nFaces,
+                             const XMFLOAT3* positions, const XMFLOAT3* normals, const XMFLOAT2* texcoords,
+                             size_t nVerts, XMFLOAT4* tangents, XMFLOAT3* bitangents )
+{
+    if ( !tangents && !bitangents )
+        return E_INVALIDARG;
+  
+    return _ComputeTangentFrame<uint32_t>( indices, nFaces, positions, normals, texcoords, nVerts, nullptr, tangents, bitangents );
+}
+
+
+//-------------------------------------------------------------------------------------
+_Use_decl_annotations_
+HRESULT ComputeTangentFrame( const uint16_t* indices, size_t nFaces,
+                             const XMFLOAT3* positions, const XMFLOAT3* normals, const XMFLOAT2* texcoords,
                              size_t nVerts, XMFLOAT4* tangents )
 {
     if ( !tangents )

@@ -223,6 +223,18 @@ namespace DirectX
                                          _In_reads_(nVerts) const XMFLOAT3* positions,
                                          _In_reads_(nVerts) const XMFLOAT3* normals,
                                          _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts, 
+                                         _Out_writes_opt_(nVerts) XMFLOAT4* tangents,
+                                         _Out_writes_opt_(nVerts) XMFLOAT3* bitangents );
+    HRESULT __cdecl ComputeTangentFrame( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces,
+                                         _In_reads_(nVerts) const XMFLOAT3* positions,   
+                                         _In_reads_(nVerts) const XMFLOAT3* normals,
+                                         _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts, 
+                                         _Out_writes_opt_(nVerts) XMFLOAT4* tangents,
+                                         _Out_writes_opt_(nVerts) XMFLOAT3* bitangents );       
+    HRESULT __cdecl ComputeTangentFrame( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces,
+                                         _In_reads_(nVerts) const XMFLOAT3* positions,
+                                         _In_reads_(nVerts) const XMFLOAT3* normals,
+                                         _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts, 
                                          _Out_writes_(nVerts) XMFLOAT4* tangents );
     HRESULT __cdecl ComputeTangentFrame( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces,
                                          _In_reads_(nVerts) const XMFLOAT3* positions,
