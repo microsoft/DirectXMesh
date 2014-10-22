@@ -141,12 +141,12 @@ void PrintUsage()
 
     wprintf( L"Usage: meshconvert <options> <files>\n");
     wprintf( L"\n");
-    wprintf( L"   -n | -nw | -ne      generate normals weighted by angle/weight/equal\n" );
+    wprintf( L"   -n | -na | -ne      generate normals weighted by angle/area/equal\n" );
     wprintf( L"   -t                  generate tangents\n");
     wprintf( L"   -tb                 generate tangents & bi-tangents\n");
     wprintf( L"   -cw                 faces are clockwise (defaults to counter-clockwise)\n");
-    wprintf( L"   -op                 vertex cache optimize the mesh\n");
-    wprintf( L"   -c                  mesh cleaning\n");
+    wprintf( L"   -op                 vertex cache optimize the mesh (implies -c)\n");
+    wprintf( L"   -c                  mesh cleaning including vertex dups for atttribute sets\n");
     wprintf( L"   -ta | -ga           generate topological vs. geometric adjancecy (def: ta)\n");
     wprintf( L"   -sdkmesh|-cmo|-vbo  output file type\n");
     wprintf( L"   -nodds              prevents extension renaming in exported materials\n");
