@@ -3,7 +3,7 @@ DIRECTX MESH LIBRARY (DirectXMesh)
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-June 27, 2014
+October 28, 2014
 
 This package contains DirectXMesh, a shared source library for performing various geometry
 content processing operations including generating normals and tangent frames, triangle
@@ -258,6 +258,14 @@ Inserting vertex data:
 ---------------
 RELEASE HISTORY
 ---------------
+
+October 28, 2014
+    meshconvert command-line sample
+    Added VBReader/VBWriter::GetElement method
+    Added more ComputeTangentFrame overloads
+    Explicit calling-convention annotation for public headers
+    Windows phone 8.1 platform support
+    Minor code and project cleanup
 
 June 27, 2014
     Original release
