@@ -31,6 +31,12 @@ Utilities\
 
          WaveFrontReader.h - Contains a simple C++ class for reading mesh data from a WaveFront OBJ file.
 
+Meshconvert\
+    This DirectXMesh sample is an implementation of the "meshconvert" command-line texture utility
+    from the DirectX SDK utilizing DirectXMesh rather than D3DX.
+
+    Note this tool does not support legacy .X files, but can export CMO, SDKMESH, and VBO files.
+
 All content and source code for this package are bound to the Microsoft Public License (Ms-PL)
 <http://www.microsoft.com/en-us/openness/licenses.aspx#MPL>.
 
