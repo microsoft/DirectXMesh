@@ -568,7 +568,8 @@ HRESULT VBReader::Read( float* buffer, LPCSTR semanticName, UINT semanticIndex, 
     float* dptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        XMStoreFloat( dptr++, *(temp)++ );
+        XMVECTOR v = *(temp)++;
+        XMStoreFloat( dptr++, v );
     }
 
     return S_OK;
@@ -588,7 +589,8 @@ HRESULT VBReader::Read( XMFLOAT2* buffer, LPCSTR semanticName, UINT semanticInde
     XMFLOAT2* dptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        XMStoreFloat2( dptr++, *(temp)++ );
+        XMVECTOR v = *(temp)++;
+        XMStoreFloat2( dptr++, v );
     }
 
     return S_OK;
@@ -608,7 +610,8 @@ HRESULT VBReader::Read( XMFLOAT3* buffer, LPCSTR semanticName, UINT semanticInde
     XMFLOAT3* dptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        XMStoreFloat3( dptr++, *(temp)++ );
+        XMVECTOR v = *(temp)++;
+        XMStoreFloat3( dptr++, v );
     }
 
     return S_OK;
@@ -628,7 +631,8 @@ HRESULT VBReader::Read( XMFLOAT4* buffer, LPCSTR semanticName, UINT semanticInde
     XMFLOAT4* dptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        XMStoreFloat4( dptr++, *(temp)++ );
+        XMVECTOR v = *(temp)++;
+        XMStoreFloat4( dptr++, v );
     }
 
     return S_OK;

@@ -574,7 +574,8 @@ HRESULT VBWriter::Write( const float* buffer, LPCSTR semanticName, UINT semantic
     const float* sptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        *(dptr)++ = XMLoadFloat( sptr++ );
+        XMVECTOR v = XMLoadFloat( sptr++ );
+        *(dptr)++ = v;
     }
 
     return pImpl->Write( temp, semanticName, semanticIndex, count );
@@ -591,7 +592,8 @@ HRESULT VBWriter::Write( const XMFLOAT2* buffer, LPCSTR semanticName, UINT seman
     const XMFLOAT2* sptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        *(dptr)++ = XMLoadFloat2( sptr++ );
+        XMVECTOR v = XMLoadFloat2( sptr++ );
+        *(dptr)++ = v;
     }
 
     return pImpl->Write( temp, semanticName, semanticIndex, count );
@@ -608,7 +610,8 @@ HRESULT VBWriter::Write( const XMFLOAT3* buffer, LPCSTR semanticName, UINT seman
     const XMFLOAT3* sptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        *(dptr)++ = XMLoadFloat3( sptr++ );
+        XMVECTOR v = XMLoadFloat3( sptr++ );
+        *(dptr)++ = v;
     }
 
     return pImpl->Write( temp, semanticName, semanticIndex, count );
@@ -625,7 +628,8 @@ HRESULT VBWriter::Write( const XMFLOAT4* buffer, LPCSTR semanticName, UINT seman
     const XMFLOAT4* sptr = buffer;
     for( size_t j = 0; j < count; ++j )
     {
-        *(dptr)++ = XMLoadFloat4( sptr++ );
+        XMVECTOR v = XMLoadFloat4( sptr++ );
+        *(dptr)++ = v;
     }
 
     return pImpl->Write( temp, semanticName, semanticIndex, count );
