@@ -191,6 +191,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             if(!dwOption || (dwOptions & (1 << dwOption)))
             {
+                wprintf( L"ERROR: unknown command-line option '%s'\n\n", pArg);
                 PrintUsage();
                 return 1;
             }
@@ -208,6 +209,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             {
                 if(!*pValue)
                 {
+                    wprintf( L"ERROR: missing value for command-line option '%s'\n\n", pArg);
                     if((iArg + 1 >= argc))
                     {
                         PrintUsage();
