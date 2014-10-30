@@ -430,7 +430,7 @@ HRESULT Mesh::Clean()
         if (!texcoord)
             return E_OUTOFMEMORY;
 
-        memcpy(texcoord.get(), mTexCoords.get(), sizeof(XMFLOAT3) * mnVerts);
+        memcpy(texcoord.get(), mTexCoords.get(), sizeof(XMFLOAT2) * mnVerts);
     }
 
     std::unique_ptr<XMFLOAT4[]> colors;
