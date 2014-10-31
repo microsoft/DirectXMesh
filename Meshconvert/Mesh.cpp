@@ -1448,6 +1448,7 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
             return hr;
 
         VSD3DStarter::Material mdata;
+        memset( &mdata, 0, sizeof(mdata) );
 
         mdata.Ambient.x = m.ambientColor.x;
         mdata.Ambient.y = m.ambientColor.y;
@@ -1459,12 +1460,18 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
         mdata.Diffuse.z = m.diffuseColor.z;
         mdata.Diffuse.w = m.alpha;
 
-        mdata.Specular.x = m.specularColor.x;
-        mdata.Specular.y = m.specularColor.y;
-        mdata.Specular.z = m.specularColor.z;
+        if (m.specularColor.x > 0.f || m.specularColor.y > 0.f || m.specularColor.z > 0.f)
+        {
+            mdata.Specular.x = m.specularColor.x;
+            mdata.Specular.y = m.specularColor.y;
+            mdata.Specular.z = m.specularColor.z;
+            mdata.SpecularPower = ( m.specularPower <= 0.f ) ? 16.f : m.specularPower;
+        }
+        else
+        {
+            mdata.SpecularPower = 1.f;
+        }
         mdata.Specular.w = 1.f;
-
-        mdata.SpecularPower = m.specularPower;
 
         mdata.Emissive.x = m.emissiveColor.x;
         mdata.Emissive.y = m.emissiveColor.y;
@@ -2226,7 +2233,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
                 m->Specular.x = m0->specularColor.x;
                 m->Specular.y = m0->specularColor.y;
                 m->Specular.z = m0->specularColor.z;
-                m->Power = ( !m0->specularPower ) ? 16.f :m0->specularPower;
+                m->Power = ( m0->specularPower <= 0.f ) ? 16.f : m0->specularPower;
             }
             else
             {
