@@ -59,14 +59,6 @@ struct SValue
     DWORD dwValue;
 };
 
-const D3D11_INPUT_ELEMENT_DESC g_vboLayout[] =
-{
-    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    { "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-};
-
-
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -160,6 +152,111 @@ void PrintUsage()
 
 
 //--------------------------------------------------------------------------------------
+HRESULT LoadFromOBJ(const WCHAR* szFilename, std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial, DWORD options )
+{
+    WaveFrontReader<uint32_t> wfReader;
+    HRESULT hr = wfReader.Load(szFilename, (options & (1 << OPT_CLOCKWISE)) ? false : true );
+    if (FAILED(hr))
+        return hr;
+
+    inMesh.reset(new (std::nothrow) Mesh);
+    if (!inMesh)
+        return E_OUTOFMEMORY;
+
+    if (wfReader.indices.empty() || wfReader.vertices.empty())
+        return E_FAIL;
+
+    hr = inMesh->SetIndexData(wfReader.indices.size() / 3, &wfReader.indices.front(),
+                              wfReader.attributes.empty() ? nullptr : &wfReader.attributes.front());
+    if (FAILED(hr))
+        return hr;
+
+    static const D3D11_INPUT_ELEMENT_DESC s_vboLayout [] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
+    static const D3D11_INPUT_ELEMENT_DESC s_vboLayoutAlt [] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
+    const D3D11_INPUT_ELEMENT_DESC* layout = s_vboLayout;
+    size_t nDecl = _countof(s_vboLayout);
+
+    if (!wfReader.hasNormals && !wfReader.hasTexcoords)
+    {
+        nDecl = 1;
+    }
+    else if (wfReader.hasNormals && !wfReader.hasTexcoords)
+    {
+        nDecl = 2;
+    }
+    else if (!wfReader.hasNormals && wfReader.hasTexcoords)
+    {
+        layout = s_vboLayoutAlt;
+        nDecl = _countof(s_vboLayoutAlt);
+    }
+
+    VBReader vbr;
+    hr = vbr.Initialize(layout, nDecl);
+    if (FAILED(hr))
+        return hr;
+
+    hr = vbr.AddStream(&wfReader.vertices.front(), wfReader.vertices.size(), 0, sizeof(WaveFrontReader<uint32_t>::Vertex));
+    if (FAILED(hr))
+        return hr;
+
+    hr = inMesh->SetVertexData(vbr, wfReader.vertices.size());
+    if (FAILED(hr))
+        return hr;
+
+    if ( !wfReader.materials.empty() )
+    {
+        inMaterial.clear();
+        inMaterial.reserve(wfReader.materials.size());
+
+        for (auto it = wfReader.materials.cbegin(); it != wfReader.materials.cend(); ++it)
+        {
+            Mesh::Material mtl;
+            memset(&mtl, 0, sizeof(mtl));
+
+            mtl.name = it->strName;
+            mtl.specularPower = (it->bSpecular) ? float(it->nShininess) : 1.f;
+            mtl.alpha = it->fAlpha;
+            mtl.ambientColor = it->vAmbient;
+            mtl.diffuseColor = it->vDiffuse;
+            mtl.specularColor = (it->bSpecular) ? it->vSpecular : XMFLOAT3(0.f, 0.f, 0.f);
+
+            WCHAR texture[_MAX_PATH] = { 0 };
+            if (*it->strTexture)
+            {
+                WCHAR txext[_MAX_EXT];
+                WCHAR txfname[_MAX_FNAME];
+                _wsplitpath_s(it->strTexture, nullptr, 0, nullptr, 0, txfname, _MAX_FNAME, txext, _MAX_EXT);
+
+                if (!(options & (1 << OPT_NODDS)))
+                {
+                    wcscpy_s(txext, L".dds");
+                }
+
+                _wmakepath_s(texture, nullptr, nullptr, txfname, txext);
+            }
+
+            mtl.texture = texture;
+
+            inMaterial.push_back(mtl);
+        }
+    }
+
+    return S_OK;
+}
+
+
+//--------------------------------------------------------------------------------------
 // Entry-point
 //--------------------------------------------------------------------------------------
 #pragma prefast(disable : 28198, "Command-line tool, frees all memory on exit")
@@ -209,9 +306,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             {
                 if(!*pValue)
                 {
-                    wprintf( L"ERROR: missing value for command-line option '%s'\n\n", pArg);
                     if((iArg + 1 >= argc))
                     {
+                        wprintf( L"ERROR: missing value for command-line option '%s'\n\n", pArg);
                         PrintUsage();
                         return 1;
                     }
@@ -246,17 +343,17 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_TOPOLOGICAL_ADJ:
-                if ( dwOptions & (1 << OPT_GEOMETRIC_ADJ ) )
+                if (dwOptions & (1 << OPT_GEOMETRIC_ADJ))
                 {
-                    wprintf( L"Cannot use both ta and ga at the same time\n" );
+                    wprintf(L"Cannot use both ta and ga at the same time\n");
                     return 1;
                 }
                 break;
 
             case OPT_GEOMETRIC_ADJ:
-                if ( dwOptions & (1 << OPT_TOPOLOGICAL_ADJ ) )
+                if (dwOptions & (1 << OPT_TOPOLOGICAL_ADJ))
                 {
-                    wprintf( L"Cannot use both ta and ga at the same time\n" );
+                    wprintf(L"Cannot use both ta and ga at the same time\n");
                     return 1;
                 }
                 break;
@@ -339,9 +436,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         wprintf( L"reading %s", pConv->szSrc );
         fflush(stdout);
 
-        size_t nMaterials = 0;
         std::unique_ptr<Mesh> inMesh;
-        std::unique_ptr<Mesh::Material[]> inMaterial;
+        std::vector<Mesh::Material> inMaterial;
         HRESULT hr = E_NOTIMPL;
         if ( _wcsicmp( ext, L".vbo" ) == 0 )
         {
@@ -364,102 +460,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else
         {
-            // Import from WaveFront OBJ file
-            WaveFrontReader<uint32_t> wfReader;
-            hr = wfReader.Load( pConv->szSrc, (dwOptions & (1 << OPT_CLOCKWISE)) ? false : true );
-            if ( SUCCEEDED(hr) )
-            {
-                inMesh.reset( new (std::nothrow) Mesh );
-                if ( !inMesh )
-                {
-                    hr = E_OUTOFMEMORY;
-                }
-                else if ( wfReader.indices.empty() || wfReader.vertices.empty() )
-                {
-                    hr = E_FAIL;
-                }
-                else
-                {
-                    hr = inMesh->SetIndexData( wfReader.indices.size() / 3, &wfReader.indices.front(),
-                                               wfReader.attributes.empty() ? nullptr : &wfReader.attributes.front() );
-
-                    if (SUCCEEDED(hr))
-                    {
-                        const D3D11_INPUT_ELEMENT_DESC s_vboLayoutAlt[] =
-                        {
-                            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-                            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-                        };
-
-                        const D3D11_INPUT_ELEMENT_DESC* layout = g_vboLayout;
-                        size_t nDecl = _countof(g_vboLayout);
-
-                        if (!wfReader.hasNormals && !wfReader.hasTexcoords)
-                        {
-                            nDecl = 1;
-                        }
-                        else if (wfReader.hasNormals && !wfReader.hasTexcoords)
-                        {
-                            nDecl = 2;
-                        }
-                        else if (!wfReader.hasNormals && wfReader.hasTexcoords)
-                        {
-                            layout = s_vboLayoutAlt;
-                            nDecl = _countof(s_vboLayoutAlt);
-                        }
-
-                        VBReader vbr;
-                        hr = vbr.Initialize(layout, nDecl);
-                        if (SUCCEEDED(hr))
-                        {
-                            hr = vbr.AddStream(&wfReader.vertices.front(), wfReader.vertices.size(), 0, sizeof(WaveFrontReader<uint32_t>::Vertex));
-                        }
-
-                        if (SUCCEEDED(hr))
-                        {
-                            hr = inMesh->SetVertexData( vbr, wfReader.vertices.size() );
-                        }
-                    }
-
-                    if (SUCCEEDED(hr) && !wfReader.materials.empty())
-                    {
-                        nMaterials = wfReader.materials.size();
-                        inMaterial.reset( new (std::nothrow) Mesh::Material[ nMaterials ] );
-
-                        auto mptr = inMaterial.get();
-
-                        memset( mptr, 0, sizeof(Mesh::Material) * nMaterials );
-
-                        size_t j = 0;
-                        for (auto it = wfReader.materials.cbegin(); it != wfReader.materials.cend() && j < nMaterials; ++it, ++j, ++mptr)
-                        {
-                            mptr->name = it->strName;
-                            mptr->specularPower = float( it->nShininess );
-                            mptr->alpha = it->fAlpha;
-                            mptr->ambientColor = it->vAmbient;
-                            mptr->diffuseColor = it->vDiffuse;
-                            mptr->specularColor = (it->bSpecular) ? it->vSpecular : XMFLOAT3(0.f, 0.f, 0.f);
-
-                            WCHAR texture[_MAX_PATH] = { 0 };
-                            if (*it->strTexture)
-                            {
-                                WCHAR txext[_MAX_EXT];
-                                WCHAR txfname[_MAX_FNAME];
-                                _wsplitpath_s(it->strTexture, nullptr, 0, nullptr, 0, txfname, _MAX_FNAME, txext, _MAX_EXT);
-
-                                if (!(dwOptions & (1 << OPT_NODDS)))
-                                {
-                                    wcscpy_s(txext, L".dds");
-                                }
-
-                                _wmakepath_s(texture, nullptr, nullptr, txfname, txext);
-                            }
-
-                            mptr->texture = texture;
-                        }
-                    }
-                }
-            }
+            hr = LoadFromOBJ(pConv->szSrc, inMesh, inMaterial, dwOptions);
         }
         if (FAILED(hr))
         {
@@ -479,8 +480,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         assert(inMesh->GetPositionBuffer() != 0);
         assert(inMesh->GetIndexBuffer() != 0);
 
-        wprintf( L" %Iu vertices, %Iu faces ", nVerts, nFaces );
+        wprintf( L"\n%Iu vertices, %Iu faces", nVerts, nFaces );
 
+        // Prepare mesh for processing
         if ( dwOptions & ( (1 << OPT_OPTIMIZE) | (1 << OPT_CLEAN) ) )
         {
             // Adjacency
@@ -520,7 +522,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
         }
 
-        if (!inMesh->GetNormalBuffer() && (dwOptions & ((1 << OPT_CMO) | (1 << OPT_VBO))))
+        if (!inMesh->GetNormalBuffer())
         {
             dwOptions |= 1 << OPT_NORMALS;
         }
@@ -530,10 +532,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             dwOptions |= 1 << OPT_TANGENTS;
         }
 
+        // Compute vertex normals from faces
         if ( (dwOptions & (1 << OPT_NORMALS))
              || ((dwOptions & ((1 << OPT_TANGENTS) | (1 << OPT_CTF))) && !inMesh->GetNormalBuffer()) )
         {
-            // Compute vertex normals from faces
             DWORD flags = CNORM_DEFAULT;
 
             if (dwOptions & (1 << OPT_WEIGHT_BY_EQUAL))
@@ -558,6 +560,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
         }
 
+        // Compute tangents and bitangents
         if (dwOptions & ((1 << OPT_TANGENTS) | (1 << OPT_CTF)))
         {
             if (!inMesh->GetTexCoordBuffer())
@@ -566,7 +569,6 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            // Compute tangents and bitangents
             hr = inMesh->ComputeTangentFrame( (dwOptions & (1 << OPT_CTF)) ? true : false );
             if (FAILED(hr))
             {
@@ -575,6 +577,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
         }
 
+        // Perform attribute and vertex-cache optimization
         if (dwOptions & (1 << OPT_OPTIMIZE))
         {
             assert(inMesh->GetAdjacencyBuffer() != 0);
@@ -671,7 +674,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else if ( !_wcsicmp(outputExt, L".sdkmesh") )
         {
-            hr = inMesh->ExportToSDKMESH(outputPath, nMaterials, inMaterial.get());
+            hr = inMesh->ExportToSDKMESH(outputPath, inMaterial.size(), &inMaterial.front());
         }
         else if ( !_wcsicmp(outputExt, L".cmo") )
         {
@@ -687,7 +690,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            hr = inMesh->ExportToCMO(outputPath, nMaterials, inMaterial.get());
+            hr = inMesh->ExportToCMO(outputPath, inMaterial.size(), &inMaterial.front());
         }
         else if ( !_wcsicmp(outputExt, L".x") )
         {
