@@ -626,7 +626,7 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
     memcpy( pointRep.get(), prin, sizeof(uint32_t) * nVerts );
     for( size_t i = 0; i < nDupVerts; ++i )
     {
-        pointRep.get()[ i + nVerts ] = prin[ dupVerts[ i ] ];
+        pointRep[ i + nVerts ] = prin[ dupVerts[ i ] ];
     }
     
     if ( vertexRemap )
@@ -636,15 +636,15 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
         {
             if ( vertexRemap[ i ] != UNUSED32 )
             {
-                uint32_t old = pointRep.get()[ i ];
+                uint32_t old = pointRep[ i ];
                 if ( ( old != UNUSED32 ) && ( vertexRemap[old] == UNUSED32 ) )
                 {
-                    pointRep.get()[ i ] = i;
+                    pointRep[ i ] = i;
 
                     for( size_t k = (i+1); k < newVerts; ++k )
                     {
-                        if ( pointRep.get()[ k ] == old )
-                            pointRep.get()[ k ] = i;
+                        if ( pointRep[ k ] == old )
+                            pointRep[ k ] = i;
                     }
                 }
             }
@@ -665,7 +665,7 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
         {
             memcpy( dptr + dest * stride, sptr, stride ); 
 
-            uint32_t pr = pointRep.get()[ j ];
+            uint32_t pr = pointRep[ j ];
             if ( pr < newVerts )
             {
                 prout[ dest ] = ( vertexRemap ) ? vertexRemap[ pr ] : pr;
@@ -693,7 +693,7 @@ HRESULT FinalizeVBAndPointReps( const void* vbin, size_t stride, size_t nVerts, 
                 sptr = reinterpret_cast<const uint8_t*>( vbin ) + dup * stride; 
                 memcpy( dptr + dest * stride, sptr, stride ); 
 
-                uint32_t pr = pointRep.get()[ nVerts + k ];
+                uint32_t pr = pointRep[ nVerts + k ];
                 if (pr < (nVerts + nDupVerts) )
                 {
                     prout[ dest ] = ( vertexRemap ) ? vertexRemap[ pr ] : pr;

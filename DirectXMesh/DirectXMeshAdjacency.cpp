@@ -181,7 +181,7 @@ HRESULT GeneratePointReps( _In_reads_(nFaces*3) const index_t* indices, size_t n
 
             uint32_t found = UNUSED32;
 
-            for( auto current = hashTable.get()[ hashKey ]; current != 0; current = current->next )
+            for( auto current = hashTable[ hashKey ]; current != 0; current = current->next )
             {
                 if ( current->v.x == positions[ vert ].x
                      && current->v.y == positions[ vert ].y
@@ -225,13 +225,13 @@ HRESULT GeneratePointReps( _In_reads_(nFaces*3) const index_t* indices, size_t n
                 assert( freeEntry < nVerts );
                 _Analysis_assume_( freeEntry < nVerts );
 
-                auto newEntry = &hashEntries.get()[ freeEntry ];
+                auto newEntry = &hashEntries[ freeEntry ];
                 ++freeEntry;
 
                 newEntry->v = positions[ vert ];
                 newEntry->index = uint32_t( vert );
-                newEntry->next = hashTable.get()[ hashKey ];
-                hashTable.get()[ hashKey ] = newEntry;
+                newEntry->next = hashTable[ hashKey ];
+                hashTable[ hashKey ] = newEntry;
 
                 pointRep[ vert ] = uint32_t( vert );
             }
@@ -265,7 +265,7 @@ HRESULT GeneratePointReps( _In_reads_(nFaces*3) const index_t* indices, size_t n
             }
 
             // check new tail against all points up to the head
-            uint32_t tailIndex = xorder.get()[ tail ];
+            uint32_t tailIndex = xorder[ tail ];
             assert( tailIndex < nVerts );
             _Analysis_assume_( tailIndex < nVerts );
             if ( pointRep[ tailIndex ] == UNUSED32 )
@@ -276,7 +276,7 @@ HRESULT GeneratePointReps( _In_reads_(nFaces*3) const index_t* indices, size_t n
 
                 for( size_t current = tail + 1; current < head; ++current )
                 {
-                    uint32_t curIndex = xorder.get()[ current ];
+                    uint32_t curIndex = xorder[ current ];
                     assert( curIndex < nVerts );
                     _Analysis_assume_( curIndex < nVerts );
 
@@ -386,15 +386,15 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
             assert( freeEntry < (3 * nFaces) );
             _Analysis_assume_( freeEntry < (3 * nFaces) );
 
-            auto newEntry = &hashEntries.get()[ freeEntry ];
+            auto newEntry = &hashEntries[ freeEntry ];
             ++freeEntry;
 
             newEntry->v1 = va;
             newEntry->v2 = vb;
             newEntry->vOther = vOther;
             newEntry->face = uint32_t( face );
-            newEntry->next = hashTable.get()[ hashKey ];
-            hashTable.get()[ hashKey ] = newEntry;
+            newEntry->next = hashTable[ hashKey ];
+            hashTable[ hashKey ] = newEntry;
         }
     }
 
@@ -442,7 +442,7 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
 
             uint32_t hashKey = va % hashSize;
 
-            edgeHashEntry* current = hashTable.get()[ hashKey ];
+            edgeHashEntry* current = hashTable[ hashKey ];
             edgeHashEntry* prev = nullptr;
 
             uint32_t foundFace = UNUSED32;
@@ -535,7 +535,7 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
                 }
                 else
                 {
-                    hashTable.get()[ hashKey ] = found->next;
+                    hashTable[ hashKey ] = found->next;
                 }
 
                 assert( adjacency[ face * 3 + point ] == UNUSED32 );
@@ -544,7 +544,7 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
                 // Check for other edge
                 uint32_t hashKey2 = vb % hashSize;
 
-                current = hashTable.get()[ hashKey2 ];
+                current = hashTable[ hashKey2 ];
                 prev = nullptr;
 
                 while( current != 0 )
@@ -558,7 +558,7 @@ HRESULT _ConvertPointRepsToAdjacency( _In_reads_(nFaces*3) const index_t* indice
                         }
                         else
                         {
-                            hashTable.get()[ hashKey2 ] = current->next;
+                            hashTable[ hashKey2 ] = current->next;
                         }
                         break;
                     }
@@ -728,7 +728,7 @@ HRESULT ConvertPointRepsToAdjacency( const uint16_t* indices, size_t nFaces,
 
         for( size_t j = 0; j < nVerts; ++j )
         {
-            temp.get()[ j ] = uint32_t( j );
+            temp[ j ] = uint32_t( j );
         }
 
         pointRep = temp.get();
@@ -761,7 +761,7 @@ HRESULT ConvertPointRepsToAdjacency( const uint32_t* indices, size_t nFaces,
 
         for( size_t j = 0; j < nVerts; ++j )
         {
-            temp.get()[ j ] = uint32_t( j );
+            temp[ j ] = uint32_t( j );
         }
 
         pointRep = temp.get();

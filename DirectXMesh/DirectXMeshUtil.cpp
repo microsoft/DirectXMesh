@@ -335,7 +335,7 @@ void _ComputeVertexCacheMissRate( _In_reads_(nFaces*3) const index_t* indices, s
 
         for( size_t ptr = 0; ptr < cacheSize; ++ptr )
         {
-            if ( fifo.get()[ ptr ] == indices[ j ] )
+            if ( fifo[ ptr ] == indices[ j ] )
             {
                 found = true;
                 break;
@@ -345,7 +345,7 @@ void _ComputeVertexCacheMissRate( _In_reads_(nFaces*3) const index_t* indices, s
         if ( !found )
         {
             ++misses;
-            fifo.get()[ tail ] = indices[ j ];
+            fifo[ tail ] = indices[ j ];
             ++tail;
             if ( tail == cacheSize ) tail = 0;
         }

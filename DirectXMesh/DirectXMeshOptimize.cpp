@@ -93,16 +93,16 @@ public:
                                 return E_UNEXPECTED;
  
                             if ( adjacency[ k*3 ] == face )
-                                mPhysicalNeighbors.get()[ k ].neighbors[ 0 ] = UNUSED32;
+                                mPhysicalNeighbors[ k ].neighbors[ 0 ] = UNUSED32;
 
                             if ( adjacency[ k*3 + 1 ] == face )
-                                mPhysicalNeighbors.get()[ k ].neighbors[ 1 ] = UNUSED32;
+                                mPhysicalNeighbors[ k ].neighbors[ 1 ] = UNUSED32;
 
                             if ( adjacency[ k*3 + 2 ] == face )
-                                mPhysicalNeighbors.get()[ k ].neighbors[ 2 ] = UNUSED32;
+                                mPhysicalNeighbors[ k ].neighbors[ 2 ] = UNUSED32;
                         }
 
-                        mPhysicalNeighbors.get()[ face ].neighbors[ point ] = UNUSED32;
+                        mPhysicalNeighbors[ face ].neighbors[ point ] = UNUSED32;
                     }
                 }
                 else
@@ -144,7 +144,7 @@ public:
                             }
                         }
 
-                        mPhysicalNeighbors.get()[ face ].neighbors[ n ] = neighbor;
+                        mPhysicalNeighbors[ face ].neighbors[ n ] = neighbor;
                     }
                 }
             }
@@ -205,18 +205,18 @@ public:
 
             for( uint32_t n = 0; n < 3; ++n )
             {
-                if ( mPhysicalNeighbors.get()[ face ].neighbors[ n ] != UNUSED32 )
+                if ( mPhysicalNeighbors[ face ].neighbors[ n ] != UNUSED32 )
                 {
                     unprocessed += 1;
 
-                    assert( mPhysicalNeighbors.get()[ face ].neighbors[ n ] >= mFaceOffset );
-                    assert( mPhysicalNeighbors.get()[ face ].neighbors[ n ] < faceMax );
+                    assert( mPhysicalNeighbors[ face ].neighbors[ n ] >= mFaceOffset );
+                    assert( mPhysicalNeighbors[ face ].neighbors[ n ] < faceMax );
                 }
             }
 
             uint32_t faceIndex = uint32_t( face - faceOffset );
-            mListElements.get()[ faceIndex ].processed = false;
-            mListElements.get()[ faceIndex ].unprocessed = unprocessed;
+            mListElements[ faceIndex ].processed = false;
+            mListElements[ faceIndex ].unprocessed = unprocessed;
 
             push_front( faceIndex );
         }
@@ -228,14 +228,14 @@ public:
     {
         assert( face < mTotalFaces );
         assert( ( face >= mFaceOffset ) || ( face < ( mFaceOffset + mFaceCount ) ) );
-        return mListElements.get()[ face - mFaceOffset ].processed;
+        return mListElements[ face - mFaceOffset ].processed;
     }
 
     uint32_t unprocessed_count( uint32_t face ) const
     {
         assert( face < mTotalFaces );
         assert( ( face >= mFaceOffset ) || ( face < ( mFaceOffset + mFaceCount ) ) );
-        return mListElements.get()[ face - mFaceOffset ].unprocessed;
+        return mListElements[ face - mFaceOffset ].unprocessed;
     }
 
     uint32_t find_initial() const
@@ -256,14 +256,14 @@ public:
 
         uint32_t faceIndex = uint32_t( face - mFaceOffset );
 
-        assert( !mListElements.get()[ faceIndex ].processed );
-        mListElements.get()[ faceIndex ].processed = true;
+        assert( !mListElements[ faceIndex ].processed );
+        mListElements[ faceIndex ].processed = true;
 
         remove( faceIndex );
 
         for( uint32_t n = 0; n < 3; ++n )
         {
-            uint32_t neighbor = mPhysicalNeighbors.get()[ face ].neighbors[ n ];
+            uint32_t neighbor = mPhysicalNeighbors[ face ].neighbors[ n ];
             if ( ( neighbor != UNUSED32 ) && !isprocessed( neighbor ) )
             {
                 decrement( neighbor );
@@ -282,7 +282,7 @@ public:
 
         for( uint32_t n = 0; n < 3; ++n )
         {
-            uint32_t neighbor = mPhysicalNeighbors.get()[ face ].neighbors[ n ];
+            uint32_t neighbor = mPhysicalNeighbors[ face ].neighbors[ n ];
 
             if( ( neighbor == UNUSED32 ) || isprocessed( neighbor ) )
                 continue;
@@ -294,7 +294,7 @@ public:
 
             for( uint32_t nt = 0; nt < 3; ++nt )
             {
-                uint32_t neighborTemp = mPhysicalNeighbors.get()[ neighbor ].neighbors[ nt ];
+                uint32_t neighborTemp = mPhysicalNeighbors[ neighbor ].neighbors[ nt ];
 
                 if( ( neighborTemp == UNUSED32 ) || isprocessed( neighborTemp ) )
                     continue;
@@ -327,13 +327,13 @@ public:
     {
         assert( face < mTotalFaces );
         assert( n < 3 );
-        return mPhysicalNeighbors.get()[ face ].neighbors[ n ];
+        return mPhysicalNeighbors[ face ].neighbors[ n ];
     }
 
     const uint32_t* get_neighborsPtr( uint32_t face ) const
     {
         assert( face < mTotalFaces );
-        return &mPhysicalNeighbors.get()[ face ].neighbors[ 0 ];
+        return &mPhysicalNeighbors[ face ].neighbors[ 0 ];
     }
 
 private:
@@ -341,54 +341,54 @@ private:
     {
         assert( faceIndex < mFaceCount );
 
-        uint32_t unprocessed = mListElements.get()[ faceIndex ].unprocessed;
+        uint32_t unprocessed = mListElements[ faceIndex ].unprocessed;
     
         uint32_t head = mUnprocessed[ unprocessed ];
-        mListElements.get()[ faceIndex ].next = head;
+        mListElements[ faceIndex ].next = head;
 
         if ( head != UNUSED32 )
-            mListElements.get()[ head ].prev = faceIndex;
+            mListElements[ head ].prev = faceIndex;
 
         mUnprocessed[ unprocessed ] = faceIndex;
 
-        mListElements.get()[ faceIndex ].prev = UNUSED32;
+        mListElements[ faceIndex ].prev = UNUSED32;
     }
 
     void remove( uint32_t faceIndex )
     {
         assert( faceIndex < mFaceCount );
 
-        if ( mListElements.get()[ faceIndex ].prev != UNUSED32 )
+        if ( mListElements[ faceIndex ].prev != UNUSED32 )
         {
-            assert( mUnprocessed[ mListElements.get()[ faceIndex ].unprocessed ] != faceIndex );
+            assert( mUnprocessed[ mListElements[ faceIndex ].unprocessed ] != faceIndex );
 
-            uint32_t prev = mListElements.get()[ faceIndex ].prev;
-            uint32_t next = mListElements.get()[ faceIndex ].next;
+            uint32_t prev = mListElements[ faceIndex ].prev;
+            uint32_t next = mListElements[ faceIndex ].next;
 
-            mListElements.get()[ prev ].next = next;
+            mListElements[ prev ].next = next;
 
             if ( next != UNUSED32 )
             {
-                mListElements.get()[ next ].prev = prev;
+                mListElements[ next ].prev = prev;
             }
         }
         else
         {
             // remove head of the list
-            assert( mUnprocessed[ mListElements.get()[ faceIndex ].unprocessed ] == faceIndex );
+            assert( mUnprocessed[ mListElements[ faceIndex ].unprocessed ] == faceIndex );
 
-            uint32_t unprocessed = mListElements.get()[ faceIndex ].unprocessed;
+            uint32_t unprocessed = mListElements[ faceIndex ].unprocessed;
 
-            mUnprocessed[ unprocessed ] = mListElements.get()[ faceIndex ].next;
+            mUnprocessed[ unprocessed ] = mListElements[ faceIndex ].next;
 
             if ( mUnprocessed[ unprocessed ] != UNUSED32 )
             {
-                mListElements.get()[ mUnprocessed[ unprocessed ] ].prev = UNUSED32;
+                mListElements[ mUnprocessed[ unprocessed ] ].prev = UNUSED32;
             }
         }
 
-        mListElements.get()[ faceIndex ].prev =
-        mListElements.get()[ faceIndex ].next = UNUSED32;
+        mListElements[ faceIndex ].prev =
+        mListElements[ faceIndex ].next = UNUSED32;
     }
 
     void decrement( uint32_t face )
@@ -399,11 +399,11 @@ private:
 
         uint32_t faceIndex = uint32_t( face - mFaceOffset );
 
-        assert( (mListElements.get()[faceIndex].unprocessed >= 1) && (mListElements.get()[faceIndex].unprocessed <= 3) );
+        assert( (mListElements[faceIndex].unprocessed >= 1) && (mListElements[faceIndex].unprocessed <= 3) );
 
         remove( faceIndex );
 
-        mListElements.get()[ faceIndex ].unprocessed -= 1;
+        mListElements[ faceIndex ].unprocessed -= 1;
 
         push_front( faceIndex );
     }
@@ -481,13 +481,13 @@ public:
 
         for( size_t ptr = 0; ptr < mCacheSize; ++ptr )
         {
-            if ( mFIFO.get()[ ptr ] == vertex )
+            if ( mFIFO[ ptr ] == vertex )
             {
                 return true;
             }
         }
 
-        mFIFO.get()[ mTail ] = vertex;
+        mFIFO[ mTail ] = vertex;
         mTail += 1;
         if ( mTail == mCacheSize )
             mTail = 0;
@@ -545,7 +545,7 @@ HRESULT _StripReorder( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t 
             for(;;)
             {
                 assert( face != UNUSED32 );
-                faceRemapInverse.get()[ face ] = uint32_t( curface + it->first );
+                faceRemapInverse[ face ] = uint32_t( curface + it->first );
                 curface += 1;
 
                 // if at end of strip, break out
@@ -567,7 +567,7 @@ HRESULT _StripReorder( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t 
 
     for( uint32_t j = 0; j < nFaces; ++j )
     {
-        uint32_t f = faceRemapInverse.get()[ j ];
+        uint32_t f = faceRemapInverse[ j ];
         if ( f < nFaces )
         {
             faceRemap[ f ] = j;
@@ -685,7 +685,7 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
                     assert( curCorner.first != UNUSED32 );
                     status.mark( curCorner.first );
 
-                    faceRemapInverse.get()[ curCorner.first ] = uint32_t( curface + it->first );
+                    faceRemapInverse[ curCorner.first ] = uint32_t( curface + it->first );
                     curface += 1;
 
                     assert( indices[ curCorner.first * 3 ] != index_t(-1) );
@@ -747,7 +747,7 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
 
     for( uint32_t j = 0; j < nFaces; ++j )
     {
-        uint32_t f = faceRemapInverse.get()[ j ];
+        uint32_t f = faceRemapInverse[ j ];
         if ( f < nFaces )
         {
             faceRemap[ f ] = j;
@@ -799,7 +799,7 @@ HRESULT _OptimizeVertices( const index_t* indices, size_t nFaces, size_t nVerts,
 
     for( uint32_t j = 0; j < nVerts; ++j )
     {
-        uint32_t vertindex = tempRemap.get()[ j ];
+        uint32_t vertindex = tempRemap[ j ];
         if ( vertindex != UNUSED32 )
         {
             vertexRemap[ vertindex ] = j;
