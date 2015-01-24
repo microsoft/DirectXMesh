@@ -288,7 +288,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             if(!dwOption || (dwOptions & (1 << dwOption)))
             {
-                wprintf( L"ERROR: unknown command-line option '%s'\n\n", pArg);
+                wprintf( L"ERROR: unknown command-line option '%ls'\n\n", pArg);
                 PrintUsage();
                 return 1;
             }
@@ -308,7 +308,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 {
                     if((iArg + 1 >= argc))
                     {
-                        wprintf( L"ERROR: missing value for command-line option '%s'\n\n", pArg);
+                        wprintf( L"ERROR: missing value for command-line option '%ls'\n\n", pArg);
                         PrintUsage();
                         return 1;
                     }
@@ -433,7 +433,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         if ( pConv != conversion.begin() )
             wprintf( L"\n");
 
-        wprintf( L"reading %s", pConv->szSrc );
+        wprintf( L"reading %ls", pConv->szSrc );
         fflush(stdout);
 
         std::unique_ptr<Mesh> inMesh;
@@ -651,7 +651,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         {
             if (GetFileAttributesW(outputPath) != INVALID_FILE_ATTRIBUTES)
             {
-                wprintf(L"\nERROR: Output file already exists, use -y to overwrite:\n'%s'\n", outputPath);
+                wprintf(L"\nERROR: Output file already exists, use -y to overwrite:\n'%ls'\n", outputPath);
                 return 1;
             }
         }
@@ -699,17 +699,17 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else
         {
-            wprintf(L"\nERROR: Unknown output file type '%s'\n", outputExt);
+            wprintf(L"\nERROR: Unknown output file type '%ls'\n", outputExt);
             return 1;
         }
 
         if (FAILED(hr))
         {
-            wprintf(L"\nERROR: Failed write (%08X):-> '%s'\n", hr, outputPath);
+            wprintf(L"\nERROR: Failed write (%08X):-> '%ls'\n", hr, outputPath);
             return 1;
         }
 
-        wprintf(L" %Iu vertices, %Iu faces written:\n'%s'\n", nVerts, nFaces, outputPath);
+        wprintf(L" %Iu vertices, %Iu faces written:\n'%ls'\n", nVerts, nFaces, outputPath);
     }
 
     return 0;
