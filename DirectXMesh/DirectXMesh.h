@@ -32,6 +32,17 @@
 #include <d3d11_1.h>
 #endif
 
+// VS 2010/2012 do not support =default =delete
+#ifndef DIRECTX_CTOR_DEFAULT
+#if defined(_MSC_VER) && (_MSC_VER < 1800)
+#define DIRECTX_CTOR_DEFAULT {}
+#define DIRECTX_CTOR_DELETE ;
+#else
+#define DIRECTX_CTOR_DEFAULT =default;
+#define DIRECTX_CTOR_DELETE =delete;
+#endif
+#endif
+
 #include <directxmath.h>
 
 #define DIRECTX_MESH_VERSION 100
@@ -102,8 +113,8 @@ namespace DirectX
         std::unique_ptr<Impl> pImpl;
 
         // Prevent copying.
-        VBReader(VBReader const&);
-        VBReader& operator= (VBReader const&);
+        VBReader(VBReader const&) DIRECTX_CTOR_DELETE
+        VBReader& operator= (VBReader const&) DIRECTX_CTOR_DELETE
     };
 
     class VBWriter
@@ -140,8 +151,8 @@ namespace DirectX
         std::unique_ptr<Impl> pImpl;
 
         // Prevent copying.
-        VBWriter(VBWriter const&);
-        VBWriter& operator= (VBWriter const&);
+        VBWriter(VBWriter const&) DIRECTX_CTOR_DELETE
+        VBWriter& operator= (VBWriter const&) DIRECTX_CTOR_DELETE
     };
 
     //---------------------------------------------------------------------------------
