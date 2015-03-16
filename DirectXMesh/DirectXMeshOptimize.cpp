@@ -921,7 +921,7 @@ HRESULT OptimizeFacesEx( const uint16_t* indices, size_t nFaces, const uint32_t*
         if ( restart > vertexCache )
             return E_INVALIDARG;
 
-        return _VertexCacheStripReorder<uint16_t>( indices, nFaces, adjacency, nullptr, faceRemap, vertexCache, restart );
+        return _VertexCacheStripReorder<uint16_t>( indices, nFaces, adjacency, attributes, faceRemap, vertexCache, restart );
     }
 }
 
@@ -944,7 +944,7 @@ HRESULT OptimizeFacesEx( const uint32_t* indices, size_t nFaces, const uint32_t*
         if ( restart > vertexCache )
             return E_INVALIDARG;
 
-        return _VertexCacheStripReorder<uint32_t>( indices, nFaces, adjacency, nullptr, faceRemap, vertexCache, restart );
+        return _VertexCacheStripReorder<uint32_t>( indices, nFaces, adjacency, attributes, faceRemap, vertexCache, restart );
     }
 }
 
