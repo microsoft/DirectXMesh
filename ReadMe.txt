@@ -37,8 +37,8 @@ Meshconvert\
 
     Note this tool does not support legacy .X files, but can export CMO, SDKMESH, and VBO files.
 
-All content and source code for this package are bound to the Microsoft Public License (Ms-PL)
-<http://www.microsoft.com/en-us/openness/licenses.aspx#MPL>.
+All content and source code for this package are subject to the terms of the MIT License.
+<http://opensource.org/licenses/MIT>.
 
 For the latest version of DirectXMesh, more detailed documentation, discussion forums, bug
 reports and feature requests, please visit the Codeplex site.
@@ -66,7 +66,7 @@ functions for computing this from mesh triangles.
 
    std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
-      pos.get()[ j ] = mesh->vertices[ j ].position;
+      pos[ j ] = mesh->vertices[ j ].position;
 
    std::unique_ptr<XMFLOAT3[]> normals( new XMFLOAT3[ nVerts ] );
    if ( FAILED( ComputeNormals( &mesh->indices.front(), nFaces, pos.get(), nVerts, CNORM_DEFAULT, normals.get() ) ) )
@@ -77,7 +77,7 @@ functions for computing this from mesh triangles.
 
    std::unique_ptr<XMFLOAT2[]> texcoords( new XMFLOAT2[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
-      texcoords.get()[ j ] = mesh->vertices[ j ].textureCoordinate;
+      texcoords[ j ] = mesh->vertices[ j ].textureCoordinate;
 
    std::unique_ptr<XMFLOAT3[]> tangents( new XMFLOAT3[ nVerts ] );
    std::unique_ptr<XMFLOAT3[]> bitangents( new XMFLOAT3[ nVerts ] );
@@ -106,7 +106,7 @@ adjacency information to function.
 
    std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
-      pos.get()[ j ] = mesh->vertices[ j ].position;
+      pos[ j ] = mesh->vertices[ j ].position;
 
    std::unique_ptr<uint32_t[]> adj( new uint32_t[ mesh->indices.size() ] );
    if ( FAILED( GenerateAdjacencyAndPointReps( &mesh->indices.front(), nFaces, pos.get(), nVerts,
@@ -137,7 +137,7 @@ resolve such issues.
 
    std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
-      pos.get()[ j ] = mesh->vertices[ j ].position;
+      pos[ j ] = mesh->vertices[ j ].position;
 
    std::unique_ptr<uint32_t[]> adj( new uint32_t[ mesh->indices.size() ] );
    if ( FAILED( GenerateAdjacencyAndPointReps( &mesh->indices.front(), nFaces, pos.get(), nVerts,
@@ -172,7 +172,7 @@ improved utilization of hardware resources.
 
    std::unique_ptr<XMFLOAT3[]> pos( new XMFLOAT3[ nVerts ] );
    for( size_t j = 0; j < nVerts; ++j )
-      pos.get()[ j ] = mesh->vertices[ j ].position;
+      pos[ j ] = mesh->vertices[ j ].position;
 
    std::unique_ptr<uint32_t[]> adj( new uint32_t[ mesh->indices.size() ] );
    if ( FAILED( GenerateAdjacencyAndPointReps( &mesh->indices.front(), nFaces, pos.get(), nVerts,
@@ -242,7 +242,7 @@ Extracting vertex data:
 
    struct aligned_deleter { void operator()(void* p) { _aligned_free(p); } };
 
-   std::unique_ptr<XMVECTOR, aligned_deleter> buff(
+   std::unique_ptr<XMVECTOR[], aligned_deleter> buff(
     reinterpret_cast<XMVECTOR*>( _aligned_malloc( sizeof(XMVECTOR) * nVerts, 16 ) ) );
 
    if ( FAILED( reader->Read( buff.get(), "POSITION", 0, nVerts ) ) )
@@ -252,7 +252,7 @@ Inserting vertex data:
 
    struct aligned_deleter { void operator()(void* p) { _aligned_free(p); } };
 
-   std::unique_ptr<XMVECTOR, aligned_deleter> buff(
+   std::unique_ptr<XMVECTOR[], aligned_deleter> buff(
        reinterpret_cast<XMVECTOR*>( _aligned_malloc( sizeof(XMVECTOR) * nVerts, 16 ) ) );
 
    // Store position data into XMVECTOR buff array
