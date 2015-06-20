@@ -298,7 +298,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh Optimization
 
-    HRESULT __cdecl AttributeSort( _In_ size_t nFaces, _Inout_updates_all_opt_(nFaces) uint32_t* attributes,
+    HRESULT __cdecl AttributeSort( _In_ size_t nFaces, _Inout_updates_all_(nFaces) uint32_t* attributes,
                                    _Out_writes_(nFaces) uint32_t* faceRemap );
         // Reorders faces by attribute id
 
