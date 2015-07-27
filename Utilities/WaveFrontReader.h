@@ -84,9 +84,21 @@ public:
             if( !InFile )
                 break;
 
-            if( 0 == wcscmp( strCommand, L"#" ) )
+            if ( *strCommand == L'#' )
             {
                 // Comment
+            }
+            else if( 0 == wcscmp( strCommand, L"o" ) )
+            {
+                // Object name ignored
+            }
+            else if( 0 == wcscmp( strCommand, L"g" ) )
+            {
+                // Group name ignored
+            }
+            else if( 0 == wcscmp( strCommand, L"s" ) )
+            {
+                // Smoothing group ignored
             }
             else if( 0 == wcscmp( strCommand, L"v" ) )
             {
@@ -274,8 +286,10 @@ public:
             }
             else
             {
+#ifdef _DEBUG
                 // Unimplemented or unrecognized command
                 OutputDebugStringW( strCommand );
+#endif
             }
 
             InFile.ignore( 1000, '\n' );
