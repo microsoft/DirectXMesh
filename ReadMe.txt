@@ -3,17 +3,14 @@ DIRECTX MESH LIBRARY (DirectXMesh)
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-July 8, 2015
+July 29, 2015
 
 This package contains DirectXMesh, a shared source library for performing various geometry
 content processing operations including generating normals and tangent frames, triangle
 adjacency computations, and vertex cache optimization.
 
-The source is written for Visual Studio 2010, 2012, 2013, or 2015. It is recommended that you
+The source is written for Visual Studio 2012, 2013, or 2015. It is recommended that you
 make use of the Windows 8.1 SDK and Windows 7 Service Pack 1 or later.
-
-Details on using the Windows 8.1 SDK with VS 2010 are described on the Visual C++ Team Blog:
-<http://blogs.msdn.com/b/vcblog/archive/2012/11/23/using-the-windows-8-sdk-with-visual-studio-2010-configuring-multiple-projects.aspx>
 
 These components are designed to work without requiring any content from the DirectX SDK. For details,
 see "Where is the DirectX SDK?" <http://msdn.microsoft.com/en-us/library/ee663275.aspx>.
@@ -50,6 +47,11 @@ http://go.microsoft.com/fwlink/?LinkID=324981
 ---------------
 RELEASE HISTORY
 ---------------
+
+July 29, 2015
+    Updated for VS 2015 and Windows 10 SDK RTM
+    Retired VS 2010 projects
+    WaveFrontReader: updated utility to minimize debug output
 
 July 8, 2015
     Minor SAL fix and project cleanup
