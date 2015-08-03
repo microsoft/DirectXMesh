@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXMesh", "DirectXMesh_WindowsPhone81.vcxproj", "{D61DFA02-CC01-4DE4-B3F3-B4EBE4A76678}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXMesh", "DirectXMesh\DirectXMesh_WindowsPhone81.vcxproj", "{D61DFA02-CC01-4DE4-B3F3-B4EBE4A76678}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
