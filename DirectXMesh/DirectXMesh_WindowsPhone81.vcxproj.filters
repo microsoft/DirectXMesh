@@ -13,10 +13,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scoped.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="DirectXMeshP.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
