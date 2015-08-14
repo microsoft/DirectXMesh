@@ -13,11 +13,16 @@
 // http://go.microsoft.com/fwlink/?LinkID=324981
 //-------------------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && (_MSC_VER > 1000)
 #pragma once
+
+#if !defined(WIN32_LEAN_AND_MEAN)
+#define WIN32_LEAN_AND_MEAN
 #endif
 
+#if !defined(NOMINMAX)
 #define NOMINMAX
+#endif
+
 #include <windows.h>
 
 #include <directxmath.h>
@@ -34,6 +39,11 @@
 #include "directxmesh.h"
 
 #include "scoped.h"
+
+#ifndef XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM
+#define XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM DXGI_FORMAT(189)
+#endif
+
 
 namespace DirectX
 {

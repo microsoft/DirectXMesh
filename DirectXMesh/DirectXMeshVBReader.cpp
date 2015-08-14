@@ -205,7 +205,7 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
     const uint8_t* eptr = vb + stride * mVerts[ inputSlot ];
     const uint8_t* ptr = vb + mInputDesc[ it->second ].AlignedByteOffset;
 
-    switch( mInputDesc[ it->second ].Format )
+    switch( static_cast<int>(mInputDesc[ it->second ].Format) )
     {
     case DXGI_FORMAT_R32G32B32A32_FLOAT:
         LOAD_VERTS( XMFLOAT4, XMLoadFloat4 )
@@ -488,6 +488,10 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
             }
         }
         break;
+
+    case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
+        // Xbox One specific format
+        LOAD_VERTS( XMXDECN4, XMLoadXDecN4 );
 
     default:
         return E_FAIL;

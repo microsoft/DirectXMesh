@@ -45,7 +45,7 @@
 
 #include <directxmath.h>
 
-#define DIRECTX_MESH_VERSION 100
+#define DIRECTX_MESH_VERSION 101
 
 namespace DirectX
 {

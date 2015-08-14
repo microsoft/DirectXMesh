@@ -205,7 +205,7 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
     const uint8_t* eptr = vb + stride * mVerts[ inputSlot ];
     uint8_t* ptr = vb + mInputDesc[ it->second ].AlignedByteOffset;
 
-    switch( mInputDesc[ it->second ].Format )
+    switch( static_cast<int>( mInputDesc[ it->second ].Format ) )
     {
     case DXGI_FORMAT_R32G32B32A32_FLOAT:
         STORE_VERTS( XMFLOAT4, XMStoreFloat4 )
@@ -497,6 +497,10 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
             }
         }
         break;
+
+    case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
+        // Xbox One specific format
+        STORE_VERTS( XMXDECN4, XMStoreXDecN4 );
 
     default:
         return E_FAIL;

@@ -17,6 +17,11 @@
 
 using namespace DirectX;
 
+#if defined(_XBOX_ONE) && defined(_TITLE)
+static_assert(XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM == DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM, "Xbox One XDK mismatch detected");
+#endif
+
+
 namespace DirectX
 {
 
@@ -32,7 +37,7 @@ size_t BytesPerElement( DXGI_FORMAT fmt )
 {
     // This list only includes those formats that are valid for use by IB or VB
 
-    switch( fmt )
+    switch( static_cast<int>(fmt) )
     {
     case DXGI_FORMAT_R32G32B32A32_FLOAT:
     case DXGI_FORMAT_R32G32B32A32_UINT:
@@ -71,6 +76,7 @@ size_t BytesPerElement( DXGI_FORMAT fmt )
     case DXGI_FORMAT_R32_SINT:
     case DXGI_FORMAT_B8G8R8A8_UNORM:
     case DXGI_FORMAT_B8G8R8X8_UNORM:
+    case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
         return 4;
 
     case DXGI_FORMAT_R8G8_UNORM:
