@@ -514,7 +514,7 @@ public:
             nShininess( 0 ),
             fAlpha( 1.f ),
             bSpecular( false )
-            { memset(strName, 0, MAX_PATH); memset(strTexture, 0, MAX_PATH); } 
+            { memset(strName, 0, sizeof(strName)); memset(strTexture, 0, sizeof(strTexture)); } 
     };
 
     std::vector<Vertex>     vertices;
