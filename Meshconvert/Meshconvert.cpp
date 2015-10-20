@@ -166,8 +166,8 @@ HRESULT LoadFromOBJ(const WCHAR* szFilename, std::unique_ptr<Mesh>& inMesh, std:
     if (wfReader.indices.empty() || wfReader.vertices.empty())
         return E_FAIL;
 
-    hr = inMesh->SetIndexData(wfReader.indices.size() / 3, &wfReader.indices.front(),
-                              wfReader.attributes.empty() ? nullptr : &wfReader.attributes.front());
+    hr = inMesh->SetIndexData(wfReader.indices.size() / 3, wfReader.indices.data(),
+                              wfReader.attributes.empty() ? nullptr : wfReader.attributes.data());
     if (FAILED(hr))
         return hr;
 
@@ -206,7 +206,7 @@ HRESULT LoadFromOBJ(const WCHAR* szFilename, std::unique_ptr<Mesh>& inMesh, std:
     if (FAILED(hr))
         return hr;
 
-    hr = vbr.AddStream(&wfReader.vertices.front(), wfReader.vertices.size(), 0, sizeof(WaveFrontReader<uint32_t>::Vertex));
+    hr = vbr.AddStream(wfReader.vertices.data(), wfReader.vertices.size(), 0, sizeof(WaveFrontReader<uint32_t>::Vertex));
     if (FAILED(hr))
         return hr;
 
@@ -674,7 +674,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else if ( !_wcsicmp(outputExt, L".sdkmesh") )
         {
-            hr = inMesh->ExportToSDKMESH(outputPath, inMaterial.size(), inMaterial.empty() ? nullptr : &inMaterial.front());
+            hr = inMesh->ExportToSDKMESH(outputPath, inMaterial.size(), inMaterial.empty() ? nullptr : inMaterial.data());
         }
         else if ( !_wcsicmp(outputExt, L".cmo") )
         {
@@ -690,7 +690,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            hr = inMesh->ExportToCMO(outputPath, inMaterial.size(), inMaterial.empty() ? nullptr : &inMaterial.front());
+            hr = inMesh->ExportToCMO(outputPath, inMaterial.size(), inMaterial.empty() ? nullptr : inMaterial.data());
         }
         else if ( !_wcsicmp(outputExt, L".x") )
         {

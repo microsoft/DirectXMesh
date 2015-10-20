@@ -298,7 +298,7 @@ public:
         // Cleanup
         InFile.close();
 
-        BoundingBox::CreateFromPoints( bounds, positions.size(), &positions.front(), sizeof(XMFLOAT3) );
+        BoundingBox::CreateFromPoints( bounds, positions.size(), positions.data(), sizeof(XMFLOAT3) );
 
         // If an associated material file was found, read that in as well.
         if( *strMaterialFilename )
@@ -466,19 +466,19 @@ public:
             return E_FAIL;
 
         vertices.resize( numVertices );
-        vboFile.read( reinterpret_cast<char*>( &vertices.front() ), sizeof(Vertex) * numVertices );
+        vboFile.read( reinterpret_cast<char*>( vertices.data() ), sizeof(Vertex) * numVertices );
 
 #pragma warning( suppress : 4127 )
         if ( sizeof( index_t ) == 2 )
         {
             indices.resize( numIndices );
-            vboFile.read( reinterpret_cast<char*>( &indices.front() ), sizeof(uint16_t) * numIndices );
+            vboFile.read( reinterpret_cast<char*>( indices.data() ), sizeof(uint16_t) * numIndices );
         }
         else
         {
             std::vector<uint16_t> tmp;
             tmp.resize( numIndices );
-            vboFile.read( reinterpret_cast<char*>( &tmp.front() ), sizeof(uint16_t) * numIndices );
+            vboFile.read( reinterpret_cast<char*>( tmp.data() ), sizeof(uint16_t) * numIndices );
 
             indices.reserve( numIndices );
             for( auto it = tmp.cbegin(); it != tmp.cend(); ++it )
@@ -487,7 +487,7 @@ public:
             }
         }
 
-        BoundingBox::CreateFromPoints( bounds, vertices.size(), reinterpret_cast<const XMFLOAT3*>( &vertices.front() ), sizeof(Vertex) );
+        BoundingBox::CreateFromPoints( bounds, vertices.size(), reinterpret_cast<const XMFLOAT3*>( vertices.data() ), sizeof(Vertex) );
 
         vboFile.close();
 
