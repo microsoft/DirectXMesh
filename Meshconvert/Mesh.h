@@ -62,7 +62,11 @@ public:
 
     HRESULT Optimize( _In_ uint32_t vertexCache = DirectX::OPTFACES_V_DEFAULT, _In_ uint32_t restart = DirectX::OPTFACES_R_DEFAULT );
 
-    HRESULT ReverseWinding( bool texcoords );
+    HRESULT ReverseWinding();
+
+    HRESULT InvertVTexCoord();
+
+    HRESULT ReverseHandedness();
 
     // Accessors
     const uint32_t* GetAttributeBuffer() const { return mAttributes.get(); }
