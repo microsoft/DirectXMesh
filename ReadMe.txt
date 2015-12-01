@@ -3,7 +3,7 @@ DIRECTX MESH LIBRARY (DirectXMesh)
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-October 30, 2015
+November 30, 2015
 
 This package contains DirectXMesh, a shared source library for performing various geometry
 content processing operations including generating normals and tangent frames, triangle
@@ -47,6 +47,10 @@ http://go.microsoft.com/fwlink/?LinkID=324981
 ---------------
 RELEASE HISTORY
 ---------------
+
+November 30, 2015
+    meshconvert command-line tool updated with -flipv and -flipz switches; removed -fliptc
+    Updated for VS 2015 Update 1 and Windows 10 SDK (10586)
 
 October 30, 2015
     Minor code cleanup
