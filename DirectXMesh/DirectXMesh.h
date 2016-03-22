@@ -15,32 +15,17 @@
 
 #pragma once
 
-// VS 2010's stdint.h conflicts with intsafe.h
-#pragma warning(push)
-#pragma warning(disable : 4005)
-#include <stdint.h>
-#pragma warning(pop)
-
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <stdint.h>
 
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <d3d11_x.h>
 #define DCOMMON_H_INCLUDED
 #else
 #include <d3d11_1.h>
-#endif
-
-// VS 2010/2012 do not support =default =delete
-#ifndef DIRECTX_CTOR_DEFAULT
-#if defined(_MSC_VER) && (_MSC_VER < 1800)
-#define DIRECTX_CTOR_DEFAULT {}
-#define DIRECTX_CTOR_DELETE ;
-#else
-#define DIRECTX_CTOR_DEFAULT =default;
-#define DIRECTX_CTOR_DELETE =delete;
-#endif
 #endif
 
 #include <directxmath.h>
@@ -85,6 +70,10 @@ namespace DirectX
         VBReader();
         VBReader(VBReader&& moveFrom);
         VBReader& operator= (VBReader&& moveFrom);
+
+        VBReader(VBReader const&) = delete;
+        VBReader& operator= (VBReader const&) = delete;
+
         ~VBReader();
 
         HRESULT __cdecl Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl );
@@ -111,10 +100,6 @@ namespace DirectX
         class Impl;
 
         std::unique_ptr<Impl> pImpl;
-
-        // Prevent copying.
-        VBReader(VBReader const&) DIRECTX_CTOR_DELETE
-        VBReader& operator= (VBReader const&) DIRECTX_CTOR_DELETE
     };
 
     class VBWriter
@@ -123,6 +108,10 @@ namespace DirectX
         VBWriter();
         VBWriter(VBWriter&& moveFrom);
         VBWriter& operator= (VBWriter&& moveFrom);
+
+        VBWriter(VBWriter const&) = delete;
+        VBWriter& operator= (VBWriter const&) = delete;
+
         ~VBWriter();
 
         HRESULT __cdecl Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl );
@@ -149,10 +138,6 @@ namespace DirectX
         class Impl;
 
         std::unique_ptr<Impl> pImpl;
-
-        // Prevent copying.
-        VBWriter(VBWriter const&) DIRECTX_CTOR_DELETE
-        VBWriter& operator= (VBWriter const&) DIRECTX_CTOR_DELETE
     };
 
     //---------------------------------------------------------------------------------
