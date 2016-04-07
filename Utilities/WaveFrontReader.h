@@ -15,6 +15,7 @@
 // http://go.microsoft.com/fwlink/?LinkID=324981
 //--------------------------------------------------------------------------------------
 
+#define NOMINMAX
 #include <windows.h>
 
 #include <algorithm>
@@ -188,6 +189,7 @@ public:
                         // Too many indices for 16-bit IB!
                         return E_FAIL;
                     }
+#pragma warning( suppress : 4127 )
                     else if ( sizeof(index_t) == 4 && ( index >= 0xFFFFFFFF ) )
                     {
                         // Too many indices for 32-bit IB!
