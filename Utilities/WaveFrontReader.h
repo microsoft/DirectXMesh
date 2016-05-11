@@ -56,7 +56,7 @@ public:
         if( !InFile )
             return HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND );
 
-        WCHAR fname[_MAX_FNAME];
+        wchar_t fname[_MAX_FNAME];
         _wsplitpath_s( szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0 );
 
         name = fname;
@@ -74,8 +74,8 @@ public:
 
         uint32_t curSubset = 0;
 
-        WCHAR strCommand[256] = {0};
-        WCHAR strMaterialFilename[MAX_PATH] = {0};
+        wchar_t strCommand[256] = {0};
+        wchar_t strMaterialFilename[MAX_PATH] = {0};
         for( ;; )
         {
             InFile >> strCommand;
@@ -260,7 +260,7 @@ public:
             else if( 0 == wcscmp( strCommand, L"usemtl" ) )
             {
                 // Material
-                WCHAR strName[MAX_PATH] = {0};
+                wchar_t strName[MAX_PATH] = {0};
                 InFile >> strName;
 
                 bool bFound = false;
@@ -302,14 +302,14 @@ public:
         // If an associated material file was found, read that in as well.
         if( *strMaterialFilename )
         {
-            WCHAR ext[_MAX_EXT];
+            wchar_t ext[_MAX_EXT];
             _wsplitpath_s( strMaterialFilename, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, ext, _MAX_EXT );
 
-            WCHAR drive[_MAX_DRIVE];
-            WCHAR dir[_MAX_DIR];
+            wchar_t drive[_MAX_DRIVE];
+            wchar_t dir[_MAX_DIR];
             _wsplitpath_s( szFileName, drive, _MAX_DRIVE, dir, _MAX_DIR, nullptr, 0, nullptr, 0 );
 
-            WCHAR szPath[ MAX_PATH ];
+            wchar_t szPath[ MAX_PATH ];
             _wmakepath_s( szPath, MAX_PATH, drive, dir, fname, ext );
 
             HRESULT hr = LoadMTL( szPath );
@@ -329,7 +329,7 @@ public:
 
         auto curMaterial = materials.end();
 
-        WCHAR strCommand[256] = {0};
+        wchar_t strCommand[256] = {0};
         for( ;; )
         {
             InFile >> strCommand;
@@ -339,7 +339,7 @@ public:
             if( 0 == wcscmp( strCommand, L"newmtl" ) )
             {
                 // Switching active materials
-                WCHAR strName[MAX_PATH] = {0};
+                wchar_t strName[MAX_PATH] = {0};
                 InFile >> strName;
 
                 curMaterial = materials.end();
@@ -438,7 +438,7 @@ public:
     {
         Clear();
 
-        WCHAR fname[_MAX_FNAME];
+        wchar_t fname[_MAX_FNAME];
         _wsplitpath_s( szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0 );
 
         name = fname;
@@ -503,8 +503,8 @@ public:
 
         bool bSpecular;
 
-        WCHAR   strName[MAX_PATH];
-        WCHAR   strTexture[MAX_PATH];
+        wchar_t strName[MAX_PATH];
+        wchar_t strTexture[MAX_PATH];
 
         Material() :
             vAmbient( 0.2f, 0.2f, 0.2f ),
