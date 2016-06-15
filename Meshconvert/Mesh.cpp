@@ -1065,25 +1065,18 @@ HRESULT Mesh::CreateFromVBO( const wchar_t* szFileName, std::unique_ptr<Mesh>& r
     }
 
     // Get the file size
-    LARGE_INTEGER FileSize = { 0 };
-
-#if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
     FILE_STANDARD_INFO fileInfo;
     if (!GetFileInformationByHandleEx(hFile.get(), FileStandardInfo, &fileInfo, sizeof(fileInfo)))
     {
         return HRESULT_FROM_WIN32(GetLastError());
     }
-    FileSize = fileInfo.EndOfFile;
-#else
-    GetFileSizeEx(hFile.get(), &FileSize);
-#endif
 
     // File is too big for 32-bit allocation, so reject read
-    if (FileSize.HighPart > 0)
+    if (fileInfo.EndOfFile.HighPart > 0)
         return E_FAIL;
 
     // Need at least enough data to read the header
-    if (FileSize.LowPart < sizeof(header_t))
+    if (fileInfo.EndOfFile.LowPart < sizeof(header_t))
         return E_FAIL;
 
     // Read VBO header
