@@ -74,8 +74,8 @@ public:
 
         uint32_t curSubset = 0;
 
-        wchar_t strCommand[256] = {0};
-        wchar_t strMaterialFilename[MAX_PATH] = {0};
+        wchar_t strCommand[256] = {};
+        wchar_t strMaterialFilename[MAX_PATH] = {};
         for( ;; )
         {
             InFile >> strCommand;
@@ -260,7 +260,7 @@ public:
             else if( 0 == wcscmp( strCommand, L"usemtl" ) )
             {
                 // Material
-                wchar_t strName[MAX_PATH] = {0};
+                wchar_t strName[MAX_PATH] = {};
                 InFile >> strName;
 
                 bool bFound = false;
@@ -329,7 +329,7 @@ public:
 
         auto curMaterial = materials.end();
 
-        wchar_t strCommand[256] = {0};
+        wchar_t strCommand[256] = {};
         for( ;; )
         {
             InFile >> strCommand;
@@ -339,7 +339,7 @@ public:
             if( 0 == wcscmp( strCommand, L"newmtl" ) )
             {
                 // Switching active materials
-                wchar_t strName[MAX_PATH] = {0};
+                wchar_t strName[MAX_PATH] = {};
                 InFile >> strName;
 
                 curMaterial = materials.end();

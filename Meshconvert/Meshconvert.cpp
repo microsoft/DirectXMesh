@@ -226,8 +226,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
 
         for (auto it = wfReader.materials.cbegin(); it != wfReader.materials.cend(); ++it)
         {
-            Mesh::Material mtl;
-            memset(&mtl, 0, sizeof(mtl));
+            Mesh::Material mtl = {};
 
             mtl.name = it->strName;
             mtl.specularPower = (it->bSpecular) ? float(it->nShininess) : 1.f;

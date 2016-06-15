@@ -1475,8 +1475,7 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
         if (FAILED(hr))
             return hr;
 
-        VSD3DStarter::Material mdata;
-        memset( &mdata, 0, sizeof(mdata) );
+        VSD3DStarter::Material mdata = {};
 
         mdata.Ambient.x = m.ambientColor.x;
         mdata.Ambient.y = m.ambientColor.y;
