@@ -43,6 +43,11 @@ For the latest version of DirectXMesh, bug reports, etc. please visit the projec
 
 http://go.microsoft.com/fwlink/?LinkID=324981
 
+This project has adopted the Microsoft Open Source Code of Conduct. For more information see the
+Code of Conduct FAQ or contact opencode@microsoft.com with any additional questions or comments.
+
+https://opensource.microsoft.com/codeofconduct/
+
 
 ---------------
 RELEASE HISTORY
