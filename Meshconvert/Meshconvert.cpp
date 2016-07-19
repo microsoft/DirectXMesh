@@ -42,6 +42,7 @@ enum OPTIONS    // Note: dwOptions below assumes 32 or less options.
     OPT_OVERWRITE,
     OPT_NODDS,
     OPT_FLIP,
+    OPT_FLIPU,
     OPT_FLIPV,
     OPT_FLIPZ,
     OPT_NOLOGO,
@@ -84,6 +85,7 @@ SValue g_pOptions[] =
     { L"y",             OPT_OVERWRITE  },
     { L"nodds",         OPT_NODDS      },
     { L"flip",          OPT_FLIP       },
+    { L"flipu",         OPT_FLIPU      },
     { L"flipv",         OPT_FLIPV      },
     { L"flipz",         OPT_FLIPZ      },
     { L"nologo",        OPT_NOLOGO     },
@@ -146,6 +148,7 @@ void PrintUsage()
     wprintf( L"   -sdkmesh|-cmo|-vbo  output file type\n");
     wprintf( L"   -nodds              prevents extension renaming in exported materials\n");
     wprintf( L"   -flip               reverse winding of faces\n");
+    wprintf( L"   -flipu              inverts the u texcoords\n");
     wprintf( L"   -flipv              inverts the v texcoords\n");
     wprintf( L"   -flipz              flips the handedness of the positions/normals\n");
     wprintf( L"   -o <filename>       output filename\n");
@@ -234,6 +237,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
             mtl.ambientColor = it->vAmbient;
             mtl.diffuseColor = it->vDiffuse;
             mtl.specularColor = (it->bSpecular) ? it->vSpecular : XMFLOAT3(0.f, 0.f, 0.f);
+            mtl.emissiveColor = XMFLOAT3(0.f, 0.f, 0.f);
 
             wchar_t texture[_MAX_PATH] = { 0 };
             if (*it->strTexture)
@@ -299,15 +303,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             dwOptions |= (1 << dwOption);
 
-            if ( OPT_NOLOGO != dwOption && OPT_OVERWRITE != dwOption
-                 && OPT_CLOCKWISE != dwOption && OPT_NODDS != dwOption
-                 && OPT_FLIP != dwOption && OPT_FLIPV != dwOption && OPT_FLIPZ != dwOption
-                 && OPT_NORMALS != dwOption && OPT_WEIGHT_BY_AREA != dwOption && OPT_WEIGHT_BY_EQUAL != dwOption
-                 && OPT_TANGENTS != dwOption && OPT_CTF != dwOption
-                 && OPT_OPTIMIZE != dwOption && OPT_CLEAN != dwOption
-                 && OPT_TOPOLOGICAL_ADJ != dwOption && OPT_GEOMETRIC_ADJ != dwOption
-                 && OPT_SDKMESH != dwOption && OPT_CMO != dwOption && OPT_VBO != dwOption )
+            // Handle options with additional value parameter
+            switch (dwOption)
             {
+            case OPT_OUTPUTFILE:
                 if(!*pValue)
                 {
                     if((iArg + 1 >= argc))
@@ -320,6 +319,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                     iArg++;
                     pValue = argv[iArg];
                 }
+                break;
             }
 
             switch(dwOption)
@@ -469,6 +469,16 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         assert(inMesh->GetIndexBuffer() != 0);
 
         wprintf( L"\n%Iu vertices, %Iu faces", nVerts, nFaces );
+
+        if (dwOptions & (1 << OPT_FLIPU))
+        {
+            hr = inMesh->InvertUTexCoord();
+            if (FAILED(hr))
+            {
+                wprintf(L"\nERROR: Failed inverting u texcoord (%08X)\n", hr);
+                return 1;
+            }
+        }
 
         if (dwOptions & (1 << OPT_FLIPV))
         {

@@ -64,6 +64,7 @@ public:
 
     HRESULT ReverseWinding();
 
+    HRESULT InvertUTexCoord();
     HRESULT InvertVTexCoord();
 
     HRESULT ReverseHandedness();

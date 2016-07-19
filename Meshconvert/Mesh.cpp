@@ -727,6 +727,22 @@ HRESULT Mesh::ReverseWinding()
 
 
 //--------------------------------------------------------------------------------------
+HRESULT Mesh::InvertUTexCoord()
+{
+    if (!mTexCoords)
+        return E_UNEXPECTED;
+
+    auto tptr = mTexCoords.get();
+    for (size_t j = 0; j < mnVerts; ++j, ++tptr)
+    {
+        tptr->x = 1.f - tptr->x;
+    }
+
+    return S_OK;
+}
+
+
+//--------------------------------------------------------------------------------------
 HRESULT Mesh::InvertVTexCoord()
 {
     if (!mTexCoords)
@@ -1475,7 +1491,8 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
         if (FAILED(hr))
             return hr;
 
-        VSD3DStarter::Material mdata = {};
+        VSD3DStarter::Material mdata;
+        memset(&mdata, 0, sizeof(mdata));
 
         mdata.Ambient.x = m.ambientColor.x;
         mdata.Ambient.y = m.ambientColor.y;
