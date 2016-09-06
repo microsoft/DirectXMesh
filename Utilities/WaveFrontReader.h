@@ -15,7 +15,19 @@
 // http://go.microsoft.com/fwlink/?LinkID=324981
 //--------------------------------------------------------------------------------------
 
+#pragma once
+
+#pragma warning(push)
+#pragma warning(disable : 4005)
+#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+#define NODRAWTEXT
+#define NOGDI
+#define NOMCX
+#define NOSERVICE
+#define NOHELP
+#pragma warning(pop)
+
 #include <windows.h>
 
 #include <algorithm>
