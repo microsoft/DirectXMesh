@@ -224,6 +224,9 @@ namespace
     {
         wprintf(L"Microsoft (R) MeshConvert Command-line Tool\n");
         wprintf(L"Copyright (C) Microsoft Corp. All rights reserved.\n");
+#ifdef _DEBUG
+        wprintf(L"*** Debug build ***\n");
+#endif
         wprintf(L"\n");
     }
 
