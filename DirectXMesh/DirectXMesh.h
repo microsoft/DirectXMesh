@@ -30,7 +30,7 @@
 
 #include <directxmath.h>
 
-#define DIRECTX_MESH_VERSION 101
+#define DIRECTX_MESH_VERSION 102
 
 namespace DirectX
 {
@@ -82,13 +82,13 @@ namespace DirectX
         HRESULT __cdecl AddStream( _In_reads_bytes_(stride*nVerts) const void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0 );
             // Add vertex buffer to reader
 
-        HRESULT __cdecl Read( _Out_writes_(count) XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Extracts data elements from vertex buffer
 
-        HRESULT __cdecl Read( _Out_writes_(count) float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
-        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
-        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
-        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Helpers for data extraction
 
         void __cdecl Release();
@@ -120,13 +120,13 @@ namespace DirectX
         HRESULT __cdecl AddStream( _Out_writes_bytes_(stride*nVerts) void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0 );
             // Add vertex buffer to writer
 
-        HRESULT __cdecl Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Inserts data elements into vertex buffer
 
-        HRESULT __cdecl Write( _In_reads_(count) const float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
-        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
-        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
-        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Helpers for data insertion
 
         void __cdecl Release();

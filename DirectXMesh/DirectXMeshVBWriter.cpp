@@ -25,9 +25,9 @@ class VBWriter::Impl
 public:
     Impl() : mTempSize(0) {}
 
-    HRESULT Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl );
-    HRESULT AddStream( _Out_writes_bytes_(stride*nVerts) void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride );
-    HRESULT Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+    HRESULT Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl );
+    HRESULT AddStream( _Out_writes_bytes_(stride*nVerts) void* vb, size_t nVerts, size_t inputSlot, size_t stride );
+    HRESULT Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const;
 
     void Release()
     {
@@ -171,8 +171,24 @@ HRESULT VBWriter::Impl::AddStream( void* vb, size_t nVerts, size_t inputSlot, si
         }\
         break;
 
+#define STORE_VERTS_X2( type, func, x2bias )\
+        for( size_t icount = 0; icount < count; ++icount )\
+        {\
+            if ( ( ptr + sizeof(type) ) > eptr )\
+                return E_UNEXPECTED;\
+            XMVECTOR v = *buffer++;\
+            if (x2bias)\
+            {\
+                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);\
+                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);\
+            }\
+            func( reinterpret_cast<type*>(ptr), v );\
+            ptr += stride;\
+        }\
+        break;
+
 _Use_decl_annotations_
-HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     if ( !buffer || !semanticName || !count )
         return E_INVALIDARG;
@@ -229,7 +245,7 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         STORE_VERTS( XMHALF4, XMStoreHalf4 )
 
     case DXGI_FORMAT_R16G16B16A16_UNORM:
-        STORE_VERTS( XMUSHORTN4, XMStoreUShortN4 ) 
+        STORE_VERTS_X2( XMUSHORTN4, XMStoreUShortN4, x2bias ) 
 
     case DXGI_FORMAT_R16G16B16A16_UINT:
         STORE_VERTS( XMUSHORT4, XMStoreUShort4 )
@@ -250,16 +266,30 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         STORE_VERTS( XMINT2, XMStoreSInt2 )
 
     case DXGI_FORMAT_R10G10B10A2_UNORM:
-        STORE_VERTS( XMUDECN4, XMStoreUDecN4 );
+        for (size_t icount = 0; icount < count; ++icount)
+        {
+            if ((ptr + sizeof(XMUDECN4)) > eptr)
+                return E_UNEXPECTED; 
+            XMVECTOR v = *buffer++; 
+            if (x2bias)
+            {
+                XMVECTOR v2 = XMVectorClamp(v, g_XMNegativeOne, g_XMOne); 
+                v2 = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf); 
+                v = XMVectorSelect(v, v2, g_XMSelect1110);
+            }
+            XMStoreUDecN4(reinterpret_cast<XMUDECN4*>(ptr), v);
+            ptr += stride; 
+        }
+        break;
 
     case DXGI_FORMAT_R10G10B10A2_UINT:
         STORE_VERTS( XMUDEC4, XMStoreUDec4 );
 
     case DXGI_FORMAT_R11G11B10_FLOAT:
-        STORE_VERTS( XMFLOAT3PK, XMStoreFloat3PK );
+        STORE_VERTS_X2( XMFLOAT3PK, XMStoreFloat3PK, x2bias )
 
     case DXGI_FORMAT_R8G8B8A8_UNORM:
-        STORE_VERTS( XMUBYTEN4, XMStoreUByteN4 )
+        STORE_VERTS_X2( XMUBYTEN4, XMStoreUByteN4, x2bias )
 
     case DXGI_FORMAT_R8G8B8A8_UINT:
         STORE_VERTS( XMUBYTE4, XMStoreUByte4 )
@@ -274,7 +304,7 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         STORE_VERTS( XMHALF2, XMStoreHalf2 )
 
     case DXGI_FORMAT_R16G16_UNORM:
-        STORE_VERTS( XMUSHORTN2, XMStoreUShortN2 )
+        STORE_VERTS_X2( XMUSHORTN2, XMStoreUShortN2, x2bias )
 
     case DXGI_FORMAT_R16G16_UINT:
         STORE_VERTS( XMUSHORT2, XMStoreUShort2 )
@@ -311,7 +341,7 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         break;
 
     case DXGI_FORMAT_R8G8_UNORM:
-        STORE_VERTS( XMUBYTEN2, XMStoreUByteN2 )
+        STORE_VERTS_X2( XMUBYTEN2, XMStoreUByteN2, x2bias )
 
     case DXGI_FORMAT_R8G8_UINT:
         STORE_VERTS( XMUBYTE2, XMStoreUByte2 )
@@ -327,8 +357,8 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(HALF) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            *reinterpret_cast<HALF*>(ptr) = XMConvertFloatToHalf(v);
+            float f = XMVectorGetX( *buffer++ );
+            *reinterpret_cast<HALF*>(ptr) = XMConvertFloatToHalf(f);
             ptr += stride;
         }
         break;
@@ -338,9 +368,17 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(uint16_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 1.f ), 0.f );
-            *reinterpret_cast<uint16_t*>(ptr) = static_cast<uint16_t>( v*65535.f + 0.5f );
+            float f = XMVectorGetX( *buffer++ );
+            if (x2bias)
+            {
+                f = std::max<float>(std::min<float>(f, 1.f), -1.f);
+                f = f * 0.5f + 0.5f;
+            }
+            else
+            {
+                f = std::max<float>(std::min<float>(f, 1.f), 0.f);
+            }
+            *reinterpret_cast<uint16_t*>(ptr) = static_cast<uint16_t>( f*65535.f + 0.5f );
             ptr += stride;
         }
         break;
@@ -350,9 +388,9 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(uint16_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 65535.f  ), 0.f );
-            *reinterpret_cast<uint16_t*>(ptr) = static_cast<uint16_t>( v );
+            float f = XMVectorGetX( *buffer++ );
+            f = std::max<float>( std::min<float>( f, 65535.f  ), 0.f );
+            *reinterpret_cast<uint16_t*>(ptr) = static_cast<uint16_t>( f );
             ptr += stride;
         }
         break;
@@ -362,9 +400,9 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(int16_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 1.f ), -1.f );
-            *reinterpret_cast<int16_t*>(ptr) = static_cast<int16_t>( v * 32767.f );
+            float f = XMVectorGetX( *buffer++ );
+            f = std::max<float>( std::min<float>( f, 1.f ), -1.f );
+            *reinterpret_cast<int16_t*>(ptr) = static_cast<int16_t>( f * 32767.f );
             ptr += stride;
         }
         break;
@@ -374,9 +412,9 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(int16_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 32767.f ), -32767.f );
-            *reinterpret_cast<int16_t*>(ptr)  = static_cast<int16_t>(v);
+            float f = XMVectorGetX( *buffer++ );
+            f = std::max<float>( std::min<float>( f, 32767.f ), -32767.f );
+            *reinterpret_cast<int16_t*>(ptr) = static_cast<int16_t>(f);
             ptr += stride;
         }
         break;
@@ -386,9 +424,17 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(uint8_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 1.f ), 0.f );
-            *reinterpret_cast<uint8_t*>(ptr)  = static_cast<uint8_t>( v * 255.f );
+            float f = XMVectorGetX( *buffer++ );
+            if (x2bias)
+            {
+                f = std::max<float>(std::min<float>(f, 1.f), -1.f);
+                f = f * 0.5f + 0.5f;
+            }
+            else
+            {
+                f = std::max<float>(std::min<float>(f, 1.f), 0.f);
+            }
+            *reinterpret_cast<uint8_t*>(ptr) = static_cast<uint8_t>( f * 255.f );
             ptr += stride;
         }
         break;
@@ -398,9 +444,9 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(uint8_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 255.f ), 0.f );
-            *reinterpret_cast<uint8_t*>(ptr)  = static_cast<uint8_t>( v );
+            float f = XMVectorGetX( *buffer++ );
+            f = std::max<float>( std::min<float>( f, 255.f ), 0.f );
+            *reinterpret_cast<uint8_t*>(ptr)  = static_cast<uint8_t>( f );
             ptr += stride;
         }
         break;
@@ -410,9 +456,9 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(int8_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 1.f ), -1.f );
-            *reinterpret_cast<int8_t*>(ptr)  = static_cast<int8_t>( v * 127.f );
+            float f = XMVectorGetX( *buffer++ );
+            f = std::max<float>( std::min<float>( f, 1.f ), -1.f );
+            *reinterpret_cast<int8_t*>(ptr)  = static_cast<int8_t>( f * 127.f );
             ptr += stride;
         }
         break;
@@ -422,21 +468,26 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
         {
             if ( ( ptr + sizeof(int8_t) ) > eptr )
                 return E_UNEXPECTED;
-            float v = XMVectorGetX( *buffer++ );
-            v = std::max<float>( std::min<float>( v, 127.f ), -127.f );
-            *reinterpret_cast<int8_t*>(ptr)  = static_cast<int8_t>(v);
+            float f = XMVectorGetX( *buffer++ );
+            f = std::max<float>( std::min<float>( f, 127.f ), -127.f );
+            *reinterpret_cast<int8_t*>(ptr)  = static_cast<int8_t>(f);
             ptr += stride;
         }
         break;
 
     case DXGI_FORMAT_B5G6R5_UNORM:
         {
-            static XMVECTORF32 s_Scale = { 31.f, 63.f, 31.f, 1.f };
+            static const XMVECTORF32 s_Scale = { 31.f, 63.f, 31.f, 1.f };
             for( size_t icount = 0; icount < count; ++icount )
             {
                 if ( ( ptr + sizeof(XMU565) ) > eptr )
                     return E_UNEXPECTED;
                 XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>( *buffer++  );
+                if (x2bias)
+                {
+                    v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne); 
+                    v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+                }
                 v = XMVectorMultiply( v, s_Scale );
                 XMStoreU565( reinterpret_cast<XMU565*>(ptr), v );
                 ptr += stride;
@@ -446,13 +497,19 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
 
     case DXGI_FORMAT_B5G5R5A1_UNORM:
         {
-            static XMVECTORF32 s_Scale = { 31.f, 31.f, 31.f, 1.f };
+            static const XMVECTORF32 s_Scale = { 31.f, 31.f, 31.f, 1.f };
             for( size_t icount = 0; icount < count; ++icount )
             {
                 if ( ( ptr + sizeof(XMU555) ) > eptr )
                     return E_UNEXPECTED;
                 XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>( *buffer++  );
-                v = XMVectorMultiply( v, s_Scale );
+                if (x2bias)
+                {
+                    XMVECTOR v2 = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                    v2 = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
+                    v = XMVectorSelect(v, v2, g_XMSelect1110);
+                }
+                v = XMVectorMultiply(v, s_Scale);
                 XMStoreU555( reinterpret_cast<XMU555*>(ptr), v );
                 reinterpret_cast<XMU555*>(ptr)->w = ( XMVectorGetW( v ) > 0.5f ) ? 1 : 0;
                 ptr += stride;
@@ -466,6 +523,11 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
             if ( ( ptr + sizeof(XMUBYTEN4) ) > eptr )
                 return E_UNEXPECTED;
             XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>( *buffer++  );
+            if (x2bias)
+            {
+                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+            }
             XMStoreUByteN4( reinterpret_cast<XMUBYTEN4*>(ptr), v );
             ptr += stride;
         }
@@ -477,7 +539,12 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
             if ( ( ptr + sizeof(XMUBYTEN4) ) > eptr )
                 return E_UNEXPECTED;
             XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>( *buffer++ );
-            v = XMVectorSelect( g_XMZero, v, g_XMSelect1110 );
+            if (x2bias)
+            {
+                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+            }
+            v = XMVectorSelect(g_XMZero, v, g_XMSelect1110);
             XMStoreUByteN4( reinterpret_cast<XMUBYTEN4*>(ptr), v );
             ptr += stride;
         }
@@ -485,13 +552,18 @@ HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT
 
     case DXGI_FORMAT_B4G4R4A4_UNORM:
         {
-            static XMVECTORF32 s_Scale = { 15.f, 15.f, 15.f, 15.f };
+            static const XMVECTORF32 s_Scale = { 15.f, 15.f, 15.f, 15.f };
             for( size_t icount = 0; icount < count; ++icount )
             {
                 if ( ( ptr + sizeof(XMUNIBBLE4) ) > eptr )
                     return E_UNEXPECTED;
                 XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>( *buffer++  );
-                v = XMVectorMultiply( v, s_Scale );
+                if (x2bias)
+                {
+                    v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                    v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+                }
+                v = XMVectorMultiply(v, s_Scale);
                 XMStoreUNibble4( reinterpret_cast<XMUNIBBLE4*>(ptr), v );
                 ptr += stride;
             }
@@ -560,15 +632,15 @@ HRESULT VBWriter::AddStream( void* vb, size_t nVerts, size_t inputSlot, size_t s
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBWriter::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
-    return pImpl->Write( buffer, semanticName, semanticIndex, count );
+    return pImpl->Write( buffer, semanticName, semanticIndex, count, x2bias );
 }
 
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const float* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBWriter::Write( const float* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -582,11 +654,11 @@ HRESULT VBWriter::Write( const float* buffer, LPCSTR semanticName, UINT semantic
         *(dptr)++ = v;
     }
 
-    return pImpl->Write( temp, semanticName, semanticIndex, count );
+    return pImpl->Write( temp, semanticName, semanticIndex, count, x2bias );
 }
 
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMFLOAT2* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBWriter::Write( const XMFLOAT2* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -600,11 +672,11 @@ HRESULT VBWriter::Write( const XMFLOAT2* buffer, LPCSTR semanticName, UINT seman
         *(dptr)++ = v;
     }
 
-    return pImpl->Write( temp, semanticName, semanticIndex, count );
+    return pImpl->Write( temp, semanticName, semanticIndex, count, x2bias );
 }
 
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMFLOAT3* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBWriter::Write( const XMFLOAT3* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -618,11 +690,11 @@ HRESULT VBWriter::Write( const XMFLOAT3* buffer, LPCSTR semanticName, UINT seman
         *(dptr)++ = v;
     }
 
-    return pImpl->Write( temp, semanticName, semanticIndex, count );
+    return pImpl->Write( temp, semanticName, semanticIndex, count, x2bias );
 }
 
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMFLOAT4* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBWriter::Write( const XMFLOAT4* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -636,7 +708,7 @@ HRESULT VBWriter::Write( const XMFLOAT4* buffer, LPCSTR semanticName, UINT seman
         *(dptr)++ = v;
     }
 
-    return pImpl->Write( temp, semanticName, semanticIndex, count );
+    return pImpl->Write( temp, semanticName, semanticIndex, count, x2bias );
 }
 
 

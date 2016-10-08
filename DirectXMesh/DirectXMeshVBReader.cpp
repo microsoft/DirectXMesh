@@ -25,9 +25,9 @@ class VBReader::Impl
 public:
     Impl() : mTempSize(0) {}
 
-    HRESULT Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl );
-    HRESULT AddStream( _In_reads_bytes_(stride*nVerts) const void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride );
-    HRESULT Read( _Out_writes_(count) XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count ) const;
+    HRESULT Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl );
+    HRESULT AddStream( _In_reads_bytes_(stride*nVerts) const void* vb, size_t nVerts, size_t inputSlot, size_t stride );
+    HRESULT Read( _Out_writes_(count) XMVECTOR* buffer, _In_z_ LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const;
 
     void Release()
     {
@@ -171,8 +171,55 @@ HRESULT VBReader::Impl::AddStream( const void* vb, size_t nVerts, size_t inputSl
         }\
         break;
 
+#define LOAD_VERTS4_X2( type, func, x2bias )\
+        for( size_t icount = 0; icount < count; ++icount )\
+        {\
+            if ( ( ptr + sizeof(type) ) > eptr )\
+                return E_UNEXPECTED;\
+            XMVECTOR v = func( reinterpret_cast<const type*>(ptr) );\
+            if (x2bias)\
+            {\
+                v = XMVectorMultiplyAdd( v, g_XMTwo, g_XMNegativeOne );\
+            }\
+            *buffer++ = v;\
+            ptr += stride;\
+        }\
+        break;
+
+#define LOAD_VERTS3_X2( type, func, x2bias )\
+        for( size_t icount = 0; icount < count; ++icount )\
+        {\
+            if ( ( ptr + sizeof(type) ) > eptr )\
+                return E_UNEXPECTED;\
+            XMVECTOR v = func( reinterpret_cast<const type*>(ptr) );\
+            if (x2bias)\
+            {\
+                XMVECTOR v2 = XMVectorMultiplyAdd( v, g_XMTwo, g_XMNegativeOne );\
+                v = XMVectorSelect(v, v2, g_XMSelect1110);\
+            }\
+            *buffer++ = v;\
+            ptr += stride;\
+        }\
+        break;
+
+#define LOAD_VERTS2_X2( type, func, x2bias )\
+        for( size_t icount = 0; icount < count; ++icount )\
+        {\
+            if ( ( ptr + sizeof(type) ) > eptr )\
+                return E_UNEXPECTED;\
+            XMVECTOR v = func( reinterpret_cast<const type*>(ptr) );\
+            if (x2bias)\
+            {\
+                XMVECTOR v2 = XMVectorMultiplyAdd( v, g_XMTwo, g_XMNegativeOne );\
+                v = XMVectorSelect(v, v2, g_XMSelect1100);\
+            }\
+            *buffer++ = v;\
+            ptr += stride;\
+        }\
+        break;
+
 _Use_decl_annotations_
-HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     if ( !buffer || !semanticName || !count )
         return E_INVALIDARG;
@@ -229,7 +276,7 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         LOAD_VERTS( XMHALF4, XMLoadHalf4 )
 
     case DXGI_FORMAT_R16G16B16A16_UNORM:
-        LOAD_VERTS( XMUSHORTN4, XMLoadUShortN4 ) 
+        LOAD_VERTS4_X2( XMUSHORTN4, XMLoadUShortN4, x2bias )
 
     case DXGI_FORMAT_R16G16B16A16_UINT:
         LOAD_VERTS( XMUSHORT4, XMLoadUShort4 )
@@ -250,16 +297,16 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         LOAD_VERTS( XMINT2, XMLoadSInt2 )
 
     case DXGI_FORMAT_R10G10B10A2_UNORM:
-        LOAD_VERTS( XMUDECN4, XMLoadUDecN4 );
+        LOAD_VERTS3_X2(XMUDECN4, XMLoadUDecN4, x2bias)
 
     case DXGI_FORMAT_R10G10B10A2_UINT:
         LOAD_VERTS( XMUDEC4, XMLoadUDec4 );
 
     case DXGI_FORMAT_R11G11B10_FLOAT:
-        LOAD_VERTS( XMFLOAT3PK, XMLoadFloat3PK );
+        LOAD_VERTS3_X2(XMFLOAT3PK, XMLoadFloat3PK, x2bias)
 
     case DXGI_FORMAT_R8G8B8A8_UNORM:
-        LOAD_VERTS( XMUBYTEN4, XMLoadUByteN4 )
+        LOAD_VERTS4_X2( XMUBYTEN4, XMLoadUByteN4, x2bias )
 
     case DXGI_FORMAT_R8G8B8A8_UINT:
         LOAD_VERTS( XMUBYTE4, XMLoadUByte4 )
@@ -274,7 +321,7 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         LOAD_VERTS( XMHALF2, XMLoadHalf2 )
 
     case DXGI_FORMAT_R16G16_UNORM:
-        LOAD_VERTS( XMUSHORTN2, XMLoadUShortN2 )
+        LOAD_VERTS2_X2(XMUSHORTN2, XMLoadUShortN2, x2bias)
 
     case DXGI_FORMAT_R16G16_UINT:
         LOAD_VERTS( XMUSHORT2, XMLoadUShort2 )
@@ -311,7 +358,7 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         break;
 
     case DXGI_FORMAT_R8G8_UNORM:
-        LOAD_VERTS( XMUBYTEN2, XMLoadUByteN2 )
+        LOAD_VERTS2_X2( XMUBYTEN2, XMLoadUByteN2, x2bias )
 
     case DXGI_FORMAT_R8G8_UINT:
         LOAD_VERTS( XMUBYTE2, XMLoadUByte2 )
@@ -338,8 +385,14 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(uint16_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const uint16_t*>(ptr);
-            *buffer++ = XMVectorSet( static_cast<float>(v) / 65535.f, 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const uint16_t*>(ptr);
+            float f = static_cast<float>(i) / 65535.f;
+            if (x2bias)
+            {
+                f = f*2.f - 1.f;
+            }
+            XMVECTOR v = XMVectorSet(f, 0.f, 0.f, 0.f);
+            *buffer++ = v;
             ptr += stride;
         }
         break;
@@ -349,8 +402,8 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(uint16_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const uint16_t*>(ptr);
-            *buffer++ = XMVectorSet( static_cast<float>(v), 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const uint16_t*>(ptr);
+            *buffer++ = XMVectorSet( static_cast<float>(i), 0.f, 0.f, 0.f );
             ptr += stride;
         }
         break;
@@ -360,8 +413,8 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(int16_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const int16_t*>(ptr);
-            *buffer++ = XMVectorSet( static_cast<float>(v) / 32767.f, 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const int16_t*>(ptr);
+            *buffer++ = XMVectorSet( static_cast<float>(i) / 32767.f, 0.f, 0.f, 0.f );
             ptr += stride;
         }
         break;
@@ -371,8 +424,8 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(int16_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const int16_t*>(ptr);
-               *buffer++ = XMVectorSet( static_cast<float>(v), 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const int16_t*>(ptr);
+            *buffer++ = XMVectorSet( static_cast<float>(i), 0.f, 0.f, 0.f );
             ptr += stride;
         }
         break;
@@ -382,8 +435,14 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(uint8_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const uint8_t*>(ptr);
-            *buffer++ = XMVectorSet( static_cast<float>(v) / 255.f, 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const uint8_t*>(ptr);
+            float f = static_cast<float>(i) / 255.f;
+            if (x2bias)
+            {
+                f = f*2.f - 1.f;
+            }
+            XMVECTOR v = XMVectorSet(f, 0.f, 0.f, 0.f);
+            *buffer++ = v;
             ptr += stride;
         }
         break;
@@ -393,8 +452,8 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(uint8_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const uint8_t*>(ptr);
-            *buffer++ = XMVectorSet( static_cast<float>(v), 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const uint8_t*>(ptr);
+            *buffer++ = XMVectorSet( static_cast<float>(i), 0.f, 0.f, 0.f );
             ptr += stride;
         }
         break;
@@ -404,8 +463,8 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(int8_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const int8_t*>(ptr);
-            *buffer++ = XMVectorSet( static_cast<float>(v) / 127.f, 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const int8_t*>(ptr);
+            *buffer++ = XMVectorSet( static_cast<float>(i) / 127.f, 0.f, 0.f, 0.f );
             ptr += stride;
         }
         break;
@@ -415,8 +474,8 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
         {
             if ( ( ptr + sizeof(int8_t) ) > eptr )
                 return E_UNEXPECTED;
-            auto v = *reinterpret_cast<const int8_t*>(ptr);
-               *buffer++ = XMVectorSet( static_cast<float>(v), 0.f, 0.f, 0.f );
+            auto i = *reinterpret_cast<const int8_t*>(ptr);
+               *buffer++ = XMVectorSet( static_cast<float>(i), 0.f, 0.f, 0.f );
             ptr += stride;
         }
         break;
@@ -430,6 +489,11 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
                     return E_UNEXPECTED;
                 XMVECTOR v = XMLoadU565( reinterpret_cast<const XMU565*>(ptr) );
                 v = XMVectorMultiply( v, s_Scale );
+                if (x2bias)
+                {
+                    XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                    v = XMVectorSelect(v, v2, g_XMSelect1110);
+                }
                 *buffer++ = XMVectorSwizzle<2, 1, 0, 3>( v );
                 ptr += stride;
             }
@@ -445,6 +509,11 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
                     return E_UNEXPECTED;
                 XMVECTOR v = XMLoadU555( reinterpret_cast<const XMU555*>(ptr) );
                 v = XMVectorMultiply( v, s_Scale );
+                if (x2bias)
+                {
+                    XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                    v = XMVectorSelect(v, v2, g_XMSelect1110);
+                }
                 *buffer++ = XMVectorSwizzle<2, 1, 0, 3>( v );
                 ptr += stride;
             }
@@ -457,6 +526,10 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
             if ( ( ptr + sizeof(XMUBYTEN4) ) > eptr )
                 return E_UNEXPECTED;
             XMVECTOR v = XMLoadUByteN4( reinterpret_cast<const XMUBYTEN4*>(ptr) );
+            if (x2bias)
+            {
+                v = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+            }
             *buffer++ = XMVectorSwizzle<2, 1, 0, 3>( v );
             ptr += stride;
         }
@@ -468,6 +541,11 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
             if ( ( ptr + sizeof(XMUBYTEN4) ) > eptr )
                 return E_UNEXPECTED;
             XMVECTOR v = XMLoadUByteN4( reinterpret_cast<const XMUBYTEN4*>(ptr) );
+            if (x2bias)
+            {
+                XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                v = XMVectorSelect(v, v2, g_XMSelect1110);
+            }
             v = XMVectorSwizzle<2, 1, 0, 3>( v );
             *buffer++ = XMVectorSelect( g_XMZero, v, g_XMSelect1110 );
             ptr += stride;
@@ -483,6 +561,10 @@ HRESULT VBReader::Impl::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semant
                     return E_UNEXPECTED;
                 XMVECTOR v = XMLoadUNibble4( reinterpret_cast<const XMUNIBBLE4*>(ptr) );
                 v = XMVectorMultiply( v, s_Scale );
+                if (x2bias)
+                {
+                    v = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                }
                 *buffer++ = XMVectorSwizzle<2, 1, 0, 3>( v );
                 ptr += stride;
             }
@@ -551,21 +633,21 @@ HRESULT VBReader::AddStream( const void* vb, size_t nVerts, size_t inputSlot, si
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBReader::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBReader::Read( XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
-    return pImpl->Read( buffer, semanticName, semanticIndex, count );
+    return pImpl->Read( buffer, semanticName, semanticIndex, count, x2bias );
 }
 
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBReader::Read( float* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBReader::Read( float* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
         return E_OUTOFMEMORY;
 
-    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count );
+    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count, x2bias );
     if ( FAILED(hr) )
         return hr;
 
@@ -580,13 +662,13 @@ HRESULT VBReader::Read( float* buffer, LPCSTR semanticName, UINT semanticIndex, 
 }
 
 _Use_decl_annotations_
-HRESULT VBReader::Read( XMFLOAT2* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBReader::Read( XMFLOAT2* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
         return E_OUTOFMEMORY;
 
-    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count );
+    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count, x2bias );
     if ( FAILED(hr) )
         return hr;
 
@@ -601,13 +683,13 @@ HRESULT VBReader::Read( XMFLOAT2* buffer, LPCSTR semanticName, UINT semanticInde
 }
 
 _Use_decl_annotations_
-HRESULT VBReader::Read( XMFLOAT3* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBReader::Read( XMFLOAT3* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
         return E_OUTOFMEMORY;
 
-    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count );
+    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count, x2bias );
     if ( FAILED(hr) )
         return hr;
 
@@ -622,13 +704,13 @@ HRESULT VBReader::Read( XMFLOAT3* buffer, LPCSTR semanticName, UINT semanticInde
 }
 
 _Use_decl_annotations_
-HRESULT VBReader::Read( XMFLOAT4* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count ) const
+HRESULT VBReader::Read( XMFLOAT4* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
         return E_OUTOFMEMORY;
 
-    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count );
+    HRESULT hr = pImpl->Read( temp, semanticName, semanticIndex, count, x2bias );
     if ( FAILED(hr) )
         return hr;
 

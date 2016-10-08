@@ -102,7 +102,7 @@ size_t BytesPerElement( DXGI_FORMAT fmt )
         return 2;
 
     default:
-        // No BC, sRGB, X2Bias, SharedExp, Typeless, Depth, or Video formats
+        // No BC, sRGB, XRBias, SharedExp, Typeless, Depth, or Video formats
         return 0;
     }
 }
