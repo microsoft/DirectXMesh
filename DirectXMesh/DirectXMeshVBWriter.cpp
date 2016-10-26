@@ -23,7 +23,12 @@ namespace DirectX
 class VBWriter::Impl
 {
 public:
-    Impl() : mTempSize(0) {}
+    Impl() :
+        mStrides{},
+        mBuffers{},
+        mVerts{},
+        mDefaultStrides{},
+        mTempSize(0) {}
 
     HRESULT Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl );
     HRESULT AddStream( _Out_writes_bytes_(stride*nVerts) void* vb, size_t nVerts, size_t inputSlot, size_t stride );

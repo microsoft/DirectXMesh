@@ -17,6 +17,8 @@
 
 using namespace DirectX;
 
+#pragma warning(disable : 4351)
+
 namespace
 {
 
@@ -26,6 +28,7 @@ class mesh_status
 {
 public:
     mesh_status() :
+        mUnprocessed{},
         mFaceOffset(0),
         mFaceCount(0),
         mMaxSubset(0),
@@ -327,6 +330,8 @@ public:
     {
         assert( face < mTotalFaces );
         assert( n < 3 );
+        _Analysis_assume_( face < mTotalFaces );
+        _Analysis_assume_( n < 3 );
         return mPhysicalNeighbors[ face ].neighbors[ n ];
     }
 
@@ -760,7 +765,7 @@ HRESULT _VertexCacheStripReorder( _In_reads_(nFaces*3) const index_t* indices, _
 
 //-------------------------------------------------------------------------------------
 template<class index_t>
-HRESULT _OptimizeVertices( const index_t* indices, size_t nFaces, size_t nVerts, uint32_t* vertexRemap )
+HRESULT _OptimizeVertices( _In_reads_(nFaces*3) const index_t* indices, size_t nFaces, size_t nVerts, _Out_writes_(nVerts) uint32_t* vertexRemap )
 {
     if ( !indices || !nFaces || !nVerts || !vertexRemap )
         return E_INVALIDARG;
@@ -802,6 +807,9 @@ HRESULT _OptimizeVertices( const index_t* indices, size_t nFaces, size_t nVerts,
         uint32_t vertindex = tempRemap[ j ];
         if ( vertindex != UNUSED32 )
         {
+            if ( vertindex >= nVerts )
+                return E_UNEXPECTED;
+
             vertexRemap[ vertindex ] = j;
         }
     }
