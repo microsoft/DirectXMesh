@@ -17,6 +17,8 @@
 
 using namespace DirectX::PackedVector;
 
+#pragma warning(disable : 4351)
+
 namespace DirectX
 {
 
