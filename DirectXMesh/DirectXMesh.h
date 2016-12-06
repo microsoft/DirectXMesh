@@ -21,16 +21,18 @@
 
 #include <stdint.h>
 
+#if !defined(__d3d11_h__) && !defined(__d3d11_x_h__) && !defined(__d3d12_h__) && !defined(__d3d12_x_h__)
 #if defined(_XBOX_ONE) && defined(_TITLE)
 #include <d3d11_x.h>
 #define DCOMMON_H_INCLUDED
 #else
 #include <d3d11_1.h>
 #endif
+#endif
 
 #include <directxmath.h>
 
-#define DIRECTX_MESH_VERSION 102
+#define DIRECTX_MESH_VERSION 110
 
 namespace DirectX
 {
@@ -43,10 +45,19 @@ namespace DirectX
 
     //---------------------------------------------------------------------------------
     // Input Layout Descriptor Utilities
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     bool __cdecl IsValid( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl );
     void __cdecl ComputeInputLayout( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl,
                                      _Out_writes_opt_(nDecl) uint32_t* offsets,
                                      _Out_writes_opt_(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT) uint32_t* strides );
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+    bool __cdecl IsValid( const D3D12_INPUT_LAYOUT_DESC& vbDecl );
+    void __cdecl ComputeInputLayout( const D3D12_INPUT_LAYOUT_DESC& vbDecl,
+                                     _Out_writes_opt_(vbDecl.NumElements) uint32_t* offsets,
+                                     _Out_writes_opt_(D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT) uint32_t* strides);
+#endif
 
     //---------------------------------------------------------------------------------
     // Attribute Utilities
@@ -76,24 +87,37 @@ namespace DirectX
 
         ~VBReader();
 
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
         HRESULT __cdecl Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl );
             // Does not support VB decls with D3D11_INPUT_PER_INSTANCE_DATA
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+        HRESULT __cdecl Initialize( const D3D12_INPUT_LAYOUT_DESC& vbDecl );
+            // Does not support VB decls with D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA
+#endif
 
         HRESULT __cdecl AddStream( _In_reads_bytes_(stride*nVerts) const void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0 );
             // Add vertex buffer to reader
 
-        HRESULT __cdecl Read( _Out_writes_(count) XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMVECTOR* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Extracts data elements from vertex buffer
 
-        HRESULT __cdecl Read( _Out_writes_(count) float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
-        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
-        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
-        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) float* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT2* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT3* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Read( _Out_writes_(count) XMFLOAT4* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Helpers for data extraction
 
         void __cdecl Release();
 
-        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const;
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const;
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+        const D3D12_INPUT_ELEMENT_DESC* __cdecl GetElement12( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const;
+#endif
 
     private:
         // Private implementation.
@@ -114,24 +138,37 @@ namespace DirectX
 
         ~VBWriter();
 
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
         HRESULT __cdecl Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl );
             // Does not support VB decls with D3D11_INPUT_PER_INSTANCE_DATA
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+        HRESULT __cdecl Initialize( const D3D12_INPUT_LAYOUT_DESC& vbDecl );
+            // Does not support VB decls with D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA
+#endif
 
         HRESULT __cdecl AddStream( _Out_writes_bytes_(stride*nVerts) void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0 );
             // Add vertex buffer to writer
 
-        HRESULT __cdecl Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Inserts data elements into vertex buffer
 
-        HRESULT __cdecl Write( _In_reads_(count) const float* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
-        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT2* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
-        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT3* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
-        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT4* buffer, _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const float* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT2* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT3* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
+        HRESULT __cdecl Write( _In_reads_(count) const XMFLOAT4* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false ) const;
             // Helpers for data insertion
 
         void __cdecl Release();
 
-        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const;
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const;
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+        const D3D12_INPUT_ELEMENT_DESC* __cdecl GetElement12( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const;
+#endif
 
     private:
         // Private implementation.
@@ -173,7 +210,7 @@ namespace DirectX
                                          _In_reads_(nVerts) const uint32_t* pointRep,
                                          _In_reads_(nFaces*3) const uint32_t* adjacency, _In_ size_t nVerts,
                                          _Out_writes_(nFaces*6) uint32_t* indicesAdj );
-        // Generates an IB suitable for Geometry Shader using D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ
+        // Generates an IB suitable for Geometry Shader using D3D1x_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ
 
     //---------------------------------------------------------------------------------
     // Normals, Tangents, and Bi-Tangents Computation

@@ -19,6 +19,45 @@ using namespace DirectX::PackedVector;
 
 #pragma warning(disable : 4351)
 
+namespace
+{
+    const size_t c_MaxSlot = 32;
+    const size_t c_MaxStride = 2048;
+
+    enum INPUT_CLASSIFICATION
+    {
+        PER_VERTEX_DATA = 0,
+        PER_INSTANCE_DATA = 1
+    };
+
+    struct InputElementDesc
+    {
+        const char*             SemanticName;
+        unsigned int            SemanticIndex;
+        DXGI_FORMAT             Format;
+        unsigned int            InputSlot;
+        unsigned int            AlignedByteOffset;
+        INPUT_CLASSIFICATION    InputSlotClass;
+        unsigned int            InstanceDataStepRate;
+    };
+
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+    static_assert(sizeof(InputElementDesc) == sizeof(D3D11_INPUT_ELEMENT_DESC), "D3D11 mismatch");
+    static_assert(PER_VERTEX_DATA == D3D11_INPUT_PER_VERTEX_DATA, "D3D11 mismatch");
+    static_assert(PER_INSTANCE_DATA == D3D11_INPUT_PER_INSTANCE_DATA, "D3D11 mismatch");
+    static_assert(c_MaxSlot == D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "D3D11 mismatch");
+    static_assert(c_MaxStride == D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES, "D3D11 mismatch");
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+    static_assert(sizeof(InputElementDesc) == sizeof(D3D12_INPUT_ELEMENT_DESC), "D3D12 mismatch");
+    static_assert(PER_VERTEX_DATA == D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, "D3D12 mismatch");
+    static_assert(PER_INSTANCE_DATA == D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA, "D3D12 mismatch");
+    static_assert(c_MaxSlot == D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "D3D12 mismatch");
+    static_assert(c_MaxStride == D3D12_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES, "D3D12 mismatch");
+#endif
+}
+
 namespace DirectX
 {
 
@@ -32,9 +71,9 @@ public:
         mDefaultStrides{},
         mTempSize(0) {}
 
-    HRESULT Initialize( _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl );
+    HRESULT Initialize( _In_reads_(nDecl) const InputElementDesc* vbDecl, size_t nDecl );
     HRESULT AddStream( _Out_writes_bytes_(stride*nVerts) void* vb, size_t nVerts, size_t inputSlot, size_t stride );
-    HRESULT Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const;
+    HRESULT Write( _In_reads_(count) const XMVECTOR* buffer, _In_z_ const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias ) const;
 
     void Release()
     {
@@ -47,7 +86,7 @@ public:
         mTempBuffer.reset();
     }
 
-    const D3D11_INPUT_ELEMENT_DESC* GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const
+    const InputElementDesc* GetElement( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const
     {
         auto range = mSemantics.equal_range(semanticName);
 
@@ -70,7 +109,7 @@ public:
         {
             mTempSize = count;
 
-            for( size_t j = 0; j < D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT; ++j )
+            for( size_t j = 0; j < c_MaxSlot; ++j )
             {
                 if ( mVerts[ j ] > mTempSize )
                     mTempSize = mVerts[ j ];
@@ -87,12 +126,12 @@ public:
 private:
     typedef std::multimap<std::string,uint32_t> SemanticMap;
 
-    std::vector<D3D11_INPUT_ELEMENT_DESC>   mInputDesc;
+    std::vector<InputElementDesc>           mInputDesc;
     SemanticMap                             mSemantics;
-    uint32_t                                mStrides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
-    void*                                   mBuffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
-    size_t                                  mVerts[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
-    uint32_t                                mDefaultStrides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+    uint32_t                                mStrides[c_MaxSlot];
+    void*                                   mBuffers[c_MaxSlot];
+    size_t                                  mVerts[c_MaxSlot];
+    uint32_t                                mDefaultStrides[c_MaxSlot];
     mutable size_t                          mTempSize;
     mutable ScopedAlignedArrayXMVECTOR      mTempBuffer;
 };
@@ -100,22 +139,36 @@ private:
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBWriter::Impl::Initialize( const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl )
+HRESULT VBWriter::Impl::Initialize( const InputElementDesc* vbDecl, size_t nDecl )
 {
     Release();
 
-    if ( !IsValid( vbDecl, nDecl ) )
+    uint32_t offsets[c_MaxSlot];
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+    {
+        if (nDecl > D3D12_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT)
+            return E_INVALIDARG;
+
+        D3D12_INPUT_LAYOUT_DESC desc = { reinterpret_cast<const D3D12_INPUT_ELEMENT_DESC*>(vbDecl), UINT(nDecl) };
+        if (!IsValid(desc))
+            return E_INVALIDARG;
+
+        ComputeInputLayout(desc, offsets, mDefaultStrides);
+    }
+#else
+    if (!IsValid(reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(vbDecl), nDecl))
         return E_INVALIDARG;
 
-    assert( nDecl < D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT );
-    _Analysis_assume_( nDecl < D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT );
+    assert(nDecl <= D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT);
+    _Analysis_assume_(nDecl <= D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT);
 
-    uint32_t offsets[ D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT ];
-    ComputeInputLayout( vbDecl, nDecl, offsets, mDefaultStrides );
+    ComputeInputLayout(reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(vbDecl), nDecl, offsets, mDefaultStrides);
+#endif
 
     for( uint32_t j = 0; j < nDecl; ++j )
     {
-        if ( vbDecl[ j ].InputSlotClass == D3D11_INPUT_PER_INSTANCE_DATA )
+        if ( vbDecl[ j ].InputSlotClass == PER_INSTANCE_DATA )
         {
             // Does not currently support instance data layouts
             Release();
@@ -153,10 +206,10 @@ HRESULT VBWriter::Impl::AddStream( void* vb, size_t nVerts, size_t inputSlot, si
     if ( nVerts >= UINT32_MAX )
         return E_INVALIDARG;
 
-    if ( inputSlot >= D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT )
+    if ( inputSlot >= c_MaxSlot )
         return E_INVALIDARG;
 
-    if ( stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES )
+    if ( stride > c_MaxStride )
         return E_INVALIDARG;
 
     mStrides[ inputSlot ] = ( stride > 0 ) ? uint32_t( stride ) : mDefaultStrides[ inputSlot ];
@@ -195,7 +248,7 @@ HRESULT VBWriter::Impl::AddStream( void* vb, size_t nVerts, size_t inputSlot, si
         break;
 
 _Use_decl_annotations_
-HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
+HRESULT VBWriter::Impl::Write( const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias ) const
 {
     if ( !buffer || !semanticName || !count )
         return E_INVALIDARG;
@@ -622,11 +675,20 @@ VBWriter::~VBWriter()
 
 
 //-------------------------------------------------------------------------------------
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 _Use_decl_annotations_
 HRESULT VBWriter::Initialize( const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl )
 {
-    return pImpl->Initialize( vbDecl, nDecl );
+    return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl), nDecl);
 }
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+HRESULT VBWriter::Initialize( const D3D12_INPUT_LAYOUT_DESC& vbDecl )
+{
+    return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl.pInputElementDescs), vbDecl.NumElements);
+}
+#endif
 
 
 //-------------------------------------------------------------------------------------
@@ -639,7 +701,7 @@ HRESULT VBWriter::AddStream( void* vb, size_t nVerts, size_t inputSlot, size_t s
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
+HRESULT VBWriter::Write( const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias ) const
 {
     return pImpl->Write( buffer, semanticName, semanticIndex, count, x2bias );
 }
@@ -647,7 +709,7 @@ HRESULT VBWriter::Write( const XMVECTOR* buffer, LPCSTR semanticName, UINT seman
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const float* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
+HRESULT VBWriter::Write( const float* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -665,7 +727,7 @@ HRESULT VBWriter::Write( const float* buffer, LPCSTR semanticName, UINT semantic
 }
 
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMFLOAT2* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
+HRESULT VBWriter::Write( const XMFLOAT2* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -683,7 +745,7 @@ HRESULT VBWriter::Write( const XMFLOAT2* buffer, LPCSTR semanticName, UINT seman
 }
 
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMFLOAT3* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
+HRESULT VBWriter::Write( const XMFLOAT3* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -701,7 +763,7 @@ HRESULT VBWriter::Write( const XMFLOAT3* buffer, LPCSTR semanticName, UINT seman
 }
 
 _Use_decl_annotations_
-HRESULT VBWriter::Write( const XMFLOAT4* buffer, LPCSTR semanticName, UINT semanticIndex, size_t count, bool x2bias ) const
+HRESULT VBWriter::Write( const XMFLOAT4* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias ) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer( count );
     if ( !temp )
@@ -727,9 +789,20 @@ void VBWriter::Release()
 
 
 //-------------------------------------------------------------------------------------
-const D3D11_INPUT_ELEMENT_DESC* VBWriter::GetElement( _In_z_ LPCSTR semanticName, _In_ UINT semanticIndex ) const
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+_Use_decl_annotations_
+const D3D11_INPUT_ELEMENT_DESC* VBWriter::GetElement11(const char* semanticName, unsigned int semanticIndex) const
 {
-    return pImpl->GetElement(semanticName, semanticIndex);
+    return reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
 }
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+_Use_decl_annotations_
+const D3D12_INPUT_ELEMENT_DESC* VBWriter::GetElement12(const char* semanticName, unsigned int semanticIndex) const
+{
+    return reinterpret_cast<const D3D12_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
+}
+#endif
 
 } // namespace

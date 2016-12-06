@@ -27,7 +27,21 @@
 #define NOHELP
 #pragma warning(pop)
 
+#ifndef _WIN32_WINNT_WIN10
+#define _WIN32_WINNT_WIN10 0x0A00
+#endif
+
 #include <windows.h>
+
+#if defined(_XBOX_ONE) && defined(_TITLE)
+#include <d3d12_x.h>
+#include <d3d11_x.h>
+#elif (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
+#include <d3d12.h>
+#include <d3d11_4.h>
+#else
+#include <d3d11_1.h>
+#endif
 
 #include <directxmath.h>
 #include <directxpackedvector.h>
@@ -54,11 +68,21 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     const uint32_t UNUSED32 = uint32_t(-1);
 
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     static_assert( D3D11_16BIT_INDEX_STRIP_CUT_VALUE == uint16_t(-1), "Mismatch with Direct3D11" );
     static_assert( D3D11_16BIT_INDEX_STRIP_CUT_VALUE == UINT16_MAX, "Mismatch with Direct3D11" );
 
     static_assert( D3D11_32BIT_INDEX_STRIP_CUT_VALUE == uint32_t(-1), "Mismatch with Direct3D11" );
     static_assert( D3D11_32BIT_INDEX_STRIP_CUT_VALUE == UINT32_MAX, "Mismatch with Direct3D11" );
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+    static_assert( D3D12_16BIT_INDEX_STRIP_CUT_VALUE == uint16_t(-1), "Mismatch with Direct3D12" );
+    static_assert( D3D12_16BIT_INDEX_STRIP_CUT_VALUE == UINT16_MAX, "Mismatch with Direct3D12" );
+
+    static_assert( D3D12_32BIT_INDEX_STRIP_CUT_VALUE == uint32_t(-1), "Mismatch with Direct3D12" );
+    static_assert( D3D12_32BIT_INDEX_STRIP_CUT_VALUE == UINT32_MAX, "Mismatch with Direct3D12" );
+#endif
 
     //---------------------------------------------------------------------------------
     // Utility for walking adjacency

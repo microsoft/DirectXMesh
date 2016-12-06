@@ -113,8 +113,10 @@ size_t BytesPerElement( DXGI_FORMAT fmt )
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-// Validates a D3D11_INPUT_ELEMENT_DESC structure
+// Validates a Direct3D Input Layout
 //-------------------------------------------------------------------------------------
+
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 _Use_decl_annotations_
 bool IsValid( const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl )
 {
@@ -188,11 +190,87 @@ bool IsValid( const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl )
 
     return true;
 }
+#endif
 
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+bool IsValid( const D3D12_INPUT_LAYOUT_DESC& vbDecl )
+{
+    if ( !vbDecl.pInputElementDescs || !vbDecl.NumElements )
+    {
+        // Note that 0 is allowed by the runtime for degenerate cases, but is not defined for DirectXMesh
+        return false;
+    }
+
+    if ( vbDecl.NumElements > D3D12_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT )
+    {
+        return false;
+    }
+
+    for( size_t j = 0; j < vbDecl.NumElements; ++j )
+    {
+        size_t bpe = BytesPerElement( vbDecl.pInputElementDescs[ j ].Format );
+        if ( !bpe )
+        {
+            // Not a valid DXGI format or it's not valid for VB usage
+            return false;
+        }
+
+        uint32_t alignment;
+
+        if ( bpe == 1 )
+            alignment = 1;
+        else if ( bpe == 2 )
+            alignment = 2;
+        else
+            alignment = 4;
+
+        if ( ( vbDecl.pInputElementDescs[ j ].AlignedByteOffset != D3D12_APPEND_ALIGNED_ELEMENT )
+             && ( vbDecl.pInputElementDescs[ j ].AlignedByteOffset % alignment ) != 0 )
+        {
+            // Invalid alignment for element
+            return false;
+        }
+
+        if ( vbDecl.pInputElementDescs[ j ].InputSlot >= D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT )
+        {
+            // The upper-limit depends on feature level, so we assume highest value here
+            return false;
+        }
+
+        switch( vbDecl.pInputElementDescs[ j ].InputSlotClass )
+        {
+        case D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA:
+            if ( vbDecl.pInputElementDescs[ j ].InstanceDataStepRate != 0 )
+            {
+                return false;
+            }
+            break;
+
+        case D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA:
+            break;
+
+        default:
+            return false;
+        }
+
+        if ( !vbDecl.pInputElementDescs[ j ].SemanticName )
+        {
+            return false;
+        }
+
+        // Debug layer also checks for trailing digit in the semantic name, and checks
+        // for inconsistent semantic name/slot assignment.
+    }
+
+    return true;
+}
+#endif
 
 //-------------------------------------------------------------------------------------
 // Compute the offsets to each element, and total stride of each slot
 //-------------------------------------------------------------------------------------
+
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 _Use_decl_annotations_
 void ComputeInputLayout( const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl, uint32_t* offsets, uint32_t* strides )
 {
@@ -253,7 +331,70 @@ void ComputeInputLayout( const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl, u
         prevABO[ slot ] = uint32_t( alignedByteOffset + bpe + ( bpe % alignment ) );
     }
 }
+#endif
 
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+_Use_decl_annotations_
+void ComputeInputLayout( const D3D12_INPUT_LAYOUT_DESC& vbDecl, uint32_t* offsets, uint32_t* strides )
+{
+    assert( IsValid( vbDecl ) );
+
+    if ( offsets )
+        memset( offsets, 0, sizeof(uint32_t) * vbDecl.NumElements);
+
+    if ( strides )
+        memset( strides, 0, sizeof(uint32_t) * D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT );
+
+    uint32_t prevABO[ D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT ];
+    memset( prevABO, 0, sizeof(uint32_t) * D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT );
+
+    for( size_t j = 0; j < vbDecl.NumElements; ++j )
+    {
+        uint32_t slot = vbDecl.pInputElementDescs[ j ].InputSlot;
+        if ( slot >= D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT )
+        {
+            // ignore bad input slots
+            continue;
+        }
+
+        size_t bpe = BytesPerElement( vbDecl.pInputElementDescs[ j ].Format );
+        if ( !bpe )
+        {
+            // ignore invalid format
+            continue;
+        }
+
+        uint32_t alignment;
+
+        if ( bpe == 1 )
+            alignment = 1;
+        else if ( bpe == 2 )
+            alignment = 2;
+        else
+            alignment = 4;
+
+        uint32_t alignedByteOffset = vbDecl.pInputElementDescs[ j ].AlignedByteOffset;
+
+        if ( alignedByteOffset == D3D12_APPEND_ALIGNED_ELEMENT )
+        {
+            alignedByteOffset = prevABO[ slot ];
+        }
+
+        if ( offsets )
+        {
+            offsets[ j ] = alignedByteOffset;
+        }
+        
+        if( strides )
+        {
+            uint32_t istride = uint32_t( alignedByteOffset + bpe );
+            strides[ slot ] = std::max<uint32_t>( strides[ slot ], istride );
+        }
+
+        prevABO[ slot ] = uint32_t( alignedByteOffset + bpe + ( bpe % alignment ) );
+    }
+}
+#endif
 
 //=====================================================================================
 // Attribute Utilities
@@ -299,7 +440,7 @@ std::vector<std::pair<size_t,size_t>> ComputeSubsets( const uint32_t* attributes
     return subsets;
 }
 
-} // namespace // DirectX
+} // namespace DirectX
 
 
 //=====================================================================================
