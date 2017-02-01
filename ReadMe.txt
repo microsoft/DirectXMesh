@@ -3,7 +3,7 @@ DIRECTX MESH LIBRARY (DirectXMesh)
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-October 27, 2016
+January 31, 2017
 
 This package contains DirectXMesh, a shared source library for performing various geometry
 content processing operations including generating normals and tangent frames, triangle
@@ -52,6 +52,10 @@ https://opensource.microsoft.com/codeofconduct/
 ---------------
 RELEASE HISTORY
 ---------------
+
+January 31, 2017
+    DirectX 12 support for VBReader, VBWriter, IsValid, and ComputeInputLayout
+    *breaking change*: VBReader/VBWriter method GetElement method now named GetElement11 for DirectX 11
 
 October 27, 2016
     x2bias optional parameter for VB reader/writer
