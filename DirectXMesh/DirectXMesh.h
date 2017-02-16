@@ -112,6 +112,11 @@ namespace DirectX
         void __cdecl Release();
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+        const D3D11_INPUT_ELEMENT_DESC* GetElement( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const
+        {
+            return GetElement11(semanticName, semanticIndex);
+        }
+
         const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const;
 #endif
 
@@ -163,6 +168,11 @@ namespace DirectX
         void __cdecl Release();
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const
+        {
+            return GetElement11(semanticName,semanticIndex);
+        }
+
         const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11( _In_z_ const char* semanticName, _In_ unsigned int semanticIndex ) const;
 #endif
 
