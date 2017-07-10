@@ -27,6 +27,6 @@ typedef std::unique_ptr<DirectX::XMVECTOR[], aligned_deleter> ScopedAlignedArray
 //---------------------------------------------------------------------------------
 struct handle_closer { void operator()(HANDLE h) { assert(h != INVALID_HANDLE_VALUE); if (h) CloseHandle(h); } };
 
-typedef public std::unique_ptr<void, handle_closer> ScopedHandle;
+typedef std::unique_ptr<void, handle_closer> ScopedHandle;
 
 inline HANDLE safe_handle( HANDLE h ) { return (h == INVALID_HANDLE_VALUE) ? 0 : h; }
