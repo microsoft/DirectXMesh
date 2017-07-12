@@ -43,7 +43,7 @@ HRESULT _ComputeTangentFrame( _In_reads_(nFaces*3) const index_t* indices, size_
         return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
 
     static const float EPSILON = 0.0001f;
-    static const XMVECTORF32 s_flips = { 1.f, -1.f, -1.f, 1.f };
+    static const XMVECTORF32 s_flips = { { { 1.f, -1.f, -1.f, 1.f } } };
 
     ScopedAlignedArrayXMVECTOR temp( reinterpret_cast<XMVECTOR*>( _aligned_malloc( sizeof(XMVECTOR) * nVerts * 2, 16 ) ) );
     if ( !temp )
