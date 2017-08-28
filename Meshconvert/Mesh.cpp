@@ -606,7 +606,7 @@ HRESULT Mesh::Optimize( uint32_t vertexCache, uint32_t restart )
     HRESULT hr = S_OK;
 
     {
-        std::unique_ptr<uint32_t> remap(new (std::nothrow) uint32_t[mnFaces]);
+        std::unique_ptr<uint32_t[]> remap(new (std::nothrow) uint32_t[mnFaces]);
         if (!remap)
             return E_OUTOFMEMORY;
 
@@ -639,7 +639,7 @@ HRESULT Mesh::Optimize( uint32_t vertexCache, uint32_t restart )
     }
 
     // Optimize vertices for post-transform vertex cache
-    std::unique_ptr<uint32_t> remap(new (std::nothrow) uint32_t[mnVerts]);
+    std::unique_ptr<uint32_t[]> remap(new (std::nothrow) uint32_t[mnVerts]);
     if (!remap)
         return E_OUTOFMEMORY;
 
