@@ -15,119 +15,121 @@
 
 #include "DirectXMeshP.h"
 
+using namespace DirectX;
+
 //
 // Generates an IB triangle list with adjacency (D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ)
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb205124.aspx
 //
 
-namespace DirectX
+namespace
 {
-
-template<class index_t>
-HRESULT _GenerateGSAdjacency( _In_reads_(nFaces*3) const index_t* indices, _In_ size_t nFaces,
-                              _In_reads_(nVerts) const uint32_t* pointRep,
-                              _In_reads_(nFaces*3) const uint32_t* adjacency, _In_ size_t nVerts, 
-                              _Out_writes_(nFaces*6) index_t* indicesAdj )
-{
-    if ( !indices || !nFaces || !pointRep || !adjacency || !nVerts || !indicesAdj )
-        return E_INVALIDARG;
-
-    if ( nVerts >= index_t(-1) )
-        return E_INVALIDARG;
-
-    if ( indices == indicesAdj )
+    template<class index_t>
+    HRESULT GenerateGSAdjacencyImpl(
+        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces,
+        _In_reads_(nVerts) const uint32_t* pointRep,
+        _In_reads_(nFaces * 3) const uint32_t* adjacency, _In_ size_t nVerts,
+        _Out_writes_(nFaces * 6) index_t* indicesAdj)
     {
-        // Does not support in-place conversion of the index buffer
-        return HRESULT_FROM_WIN32( ERROR_NOT_SUPPORTED);
-    }
+        if (!indices || !nFaces || !pointRep || !adjacency || !nVerts || !indicesAdj)
+            return E_INVALIDARG;
 
-    if ( ( uint64_t(nFaces) * 3 ) >= UINT32_MAX )
-        return HRESULT_FROM_WIN32( ERROR_ARITHMETIC_OVERFLOW );
+        if (nVerts >= index_t(-1))
+            return E_INVALIDARG;
 
-    size_t inputi = 0;
-    size_t outputi = 0;
-
-    for( size_t face = 0; face < nFaces; ++face )
-    {
-        for( uint32_t point = 0; point < 3; ++point )
+        if (indices == indicesAdj)
         {
-            assert( outputi < (nFaces*6) );
-            _Analysis_assume_( outputi < (nFaces*6) );
+            // Does not support in-place conversion of the index buffer
+            return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+        }
 
-            indicesAdj[ outputi ] = indices[ inputi ];
-            ++outputi;
-            ++inputi;
+        if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
+            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
-            assert( outputi < (nFaces*6) );
-            _Analysis_assume_( outputi < (nFaces*6) );
+        size_t inputi = 0;
+        size_t outputi = 0;
 
-            uint32_t a = adjacency[ face * 3 + point ];
-            if ( a == UNUSED32 )
+        for (size_t face = 0; face < nFaces; ++face)
+        {
+            for (uint32_t point = 0; point < 3; ++point)
             {
-                indicesAdj[ outputi ] = indices[ face * 3 + ( ( point+2 ) % 3 ) ];
-            }
-            else
-            {
-                uint32_t v1 = indices[ face * 3 + point ];
-                uint32_t v2 = indices[ face * 3 + ( ( point + 1 ) % 3 ) ];
+                assert(outputi < (nFaces * 6));
+                _Analysis_assume_(outputi < (nFaces * 6));
 
-                if ( v1 == index_t(-1) || v2 == index_t(-1) )
+                indicesAdj[outputi] = indices[inputi];
+                ++outputi;
+                ++inputi;
+
+                assert(outputi < (nFaces * 6));
+                _Analysis_assume_(outputi < (nFaces * 6));
+
+                uint32_t a = adjacency[face * 3 + point];
+                if (a == UNUSED32)
                 {
-                    indicesAdj[ outputi ] = index_t(-1);
+                    indicesAdj[outputi] = indices[face * 3 + ((point + 2) % 3)];
                 }
                 else
                 {
-                    if ( v1 >= nVerts
-                         || v2 >= nVerts )
-                        return E_UNEXPECTED;
+                    uint32_t v1 = indices[face * 3 + point];
+                    uint32_t v2 = indices[face * 3 + ((point + 1) % 3)];
 
-                    v1 = pointRep[ v1 ];
-                    v2 = pointRep[ v2 ];
-
-                    uint32_t vOther = UNUSED32;
-
-                    // find other vertex
-                    for( uint32_t k = 0; k < 3; ++k )
+                    if (v1 == index_t(-1) || v2 == index_t(-1))
                     {
-                        assert( a < nFaces );
-                        _Analysis_assume_( a < nFaces );
-                        uint32_t ak = indices[ a * 3 + k ];
-                        if ( ak == index_t(-1) )
-                            break;
-
-                        if ( ak >= nVerts )
-                            return E_UNEXPECTED;
-
-                        if ( pointRep[ ak ] == v1 )
-                            continue;
-
-                        if ( pointRep[ ak ] == v2 )
-                            continue;
-
-                        vOther = ak;
-                    }
-
-                    if ( vOther == UNUSED32 )
-                    {
-                        indicesAdj[ outputi ] = indices[ face * 3 + ( ( point+2 ) % 3 ) ];
-
+                        indicesAdj[outputi] = index_t(-1);
                     }
                     else
                     {
-                        indicesAdj[ outputi ] = index_t( vOther );
+                        if (v1 >= nVerts
+                            || v2 >= nVerts)
+                            return E_UNEXPECTED;
+
+                        v1 = pointRep[v1];
+                        v2 = pointRep[v2];
+
+                        uint32_t vOther = UNUSED32;
+
+                        // find other vertex
+                        for (uint32_t k = 0; k < 3; ++k)
+                        {
+                            assert(a < nFaces);
+                            _Analysis_assume_(a < nFaces);
+                            uint32_t ak = indices[a * 3 + k];
+                            if (ak == index_t(-1))
+                                break;
+
+                            if (ak >= nVerts)
+                                return E_UNEXPECTED;
+
+                            if (pointRep[ak] == v1)
+                                continue;
+
+                            if (pointRep[ak] == v2)
+                                continue;
+
+                            vOther = ak;
+                        }
+
+                        if (vOther == UNUSED32)
+                        {
+                            indicesAdj[outputi] = indices[face * 3 + ((point + 2) % 3)];
+
+                        }
+                        else
+                        {
+                            indicesAdj[outputi] = index_t(vOther);
+                        }
                     }
                 }
+                ++outputi;
             }
-            ++outputi;
         }
+
+        assert(inputi == (nFaces * 3));
+        assert(outputi == (nFaces * 6));
+
+        return S_OK;
     }
-
-    assert( inputi == ( nFaces * 3 ) );
-    assert( outputi == ( nFaces * 6 ) );
-    
-    return S_OK;
 }
-
 
 //=====================================================================================
 // Entry-points
@@ -135,19 +137,23 @@ HRESULT _GenerateGSAdjacency( _In_reads_(nFaces*3) const index_t* indices, _In_ 
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT GenerateGSAdjacency( const uint16_t* indices, size_t nFaces, const uint32_t* pointRep, const uint32_t* adjacency, size_t nVerts, 
-                             uint16_t* indicesAdj )
+HRESULT DirectX::GenerateGSAdjacency(
+    const uint16_t* indices, size_t nFaces,
+    const uint32_t* pointRep,
+    const uint32_t* adjacency, size_t nVerts,
+    uint16_t* indicesAdj)
 {
-    return _GenerateGSAdjacency<uint16_t>( indices, nFaces, pointRep, adjacency, nVerts, indicesAdj );
+    return GenerateGSAdjacencyImpl<uint16_t>(indices, nFaces, pointRep, adjacency, nVerts, indicesAdj);
 }
 
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT GenerateGSAdjacency( const uint32_t* indices, size_t nFaces, const uint32_t* pointRep, const uint32_t* adjacency, size_t nVerts,
-                             uint32_t* indicesAdj )
+HRESULT DirectX::GenerateGSAdjacency(
+    const uint32_t* indices, size_t nFaces,
+    const uint32_t* pointRep,
+    const uint32_t* adjacency, size_t nVerts,
+    uint32_t* indicesAdj)
 {
-    return _GenerateGSAdjacency<uint32_t>( indices, nFaces, pointRep, adjacency, nVerts, indicesAdj );
+    return GenerateGSAdjacencyImpl<uint32_t>(indices, nFaces, pointRep, adjacency, nVerts, indicesAdj);
 }
-
-} // namespace
