@@ -55,8 +55,8 @@ namespace
             XMVECTOR p2 = XMLoadFloat3(&positions[i1]);
             XMVECTOR p3 = XMLoadFloat3(&positions[i2]);
 
-            XMVECTOR u = p2 - p1;
-            XMVECTOR v = p3 - p1;
+            XMVECTOR u = XMVectorSubtract(p2, p1);
+            XMVECTOR v = XMVectorSubtract(p3, p1);
 
             XMVECTOR faceNormal = XMVector3Normalize(XMVector3Cross(u, v));
 
@@ -124,8 +124,8 @@ namespace
             XMVECTOR p1 = XMLoadFloat3(&positions[i1]);
             XMVECTOR p2 = XMLoadFloat3(&positions[i2]);
 
-            XMVECTOR u = p1 - p0;
-            XMVECTOR v = p2 - p0;
+            XMVECTOR u = XMVectorSubtract(p1, p0);
+            XMVECTOR v = XMVectorSubtract(p2, p0);
 
             XMVECTOR faceNormal = XMVector3Normalize(XMVector3Cross(u, v));
 
@@ -137,15 +137,15 @@ namespace
             w0 = XMVectorACos(w0);
 
             // Corner 1 -> 2 - 1, 0 - 1
-            XMVECTOR c = XMVector3Normalize(p2 - p1);
-            XMVECTOR d = XMVector3Normalize(p0 - p1);
+            XMVECTOR c = XMVector3Normalize(XMVectorSubtract(p2, p1));
+            XMVECTOR d = XMVector3Normalize(XMVectorSubtract(p0, p1));
             XMVECTOR w1 = XMVector3Dot(c, d);
             w1 = XMVectorClamp(w1, g_XMNegativeOne, g_XMOne);
             w1 = XMVectorACos(w1);
 
             // Corner 2 -> 0 - 2, 1 - 2
-            XMVECTOR e = XMVector3Normalize(p0 - p2);
-            XMVECTOR f = XMVector3Normalize(p1 - p2);
+            XMVECTOR e = XMVector3Normalize(XMVectorSubtract(p0, p2));
+            XMVECTOR f = XMVector3Normalize(XMVectorSubtract(p1, p2));
             XMVECTOR w2 = XMVector3Dot(e, f);
             w2 = XMVectorClamp(w2, g_XMNegativeOne, g_XMOne);
             w2 = XMVectorACos(w2);
@@ -214,8 +214,8 @@ namespace
             XMVECTOR p1 = XMLoadFloat3(&positions[i1]);
             XMVECTOR p2 = XMLoadFloat3(&positions[i2]);
 
-            XMVECTOR u = p1 - p0;
-            XMVECTOR v = p2 - p0;
+            XMVECTOR u = XMVectorSubtract(p1, p0);
+            XMVECTOR v = XMVectorSubtract(p2, p0);
 
             XMVECTOR faceNormal = XMVector3Normalize(XMVector3Cross(u, v));
 
@@ -224,14 +224,14 @@ namespace
             w0 = XMVector3Length(w0);
 
             // Corner 1 -> 2 - 1, 0 - 1
-            XMVECTOR c = p2 - p1;
-            XMVECTOR d = p0 - p1;
+            XMVECTOR c = XMVectorSubtract(p2, p1);
+            XMVECTOR d = XMVectorSubtract(p0, p1);
             XMVECTOR w1 = XMVector3Cross(c, d);
             w1 = XMVector3Length(w1);
 
             // Corner 2 -> 0 - 2, 1 - 2
-            XMVECTOR e = p0 - p2;
-            XMVECTOR f = p1 - p2;
+            XMVECTOR e = XMVectorSubtract(p0, p2);
+            XMVECTOR f = XMVectorSubtract(p1, p2);
             XMVECTOR w2 = XMVector3Cross(e, f);
             w2 = XMVector3Length(w2);
 

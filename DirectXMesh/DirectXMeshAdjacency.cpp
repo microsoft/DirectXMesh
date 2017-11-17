@@ -287,7 +287,7 @@ namespace
                         {
                             XMVECTOR inner = XMLoadFloat3(&positions[curIndex]);
 
-                            XMVECTOR diff = XMVector3LengthSq(inner - outer);
+                            XMVECTOR diff = XMVector3LengthSq(XMVectorSubtract(inner, outer));
 
                             if (XMVector2Less(diff, vepsilon))
                             {
@@ -482,8 +482,8 @@ namespace
                             XMVECTOR pB2 = XMLoadFloat3(&positions[va]);
                             XMVECTOR pB3 = XMLoadFloat3(&positions[vOther]);
 
-                            XMVECTOR v12 = pB1 - pB2;
-                            XMVECTOR v13 = pB1 - pB3;
+                            XMVECTOR v12 = XMVectorSubtract(pB1, pB2);
+                            XMVECTOR v13 = XMVectorSubtract(pB1, pB3);
 
                             XMVECTOR bnormal = XMVector3Normalize(XMVector3Cross(v12, v13));
 
@@ -493,8 +493,8 @@ namespace
                                 XMVECTOR pA2 = XMLoadFloat3(&positions[found->v2]);
                                 XMVECTOR pA3 = XMLoadFloat3(&positions[found->vOther]);
 
-                                v12 = pA1 - pA2;
-                                v13 = pA1 - pA3;
+                                v12 = XMVectorSubtract(pA1, pA2);
+                                v13 = XMVectorSubtract(pA1, pA3);
 
                                 XMVECTOR anormal = XMVector3Normalize(XMVector3Cross(v12, v13));
 
@@ -505,8 +505,8 @@ namespace
                             XMVECTOR pA2 = XMLoadFloat3(&positions[current->v2]);
                             XMVECTOR pA3 = XMLoadFloat3(&positions[current->vOther]);
 
-                            v12 = pA1 - pA2;
-                            v13 = pA1 - pA3;
+                            v12 = XMVectorSubtract(pA1, pA2);
+                            v13 = XMVectorSubtract(pA1, pA3);
 
                             XMVECTOR anormal = XMVector3Normalize(XMVector3Cross(v12, v13));
 
