@@ -74,14 +74,14 @@ namespace
             XMVECTOR t1 = XMLoadFloat2(&texcoords[i1]);
             XMVECTOR t2 = XMLoadFloat2(&texcoords[i2]);
 
-            XMVECTOR s = XMVectorMergeXY(t1 - t0, t2 - t0);
+            XMVECTOR s = XMVectorMergeXY(XMVectorSubtract(t1, t0), XMVectorSubtract(t2, t0));
 
             XMFLOAT4A tmp;
             XMStoreFloat4A(&tmp, s);
 
             float d = tmp.x * tmp.w - tmp.z * tmp.y;
             d = (fabsf(d) <= EPSILON) ? 1.f : (1.f / d);
-            s *= d;
+            s = XMVectorScale(s, d);
             s = XMVectorMultiply(s, s_flips);
 
             XMMATRIX m0;
@@ -94,8 +94,8 @@ namespace
             XMVECTOR p2 = XMLoadFloat3(&positions[i2]);
 
             XMMATRIX m1;
-            m1.r[0] = p1 - p0;
-            m1.r[1] = p2 - p0;
+            m1.r[0] = XMVectorSubtract(p1, p0);
+            m1.r[1] = XMVectorSubtract(p2, p0);
             m1.r[2] = m1.r[3] = g_XMZero;
 
             XMMATRIX uv = XMMatrixMultiply(m0, m1);
@@ -116,11 +116,11 @@ namespace
             b0 = XMVector3Normalize(b0);
 
             XMVECTOR tan1 = tangent1[j];
-            XMVECTOR b1 = tan1 - XMVector3Dot(b0, tan1) * b0;
+            XMVECTOR b1 = XMVectorSubtract(tan1, XMVectorMultiply(XMVector3Dot(b0, tan1), b0));
             b1 = XMVector3Normalize(b1);
 
             XMVECTOR tan2 = tangent2[j];
-            XMVECTOR b2 = tan2 - XMVector3Dot(b0, tan2) * b0 - XMVector3Dot(b1, tan2) * b1;
+            XMVECTOR b2 = XMVectorSubtract(XMVectorSubtract(tan2, XMVectorMultiply(XMVector3Dot(b0, tan2), b0)), XMVectorMultiply(XMVector3Dot(b1, tan2), b1));
             b2 = XMVector3Normalize(b2);
 
             // handle degenerate vectors
