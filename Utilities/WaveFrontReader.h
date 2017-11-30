@@ -138,7 +138,7 @@ public:
             else if( 0 == wcscmp( strCommand, L"f" ) )
             {
                 // Face
-                UINT iPosition, iTexCoord, iNormal;
+                INT iPosition, iTexCoord, iNormal;
                 Vertex vertex;
 
                 DWORD faceIndex[ MAX_POLY ];
@@ -153,12 +153,29 @@ public:
 
                     memset( &vertex, 0, sizeof( vertex ) );
 
-                    // OBJ format uses 1-based arrays
                     InFile >> iPosition;
-                    if ( iPosition > positions.size() )
+
+                    UINT vertexIndex = 0;
+                    if (!iPosition)
+                    {
+                        // 0 is not allowed for index
+                        return E_UNEXPECTED;
+                    }
+                    else if (iPosition < 0)
+                    {
+                        // Negative values are relative indices
+                        vertexIndex = UINT(positions.size() + iPosition);
+                    }
+                    else
+                    {
+                        // OBJ format uses 1-based arrays
+                        vertexIndex = iPosition - 1;
+                    }
+
+                    if (vertexIndex >= positions.size())
                         return E_FAIL;
 
-                    vertex.position = positions[ iPosition - 1 ];
+                    vertex.position = positions[vertexIndex];
 
                     if( '/' == InFile.peek() )
                     {
@@ -168,10 +185,28 @@ public:
                         {
                             // Optional texture coordinate
                             InFile >> iTexCoord;
-                            if ( iTexCoord > texCoords.size() )
+
+                            UINT coordIndex = 0;
+                            if (!iTexCoord)
+                            {
+                                // 0 is not allowed for index
+                                return E_UNEXPECTED;
+                            }
+                            else if (iTexCoord < 0)
+                            {
+                                // Negative values are relative indices
+                                coordIndex = UINT(texCoords.size() + iTexCoord);
+                            }
+                            else
+                            {
+                                // OBJ format uses 1-based arrays
+                                coordIndex = iTexCoord - 1;
+                            }
+
+                            if (coordIndex >= texCoords.size())
                                 return E_FAIL;
 
-                            vertex.textureCoordinate = texCoords[ iTexCoord - 1 ];
+                            vertex.textureCoordinate = texCoords[coordIndex];
                         }
 
                         if( '/' == InFile.peek() )
@@ -180,10 +215,28 @@ public:
 
                             // Optional vertex normal
                             InFile >> iNormal;
-                            if ( iNormal > normals.size() )
+
+                            UINT normIndex = 0;
+                            if (!iNormal)
+                            {
+                                // 0 is not allowed for index
+                                return E_UNEXPECTED;
+                            }
+                            else if (iNormal < 0)
+                            {
+                                // Negative values are relative indices
+                                normIndex = UINT(normals.size() + iNormal);
+                            }
+                            else
+                            {
+                                // OBJ format uses 1-based arrays
+                                normIndex = iNormal - 1;
+                            }
+
+                            if (normIndex >= normals.size())
                                 return E_FAIL;
 
-                            vertex.normal = normals[ iNormal - 1 ];
+                            vertex.normal = normals[normIndex];
                         }
                     }
 
