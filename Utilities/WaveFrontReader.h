@@ -68,7 +68,7 @@ public:
         if( !InFile )
             return HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND );
 
-        wchar_t fname[_MAX_FNAME];
+        wchar_t fname[_MAX_FNAME] = {};
         _wsplitpath_s( szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0 );
 
         name = fname;
@@ -82,7 +82,7 @@ public:
         Material defmat;
 
         wcscpy_s( defmat.strName, L"default" );
-        materials.push_back( defmat );
+        materials.emplace_back( defmat );
 
         uint32_t curSubset = 0;
 
@@ -115,14 +115,14 @@ public:
                 // Vertex Position
                 float x, y, z;
                 InFile >> x >> y >> z;
-                positions.push_back( XMFLOAT3( x, y, z ) );
+                positions.emplace_back( XMFLOAT3( x, y, z ) );
             }
             else if( 0 == wcscmp( strCommand, L"vt" ) )
             {
                 // Vertex TexCoord
                 float u, v;
                 InFile >> u >> v;
-                texCoords.push_back( XMFLOAT2( u, v ) );
+                texCoords.emplace_back( XMFLOAT2( u, v ) );
 
                 hasTexcoords = true;
             }
@@ -131,7 +131,7 @@ public:
                 // Vertex Normal
                 float x, y, z;
                 InFile >> x >> y >> z;
-                normals.push_back( XMFLOAT3( x, y, z ) );
+                normals.emplace_back( XMFLOAT3( x, y, z ) );
 
                 hasNormals = true;
             }
@@ -244,7 +244,7 @@ public:
                     // list. Store the index in the Indices array. The Vertices and Indices
                     // lists will eventually become the Vertex Buffer and Index Buffer for
                     // the mesh.
-                    DWORD index = AddVertex( iPosition, &vertex, vertexCache );
+                    DWORD index = AddVertex( vertexIndex, &vertex, vertexCache );
                     if ( index == (DWORD)-1 )
                        return E_OUTOFMEMORY;
 
@@ -275,7 +275,7 @@ public:
                             faceEnd = true;
                             break;
                         }
-                        else if ( isdigit( p ) )
+                        else if ( isdigit( p ) || p == '-' || p == '+' )
                             break;
 
                         InFile.ignore();
@@ -298,19 +298,19 @@ public:
                 for( size_t j = 2; j < iFace; ++ j )
                 {
                     DWORD index = faceIndex[ j ];
-                    indices.push_back( static_cast<index_t>( i0 ) );
+                    indices.emplace_back( static_cast<index_t>( i0 ) );
                     if ( ccw )
                     {
-                        indices.push_back( static_cast<index_t>( i1 ) );
-                        indices.push_back( static_cast<index_t>( index ) );
+                        indices.emplace_back( static_cast<index_t>( i1 ) );
+                        indices.emplace_back( static_cast<index_t>( index ) );
                     }
                     else
                     {
-                        indices.push_back( static_cast<index_t>( index ) );
-                        indices.push_back( static_cast<index_t>( i1 ) );
+                        indices.emplace_back( static_cast<index_t>( index ) );
+                        indices.emplace_back( static_cast<index_t>( i1 ) );
                     }                        
                      
-                    attributes.push_back( curSubset );
+                    attributes.emplace_back( curSubset );
 
                     i1 = index;
                 }
@@ -345,7 +345,7 @@ public:
                     Material mat;
                     curSubset = static_cast<uint32_t>( materials.size() );
                     wcscpy_s( mat.strName, MAX_PATH - 1, strName );
-                    materials.push_back( mat );
+                    materials.emplace_back( mat );
                 }
             }
             else
@@ -367,14 +367,14 @@ public:
         // If an associated material file was found, read that in as well.
         if( *strMaterialFilename )
         {
-            wchar_t ext[_MAX_EXT];
+            wchar_t ext[_MAX_EXT] = {};
             _wsplitpath_s( strMaterialFilename, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, ext, _MAX_EXT );
 
-            wchar_t drive[_MAX_DRIVE];
-            wchar_t dir[_MAX_DIR];
+            wchar_t drive[_MAX_DRIVE] = {};
+            wchar_t dir[_MAX_DIR] = {};
             _wsplitpath_s( szFileName, drive, _MAX_DRIVE, dir, _MAX_DIR, nullptr, 0, nullptr, 0 );
 
-            wchar_t szPath[ MAX_PATH ];
+            wchar_t szPath[ MAX_PATH ] = {};
             _wmakepath_s( szPath, MAX_PATH, drive, dir, fname, ext );
 
             HRESULT hr = LoadMTL( szPath );
@@ -503,14 +503,14 @@ public:
     {
         Clear();
 
-        wchar_t fname[_MAX_FNAME];
+        wchar_t fname[_MAX_FNAME] = {};
         _wsplitpath_s( szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0 );
 
         name = fname;
 
         Material defmat;
         wcscpy_s( defmat.strName, L"default" );
-        materials.push_back( defmat );
+        materials.emplace_back( defmat );
 
         std::ifstream vboFile(szFileName, std::ifstream::in | std::ifstream::binary);
         if ( !vboFile.is_open() )
@@ -547,7 +547,7 @@ public:
             indices.reserve( numIndices );
             for( auto it = tmp.cbegin(); it != tmp.cend(); ++it )
             {
-                indices.push_back( *it );
+                indices.emplace_back( *it );
             }
         }
 
@@ -610,7 +610,7 @@ private:
         }
 
         DWORD index = static_cast<UINT>( vertices.size() );
-        vertices.push_back( *pVertex );
+        vertices.emplace_back( *pVertex );
 
         VertexCache::value_type entry( hash, index );
         cache.insert( entry );
