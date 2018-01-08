@@ -86,38 +86,38 @@ public:
 
         uint32_t curSubset = 0;
 
-        wchar_t strCommand[256] = {};
         wchar_t strMaterialFilename[MAX_PATH] = {};
         for( ;; )
         {
+            std::wstring strCommand;
             InFile >> strCommand;
             if( !InFile )
                 break;
 
-            if ( *strCommand == L'#' )
+            if ( *strCommand.c_str() == L'#' )
             {
                 // Comment
             }
-            else if( 0 == wcscmp( strCommand, L"o" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"o" ) )
             {
                 // Object name ignored
             }
-            else if( 0 == wcscmp( strCommand, L"g" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"g" ) )
             {
                 // Group name ignored
             }
-            else if( 0 == wcscmp( strCommand, L"s" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"s" ) )
             {
                 // Smoothing group ignored
             }
-            else if( 0 == wcscmp( strCommand, L"v" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"v" ) )
             {
                 // Vertex Position
                 float x, y, z;
                 InFile >> x >> y >> z;
                 positions.emplace_back( XMFLOAT3( x, y, z ) );
             }
-            else if( 0 == wcscmp( strCommand, L"vt" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"vt" ) )
             {
                 // Vertex TexCoord
                 float u, v;
@@ -126,7 +126,7 @@ public:
 
                 hasTexcoords = true;
             }
-            else if( 0 == wcscmp( strCommand, L"vn" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"vn" ) )
             {
                 // Vertex Normal
                 float x, y, z;
@@ -135,7 +135,7 @@ public:
 
                 hasNormals = true;
             }
-            else if( 0 == wcscmp( strCommand, L"f" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"f" ) )
             {
                 // Face
                 INT iPosition, iTexCoord, iNormal;
@@ -317,12 +317,12 @@ public:
 
                 assert( attributes.size()*3 == indices.size() );
             }
-            else if( 0 == wcscmp( strCommand, L"mtllib" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"mtllib" ) )
             {
                 // Material library
                 InFile >> strMaterialFilename;
             }
-            else if( 0 == wcscmp( strCommand, L"usemtl" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"usemtl" ) )
             {
                 // Material
                 wchar_t strName[MAX_PATH] = {};
@@ -352,12 +352,15 @@ public:
             {
 #ifdef _DEBUG
                 // Unimplemented or unrecognized command
-                OutputDebugStringW( strCommand );
+                OutputDebugStringW( strCommand.c_str());
 #endif
             }
 
             InFile.ignore( 1000, '\n' );
         }
+
+        if (positions.empty())
+            return E_FAIL;
 
         // Cleanup
         InFile.close();
@@ -394,14 +397,14 @@ public:
 
         auto curMaterial = materials.end();
 
-        wchar_t strCommand[256] = {};
         for( ;; )
         {
+            std::wstring strCommand;
             InFile >> strCommand;
             if( !InFile )
                 break;
 
-            if( 0 == wcscmp( strCommand, L"newmtl" ) )
+            if( 0 == wcscmp( strCommand.c_str(), L"newmtl" ) )
             {
                 // Switching active materials
                 wchar_t strName[MAX_PATH] = {};
@@ -422,52 +425,52 @@ public:
             if( curMaterial == materials.end() )
                 continue;
 
-            if( 0 == wcscmp( strCommand, L"#" ) )
+            if( 0 == wcscmp( strCommand.c_str(), L"#" ) )
             {
                 // Comment
             }
-            else if( 0 == wcscmp( strCommand, L"Ka" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"Ka" ) )
             {
                 // Ambient color
                 float r, g, b;
                 InFile >> r >> g >> b;
                 curMaterial->vAmbient = XMFLOAT3( r, g, b );
             }
-            else if( 0 == wcscmp( strCommand, L"Kd" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"Kd" ) )
             {
                 // Diffuse color
                 float r, g, b;
                 InFile >> r >> g >> b;
                 curMaterial->vDiffuse = XMFLOAT3( r, g, b );
             }
-            else if( 0 == wcscmp( strCommand, L"Ks" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"Ks" ) )
             {
                 // Specular color
                 float r, g, b;
                 InFile >> r >> g >> b;
                 curMaterial->vSpecular = XMFLOAT3( r, g, b );
             }
-            else if( 0 == wcscmp( strCommand, L"d" ) ||
-                     0 == wcscmp( strCommand, L"Tr" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"d" ) ||
+                     0 == wcscmp( strCommand.c_str(), L"Tr" ) )
             {
                 // Alpha
                 InFile >> curMaterial->fAlpha;
             }
-            else if( 0 == wcscmp( strCommand, L"Ns" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"Ns" ) )
             {
                 // Shininess
                 int nShininess;
                 InFile >> nShininess;
                 curMaterial->nShininess = nShininess;
             }
-            else if( 0 == wcscmp( strCommand, L"illum" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"illum" ) )
             {
                 // Specular on/off
                 int illumination;
                 InFile >> illumination;
                 curMaterial->bSpecular = ( illumination == 2 );
             }
-            else if( 0 == wcscmp( strCommand, L"map_Kd" ) )
+            else if( 0 == wcscmp( strCommand.c_str(), L"map_Kd" ) )
             {
                 // Texture
                 InFile >> curMaterial->strTexture;
