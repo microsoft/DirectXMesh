@@ -343,7 +343,7 @@ namespace
                 mtl.specularColor = (it->bSpecular) ? it->vSpecular : XMFLOAT3(0.f, 0.f, 0.f);
                 mtl.emissiveColor = XMFLOAT3(0.f, 0.f, 0.f);
 
-                wchar_t texture[_MAX_PATH] = { 0 };
+                wchar_t texture[_MAX_PATH] = {};
                 if (*it->strTexture)
                 {
                     wchar_t txext[_MAX_EXT];
@@ -377,7 +377,7 @@ namespace
 int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 {
     // Parameters and defaults
-    wchar_t szOutputFile[MAX_PATH] = { 0 };
+    wchar_t szOutputFile[MAX_PATH] = {};
 
     // Process command line
     DWORD dwOptions = 0;
@@ -798,8 +798,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
 
 
-        wchar_t outputPath[MAX_PATH] = { 0 };
-        wchar_t outputExt[_MAX_EXT] = { 0 };
+        wchar_t outputPath[MAX_PATH] = {};
+        wchar_t outputExt[_MAX_EXT] = {};
 
         if (*szOutputFile)
         {
@@ -822,7 +822,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wcscpy_s(outputExt, L".sdkmesh");
             }
 
-            wchar_t outFilename[_MAX_FNAME] = { 0 };
+            wchar_t outFilename[_MAX_FNAME] = {};
             wcscpy_s(outFilename, fname);
 
             _wmakepath_s(outputPath, nullptr, nullptr, outFilename, outputExt);
