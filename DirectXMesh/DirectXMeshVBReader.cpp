@@ -18,8 +18,6 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-#pragma warning(disable : 4351)
-
 namespace
 {
     const size_t c_MaxSlot = 32;

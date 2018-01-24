@@ -354,6 +354,10 @@ namespace DirectX
                                    _Out_writes_(nFaces) uint32_t* faceRemap,
                                    _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
                                    _In_ uint32_t restart = OPTFACES_R_DEFAULT );
+    HRESULT __cdecl OptimizeFacesLRU( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces,
+                                      _Out_writes_(nFaces) uint32_t* faceRemap );
+    HRESULT __cdecl OptimizeFacesLRU( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces,
+                                      _Out_writes_(nFaces) uint32_t* faceRemap );
         // Reorders faces to increase hit rate of vertex caches
 
     HRESULT __cdecl OptimizeFacesEx( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces,
@@ -368,6 +372,12 @@ namespace DirectX
                                      _Out_writes_(nFaces) uint32_t* faceRemap,
                                      _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
                                      _In_ uint32_t restart = OPTFACES_R_DEFAULT );
+    HRESULT __cdecl OptimizeFacesLRUEx( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces,
+                                        _In_reads_(nFaces) const uint32_t* attributes,
+                                        _Out_writes_(nFaces) uint32_t* faceRemap );
+    HRESULT __cdecl OptimizeFacesLRUEx( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces,
+                                        _In_reads_(nFaces) const uint32_t* attributes,
+                                        _Out_writes_(nFaces) uint32_t* faceRemap );
         // Attribute group version of OptimizeFaces
 
     HRESULT __cdecl OptimizeVertices( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
