@@ -205,7 +205,7 @@ namespace
     };
 
     template <typename IndexType>
-    HRESULT OptimizeFacesImpl(const IndexType* indexList, uint32_t indexCount, uint32_t* faceRemap, uint32_t lruCacheSize)
+    HRESULT OptimizeFacesImpl(_In_reads_(indexCount) const IndexType* indexList, uint32_t indexCount, _Out_writes_(indexCount / 3) uint32_t* faceRemap, uint32_t lruCacheSize)
     {
         std::unique_ptr<OptimizeVertexData<IndexType>[]> vertexDataList(new (std::nothrow) OptimizeVertexData<IndexType>[indexCount]);
         if (!vertexDataList)
@@ -228,6 +228,7 @@ namespace
 
         // build the vertex remap table
         unsigned int uniqueVertexCount = 0;
+        uint32_t unused = 0;
         {
             typedef IndexSortCompareIndexed<unsigned int, IndexType> indexSorter;
 
@@ -245,10 +246,18 @@ namespace
 
             for (unsigned int i = 0; i < indexCount; i++)
             {
-                if (i == 0 || sortFunc(indexSorted[i - 1], indexSorted[i]))
+                unsigned int idx = indexSorted[i];
+                if (indexList[idx] == IndexType(-1))
+                {
+                    unused++;
+                    vertexRemap[idx] = unsigned(-1);
+                    continue;
+                }
+
+                if (i == 0 || sortFunc(indexSorted[i - 1], idx))
                 {
                     // it's not a duplicate
-                    vertexRemap[indexSorted[i]] = uniqueVertexCount;
+                    vertexRemap[idx] = uniqueVertexCount;
                     uniqueVertexCount++;
                 }
                 else
@@ -261,6 +270,9 @@ namespace
         // compute face count per vertex
         for (uint32_t i = 0; i < indexCount; ++i)
         {
+            if (vertexRemap[i] == unsigned(-1))
+                continue;
+
             OptimizeVertexData<IndexType>& vertexData = vertexDataList[vertexRemap[i]];
             vertexData.activeFaceListSize++;
         }
@@ -281,7 +293,7 @@ namespace
                 vertexData.activeFaceListSize = 0;
             }
 
-            assert(curActiveFaceListPos == indexCount);
+            assert(curActiveFaceListPos == (indexCount - unused));
         }
 
         // sort unprocessed faces by highest score
@@ -303,7 +315,11 @@ namespace
         {
             for (uint32_t j = 0; j < 3; ++j)
             {
-                OptimizeVertexData<IndexType>& vertexData = vertexDataList[vertexRemap[i + j]];
+                unsigned int v = vertexRemap[i + j];
+                if (v == unsigned(-1))
+                    continue;
+
+                OptimizeVertexData<IndexType>& vertexData = vertexDataList[v];
                 activeFaceList[vertexData.activeFaceListStart + vertexData.activeFaceListSize] = i;
                 vertexData.activeFaceListSize++;
             }
@@ -320,8 +336,16 @@ namespace
         const float maxValenceScore = FindVertexScore(1, kEvictedCacheIndex, lruCacheSize) * 3.f;
         unsigned int nextBestFace = 0;
 
+        uint32_t curFace = 0;
         for (uint32_t i = 0; i < indexCount; i += 3)
         {
+            if (vertexRemap[i] == unsigned(-1)
+                || vertexRemap[i + 1] == unsigned(-1)
+                || vertexRemap[i + 2] == unsigned(-1))
+            {
+                continue;
+            }
+
             if (bestScore < 0.f)
             {
                 // no verts in the cache are used by any unprocessed faces so
@@ -335,6 +359,9 @@ namespace
                         float faceScore = 0.f;
                         for (uint32_t k = 0; k < 3; ++k)
                         {
+                            if (vertexRemap[face + k] == unsigned(-1))
+                                continue;
+
                             float vertexScore = vertexDataList[vertexRemap[face + k]].score;
                             faceScore += vertexScore;
                         }
@@ -351,9 +378,14 @@ namespace
             processedFaceList[bestFace / 3] = 1;
             uint16_t entriesInCache1 = 0;
 
-            faceRemap[i / 3] = bestFace / 3;
+            faceRemap[curFace] = bestFace / 3;
+            curFace++;
 
             // add bestFace to LRU cache
+            assert(vertexRemap[bestFace] != unsigned(-1));
+            assert(vertexRemap[bestFace + 1] != unsigned(-1));
+            assert(vertexRemap[bestFace + 2] != unsigned(-1));
+
             for (uint32_t v = 0; v < 3; ++v)
             {
                 OptimizeVertexData<IndexType>& vertexData = vertexDataList[vertexRemap[bestFace + v]];
