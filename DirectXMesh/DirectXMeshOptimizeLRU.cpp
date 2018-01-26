@@ -205,7 +205,9 @@ namespace
     };
 
     template <typename IndexType>
-    HRESULT OptimizeFacesImpl(_In_reads_(indexCount) const IndexType* indexList, uint32_t indexCount, _Out_writes_(indexCount / 3) uint32_t* faceRemap, uint32_t lruCacheSize)
+    HRESULT OptimizeFacesImpl(
+        _In_reads_(indexCount) const IndexType* indexList, uint32_t indexCount,
+        _Out_writes_(indexCount / 3) uint32_t* faceRemap, uint32_t lruCacheSize, uint32_t offset)
     {
         std::unique_ptr<OptimizeVertexData<IndexType>[]> vertexDataList(new (std::nothrow) OptimizeVertexData<IndexType>[indexCount]);
         if (!vertexDataList)
@@ -400,7 +402,7 @@ namespace
             processedFaceList[bestFace / 3] = 1;
             uint16_t entriesInCache1 = 0;
 
-            faceRemap[curFace] = bestFace / 3;
+            faceRemap[curFace] = (bestFace / 3) + offset;
             curFace++;
 
             // add bestFace to LRU cache
@@ -538,7 +540,7 @@ HRESULT DirectX::OptimizeFacesLRU(
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
-    return OptimizeFacesImpl<uint16_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize);
+    return OptimizeFacesImpl<uint16_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
 }
 
 _Use_decl_annotations_
@@ -557,7 +559,7 @@ HRESULT DirectX::OptimizeFacesLRU(
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
-    return OptimizeFacesImpl<uint32_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize);
+    return OptimizeFacesImpl<uint32_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
 }
 
 
@@ -578,8 +580,20 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
-    // TODO -
-    return E_NOTIMPL;
+    auto subsets = ComputeSubsets(attributes, nFaces);
+
+    assert(!subsets.empty());
+
+    for( auto it = subsets.cbegin(); it != subsets.cend(); ++it)
+    {
+        HRESULT hr = OptimizeFacesImpl<uint16_t>(
+            &indices[it->first * 3], static_cast<uint32_t>(it->second * 3),
+            &faceRemap[it->first], lruCacheSize, uint32_t(it->first));
+        if (FAILED(hr))
+            return hr;
+    }
+
+    return S_OK;
 }
 
 _Use_decl_annotations_
@@ -598,6 +612,18 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
-    // TODO -
-    return E_NOTIMPL;
+    auto subsets = ComputeSubsets(attributes, nFaces);
+
+    assert(!subsets.empty());
+
+    for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
+    {
+        HRESULT hr = OptimizeFacesImpl<uint32_t>(
+            &indices[it->first * 3], static_cast<uint32_t>(it->second * 3),
+            &faceRemap[it->first], lruCacheSize, uint32_t(it->first));
+        if (FAILED(hr))
+            return hr;
+    }
+
+    return S_OK;
 }
