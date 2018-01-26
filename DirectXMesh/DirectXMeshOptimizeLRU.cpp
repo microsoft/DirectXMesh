@@ -244,6 +244,7 @@ namespace
             indexSorter sortFunc(indexList);
             std::sort(indexSorted.get(), indexSorted.get() + indexCount, sortFunc);
 
+            bool first = false;
             for (unsigned int i = 0; i < indexCount; i++)
             {
                 unsigned int idx = indexSorted[i];
@@ -254,11 +255,12 @@ namespace
                     continue;
                 }
 
-                if (i == 0 || sortFunc(indexSorted[i - 1], idx))
+                if (!i || first || sortFunc(indexSorted[i - 1], idx))
                 {
                     // it's not a duplicate
                     vertexRemap[idx] = uniqueVertexCount;
                     uniqueVertexCount++;
+                    first = true;
                 }
                 else
                 {
@@ -331,6 +333,19 @@ namespace
         unsigned int entriesInCache0 = 0;
 
         uint32_t bestFace = 0;
+        for (uint32_t i = 0; i < indexCount; i += 3)
+        {
+            if (vertexRemap[i] == unsigned(-1)
+                || vertexRemap[i + 1] == unsigned(-1)
+                || vertexRemap[i + 2] == unsigned(-1))
+            {
+                ++bestFace;
+                continue;
+            }
+            else
+                break;
+        }
+
         float bestScore = -1.f;
 
         const float maxValenceScore = FindVertexScore(1, kEvictedCacheIndex, lruCacheSize) * 3.f;
@@ -357,14 +372,21 @@ namespace
                     {
                         uint32_t face = faceIndex * 3;
                         float faceScore = 0.f;
+                        bool skip = false;
                         for (uint32_t k = 0; k < 3; ++k)
                         {
                             if (vertexRemap[face + k] == unsigned(-1))
-                                continue;
+                            {
+                                skip = true;
+                                break;
+                            }
 
                             float vertexScore = vertexDataList[vertexRemap[face + k]].score;
                             faceScore += vertexScore;
                         }
+
+                        if (skip)
+                            continue;
 
                         bestScore = faceScore;
                         bestFace = face;
@@ -485,6 +507,11 @@ namespace
             std::swap(cache0, cache1);
 
             entriesInCache0 = std::min<unsigned int>(entriesInCache1, lruCacheSize);
+        }
+
+        for (; curFace < faceCount; ++curFace)
+        {
+            faceRemap[curFace] = uint32_t(-1);
         }
 
         return S_OK;
