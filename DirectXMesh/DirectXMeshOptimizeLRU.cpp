@@ -260,7 +260,7 @@ namespace
                     // it's not a duplicate
                     vertexRemap[idx] = uniqueVertexCount;
                     uniqueVertexCount++;
-                    first = true;
+                    first = false;
                 }
                 else
                 {
