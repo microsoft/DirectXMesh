@@ -60,7 +60,7 @@ public:
 
     HRESULT ComputeTangentFrame( _In_ bool bitangents );
 
-    HRESULT Optimize( _In_ uint32_t vertexCache = DirectX::OPTFACES_V_DEFAULT, _In_ uint32_t restart = DirectX::OPTFACES_R_DEFAULT );
+    HRESULT Optimize( bool lru );
 
     HRESULT ReverseWinding();
 

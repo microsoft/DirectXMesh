@@ -598,9 +598,12 @@ HRESULT Mesh::ComputeTangentFrame( _In_ bool bitangents )
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::Optimize( uint32_t vertexCache, uint32_t restart )
+HRESULT Mesh::Optimize( bool lru )
 {
-    if (!mnFaces || !mIndices || !mnVerts || !mPositions || !mAdjacency)
+    if (!mnFaces || !mIndices || !mnVerts || !mPositions)
+        return E_UNEXPECTED;
+
+    if (!lru && !mAdjacency)
         return E_UNEXPECTED;
 
     HRESULT hr = S_OK;
@@ -618,22 +621,46 @@ HRESULT Mesh::Optimize( uint32_t vertexCache, uint32_t restart )
             if (FAILED(hr))
                 return hr;
 
-            hr = ReorderIBAndAdjacency(mIndices.get(), mnFaces, mAdjacency.get(), remap.get());
+            if (mAdjacency)
+            {
+                hr = ReorderIBAndAdjacency(mIndices.get(), mnFaces, mAdjacency.get(), remap.get());
+            }
+            else
+            {
+                hr = ReorderIB(mIndices.get(), mnFaces, remap.get());
+            }
             if (FAILED(hr))
                 return hr;
 
             // Optimize faces for pre-transform vertex cache
-            hr = OptimizeFacesEx(mIndices.get(), mnFaces, mAdjacency.get(), mAttributes.get(), remap.get(), vertexCache, restart);
+            if (lru)
+            {
+                hr = OptimizeFacesLRUEx(mIndices.get(), mnFaces, mAttributes.get(), remap.get());
+            }
+            else
+            {
+                hr = OptimizeFacesEx(mIndices.get(), mnFaces, mAdjacency.get(), mAttributes.get(), remap.get());
+            }
+        }
+        else if (lru)
+        {
+            hr = OptimizeFacesLRU(mIndices.get(), mnFaces, remap.get());
         }
         else
         {
-            // Optimize faces for pre-transform vertex cache
-            hr = OptimizeFaces(mIndices.get(), mnFaces, mAdjacency.get(), remap.get(), vertexCache, restart);
+            hr = OptimizeFaces(mIndices.get(), mnFaces, mAdjacency.get(), remap.get());
         }
         if (FAILED(hr))
             return hr;
 
-        hr = ReorderIBAndAdjacency(mIndices.get(), mnFaces, mAdjacency.get(), remap.get());
+        if (mAdjacency)
+        {
+            hr = ReorderIBAndAdjacency(mIndices.get(), mnFaces, mAdjacency.get(), remap.get());
+        }
+        else
+        {
+            hr = ReorderIB(mIndices.get(), mnFaces, remap.get());
+        }
         if (FAILED(hr))
             return hr;
     }

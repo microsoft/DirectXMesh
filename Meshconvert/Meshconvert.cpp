@@ -42,6 +42,7 @@ enum OPTIONS
     OPT_TANGENTS,
     OPT_CTF,
     OPT_OPTIMIZE,
+    OPT_OPTIMIZE_LRU,
     OPT_CLEAN,
     OPT_TOPOLOGICAL_ADJ,
     OPT_GEOMETRIC_ADJ,
@@ -87,6 +88,7 @@ const SValue g_pOptions[] =
     { L"t",         OPT_TANGENTS },
     { L"tb",        OPT_CTF },
     { L"op",        OPT_OPTIMIZE },
+    { L"oplru",     OPT_OPTIMIZE_LRU },
     { L"c",         OPT_CLEAN },
     { L"ta",        OPT_TOPOLOGICAL_ADJ },
     { L"ga",        OPT_GEOMETRIC_ADJ },
@@ -245,7 +247,7 @@ namespace
         wprintf(L"   -t                  generate tangents\n");
         wprintf(L"   -tb                 generate tangents & bi-tangents\n");
         wprintf(L"   -cw                 faces are clockwise (defaults to counter-clockwise)\n");
-        wprintf(L"   -op                 vertex cache optimize the mesh (implies -c)\n");
+        wprintf(L"   -op | -oplru        vertex cache optimize the mesh (implies -c)\n");
         wprintf(L"   -c                  mesh cleaning including vertex dups for atttribute sets\n");
         wprintf(L"   -ta | -ga           generate topological vs. geometric adjancecy (def: ta)\n");
         wprintf(L"   -sdkmesh|-cmo|-vbo  output file type\n");
@@ -430,6 +432,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             switch (dwOption)
             {
+            case OPT_OPTIMIZE_LRU:
+                dwOptions |= (1 << OPT_OPTIMIZE);
+                break;
+
             case OPT_WEIGHT_BY_AREA:
                 if (dwOptions & (1 << OPT_WEIGHT_BY_EQUAL))
                 {
@@ -768,7 +774,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             wprintf(L" [ACMR %f, ATVR %f] ", acmr, atvr);
 
-            hr = inMesh->Optimize();
+            hr = inMesh->Optimize((dwOptions & (1 << OPT_OPTIMIZE_LRU)) ? true : false);
             if (FAILED(hr))
             {
                 wprintf(L"\nERROR: Failed vertex-cache optimization (%08X)\n", hr);
