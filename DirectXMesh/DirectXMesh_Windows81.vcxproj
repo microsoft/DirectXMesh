@@ -40,6 +40,8 @@
     <ClCompile Include="DirectXMeshGSAdjacency.cpp" />
     <ClCompile Include="DirectXMeshNormals.cpp" />
     <ClCompile Include="DirectXMeshOptimize.cpp" />
+    <ClCompile Include="DirectXMeshOptimizeLRU.cpp" />
+    <ClCompile Include="DirectXMeshOptimizeTVC.cpp" />
     <ClCompile Include="DirectXMeshRemap.cpp" />
     <ClCompile Include="DirectXMeshTangentFrame.cpp" />
     <ClCompile Include="DirectXMeshUtil.cpp">
