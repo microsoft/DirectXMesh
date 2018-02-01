@@ -331,13 +331,8 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh utilities
 
-    HRESULT __cdecl WeldVertices( _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
-                                  _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
-                                  _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_writes_(nFaces) uint32_t* faceRemap,
-                                  _In_ std::function<bool __cdecl(uint16_t v0, uint16_t v1)>& weldTest );
-    HRESULT __cdecl WeldVertices( _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
-                                  _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
-                                  _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_writes_(nFaces) uint32_t* faceRemap,
+    HRESULT __cdecl WeldVertices( _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
+                                  _Out_writes_(nVerts) uint32_t* vertexRemap,
                                   _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)>& weldTest );
         // Welds vertices together based on a test function
 
@@ -432,7 +427,7 @@ namespace DirectX
                                            _Out_writes_(nFaces*3) uint32_t* ibout, _Out_writes_(nFaces*3) uint32_t* adjout );
     HRESULT __cdecl ReorderIBAndAdjacency( _Inout_updates_all_(nFaces*3) uint32_t* ib, _In_ size_t nFaces, _Inout_updates_all_(nFaces*3) uint32_t* adj,
                                            _In_reads_(nFaces) const uint32_t* faceRemap );
-    // Applies a face remap reordering to an index buffer and adjacency
+        // Applies a face remap reordering to an index buffer and adjacency
 
     HRESULT __cdecl FinalizeIB( _In_reads_(nFaces*3) const uint16_t* ibin, _In_ size_t nFaces,
                                 _In_reads_(nVerts) const uint32_t* vertexRemap, _In_ size_t nVerts,

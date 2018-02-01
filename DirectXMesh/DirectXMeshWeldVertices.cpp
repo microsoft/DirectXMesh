@@ -17,48 +17,97 @@
 
 using namespace DirectX;
 
-namespace
-{
-    template<class index_t>
-    HRESULT WeldVerticesImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
-        size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
-        _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_writes_(nFaces) uint32_t* faceRemap,
-        std::function<bool __cdecl(index_t v0, index_t v1)>& weldTest)
-    {
-        if (!indices || !nFaces || !nVerts || !pointRep || !vertexRemap || !faceRemap)
-            return E_INVALIDARG;
-
-        if (nVerts >= index_t(-1))
-            return E_INVALIDARG;
-
-        // TODO -
-        weldTest;
-
-        return E_NOTIMPL;
-    }
-}
-
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
 _Use_decl_annotations_
 HRESULT DirectX::WeldVertices(
-    const uint16_t* indices, size_t nFaces,
     size_t nVerts, const uint32_t* pointRep,
-    uint32_t* vertexRemap, uint32_t* faceRemap,
-    std::function<bool __cdecl(uint16_t v0, uint16_t v1)>& weldTest)
-{
-    return WeldVerticesImpl<uint16_t>(indices, nFaces, nVerts, pointRep, vertexRemap, faceRemap, weldTest);
-}
-
-_Use_decl_annotations_
-HRESULT DirectX::WeldVertices(
-    const uint32_t* indices, size_t nFaces,
-    size_t nVerts, const uint32_t* pointRep,
-    uint32_t* vertexRemap, uint32_t* faceRemap,
+    uint32_t* vertexRemap,
     std::function<bool __cdecl(uint32_t v0, uint32_t v1)>& weldTest)
 {
-    return WeldVerticesImpl<uint32_t>(indices, nFaces, nVerts, pointRep, vertexRemap, faceRemap, weldTest);
+    if (!nVerts || !pointRep || !vertexRemap)
+        return E_INVALIDARG;
+
+    std::unique_ptr<uint32_t[]> wedgeList(new (std::nothrow) uint32_t[nVerts]);
+    if (!wedgeList)
+        return E_OUTOFMEMORY;
+
+    for (uint32_t j = 0; j < nVerts; ++j)
+    {
+        vertexRemap[j] = j;
+        wedgeList[j] = j;
+    }
+
+    // Generate wedge list
+    bool identity = true;
+
+    for (uint32_t j = 0; j < nVerts; ++j)
+    {
+        uint32_t pr = pointRep[j];
+        if (pr == UNUSED32)
+            continue;
+
+        if (pr >= nVerts)
+            return E_UNEXPECTED;
+
+        if (pr != j)
+        {
+            identity = false;
+
+            wedgeList[j] = wedgeList[pr];
+            wedgeList[pr] = j;
+        }
+    }
+
+    if (identity)
+    {
+        // No candidates for welding, so return now
+        return S_FALSE;
+    }
+
+    bool weld = false;
+
+    for (uint32_t vert = 0; vert < nVerts; ++vert)
+    {
+        if (pointRep[vert] == vert && wedgeList[vert] != vert)
+        {
+            uint32_t curOuter = vert;
+            do
+            {
+                // if a remapping for the vertex hasn't been found, check to see if it matches any other vertices
+                assert(curOuter < nVerts);
+                _Analysis_assume_(curOuter < nVerts);
+                if (vertexRemap[curOuter] == curOuter)
+                {
+                    uint32_t curInner = wedgeList[vert];
+                    assert(curInner < nVerts);
+                    _Analysis_assume_(curInner < nVerts);
+                    do
+                    {
+                        // don't check for equalivalence if indices the same (had better be equal then)
+                        // and/or if the one being checked is already being remapped
+                        if ((curInner != curOuter) && (vertexRemap[curInner] == curInner))
+                        {
+                            // if the two vertices are equal, then remap one to the other
+                            if (weldTest(curOuter, curInner))
+                            {
+                                // remap the inner vertices to the outer...
+                                vertexRemap[curInner] = curOuter;
+
+                                weld = true;
+                            }
+                        }
+
+                        curInner = wedgeList[curInner];
+                    } while (curInner != vert);
+                }
+
+                curOuter = wedgeList[curOuter];
+            } while (curOuter != vert);
+        }
+    }
+
+    return (weld) ? S_OK : S_FALSE;
 }
