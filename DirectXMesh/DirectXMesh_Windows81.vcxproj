@@ -55,6 +55,7 @@
     <ClCompile Include="DirectXMeshValidate.cpp" />
     <ClCompile Include="DirectXMeshVBReader.cpp" />
     <ClCompile Include="DirectXMeshVBWriter.cpp" />
+    <ClCompile Include="DirectXMeshWeldVertices.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{86ebe2b8-f2b0-43a0-912f-996c197d7f97}</ProjectGuid>

@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -326,6 +327,19 @@ namespace DirectX
                            _In_reads_opt_(nFaces) const uint32_t* attributes,
                            _Inout_ std::vector<uint32_t>& dupVerts, _In_ bool breakBowties=false );
         // Cleans the mesh, splitting vertices if needed
+
+    //---------------------------------------------------------------------------------
+    // Mesh utilities
+
+    HRESULT __cdecl WeldVertices( _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+                                  _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
+                                  _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_writes_(nFaces) uint32_t* faceRemap,
+                                  _In_ std::function<bool __cdecl(uint16_t v0, uint16_t v1)>& weldTest );
+    HRESULT __cdecl WeldVertices( _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+                                  _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
+                                  _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_writes_(nFaces) uint32_t* faceRemap,
+                                  _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)>& weldTest );
+        // Welds vertices together based on a test function
 
     //---------------------------------------------------------------------------------
     // Mesh Optimization
