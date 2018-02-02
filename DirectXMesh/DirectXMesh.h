@@ -397,9 +397,9 @@ namespace DirectX
         // Attribute group version of OptimizeFaces
 
     HRESULT __cdecl OptimizeVertices( _In_reads_(nFaces*3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
-                                      _Out_writes_(nVerts) uint32_t* vertexRemap );
+                                      _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_opt_ size_t* trailingUnused = nullptr );
     HRESULT __cdecl OptimizeVertices( _In_reads_(nFaces*3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
-                                      _Out_writes_(nVerts) uint32_t* vertexRemap );
+                                      _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_opt_ size_t* trailingUnused = nullptr );
         // Reorders vertices in order of use
 
     //---------------------------------------------------------------------------------
