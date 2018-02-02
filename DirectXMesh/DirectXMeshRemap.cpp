@@ -19,6 +19,16 @@ using namespace DirectX;
 
 namespace
 {
+    const size_t c_MaxStride = 2048;
+
+#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+    static_assert(c_MaxStride == D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES, "D3D11 mismatch");
+#endif
+
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+    static_assert(c_MaxStride == D3D12_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES, "D3D12 mismatch");
+#endif
+
     //---------------------------------------------------------------------------------
 #pragma warning(push)
 #pragma warning( disable : 6101 )
@@ -159,7 +169,7 @@ namespace
         if (!vb || !stride || !nVerts || !vertexRemap)
             return E_INVALIDARG;
 
-        if (stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES)
+        if (stride > c_MaxStride)
             return E_INVALIDARG;
 
         std::unique_ptr<uint8_t[]> temp(new (std::nothrow) uint8_t[(sizeof(bool) * nVerts) + stride]);
@@ -538,7 +548,7 @@ HRESULT DirectX::FinalizeVB(
     if (nVerts >= UINT32_MAX)
         return E_INVALIDARG;
 
-    if (stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES)
+    if (stride > c_MaxStride)
         return E_INVALIDARG;
 
     if ((uint64_t(nVerts) + uint64_t(nDupVerts)) >= UINT32_MAX)
@@ -640,7 +650,7 @@ HRESULT DirectX::FinalizeVBAndPointReps(
     if (nVerts >= UINT32_MAX)
         return E_INVALIDARG;
 
-    if (stride > D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES)
+    if (stride > c_MaxStride)
         return E_INVALIDARG;
 
     if ((uint64_t(nVerts) + uint64_t(nDupVerts)) >= UINT32_MAX)
