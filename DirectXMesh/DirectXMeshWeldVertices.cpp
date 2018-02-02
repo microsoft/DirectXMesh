@@ -25,9 +25,12 @@ _Use_decl_annotations_
 HRESULT DirectX::WeldVertices(
     size_t nVerts, const uint32_t* pointRep,
     uint32_t* vertexRemap,
-    std::function<bool __cdecl(uint32_t v0, uint32_t v1)>& weldTest)
+    std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest)
 {
     if (!nVerts || !pointRep || !vertexRemap)
+        return E_INVALIDARG;
+
+    if (nVerts >= UINT32_MAX)
         return E_INVALIDARG;
 
     std::unique_ptr<uint32_t[]> wedgeList(new (std::nothrow) uint32_t[nVerts]);

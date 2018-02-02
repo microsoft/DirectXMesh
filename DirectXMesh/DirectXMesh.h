@@ -333,7 +333,7 @@ namespace DirectX
 
     HRESULT __cdecl WeldVertices( _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
                                   _Out_writes_(nVerts) uint32_t* vertexRemap,
-                                  _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)>& weldTest );
+                                  _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest );
         // Welds vertices together based on a test function
 
     //---------------------------------------------------------------------------------
