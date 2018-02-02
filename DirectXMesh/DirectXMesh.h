@@ -460,6 +460,12 @@ namespace DirectX
                                             _In_reads_(nVerts) const uint32_t* vertexRemap );
         // Applies a vertex remap and/or a vertex duplication set to a vertex buffer and point representatives
 
+    HRESULT __cdecl CompactVB( _In_reads_bytes_(nVerts*stride) const void* vbin, _In_ size_t stride, _In_ size_t nVerts,
+                               _In_ size_t trailingUnused,
+                               _In_reads_opt_(nVerts) const uint32_t* vertexRemap,
+                               _Out_writes_bytes_((nVerts-trailingUnused)*stride) void* vbout );
+        // Applies a vertex remap which contains a known number of unused entries at the end
+
 #include "DirectXMesh.inl"
 
 }; // namespace

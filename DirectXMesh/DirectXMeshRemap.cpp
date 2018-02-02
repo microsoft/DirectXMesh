@@ -787,3 +787,59 @@ HRESULT DirectX::FinalizeVBAndPointReps(
 
     return SwapVertices(vb, stride, nVerts, pointRep, vertexRemap);
 }
+
+
+//-------------------------------------------------------------------------------------
+// Applies a vertex remap which contains a known number of unused entries at the end
+//-------------------------------------------------------------------------------------
+_Use_decl_annotations_
+HRESULT DirectX::CompactVB(
+    const void* vbin, size_t stride, size_t nVerts,
+    size_t trailingUnused,
+    const uint32_t* vertexRemap, void* vbout)
+{
+    if (!vbin || !stride || !nVerts || !vbout || !vertexRemap)
+        return E_INVALIDARG;
+
+    if (nVerts >= UINT32_MAX || trailingUnused >= UINT32_MAX)
+        return E_INVALIDARG;
+
+    if (stride > c_MaxStride)
+        return E_INVALIDARG;
+
+    if (trailingUnused >= nVerts)
+        return E_INVALIDARG;
+
+    if (vbin == vbout)
+        return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+
+    size_t newVerts = nVerts - trailingUnused;
+
+    auto sptr = reinterpret_cast<const uint8_t*>(vbin);
+    auto dptr = reinterpret_cast<uint8_t*>(vbout);
+
+#ifdef _DEBUG
+    memset(vbout, 0, newVerts * stride);
+#endif
+
+    for (size_t j = 0; j < newVerts; ++j)
+    {
+        uint32_t src = vertexRemap[j];
+
+        if (src == UNUSED32)
+        {
+            // remap entry is unused
+        }
+        else if (src < nVerts)
+        {
+            memcpy(dptr, sptr + src * stride, stride);
+        }
+        else
+            return E_FAIL;
+
+        dptr += stride;
+    }
+
+    return S_OK;
+}
+
