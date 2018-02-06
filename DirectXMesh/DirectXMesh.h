@@ -331,8 +331,13 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh utilities
 
-    HRESULT __cdecl WeldVertices( _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
-                                  _Out_writes_(nVerts) uint32_t* vertexRemap,
+    HRESULT __cdecl WeldVertices( _Inout_updates_all_(nFaces*3) uint16_t* indices, _In_ size_t nFaces,
+                                  _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
+                                  _Out_writes_opt_(nVerts) uint32_t* vertexRemap,
+                                  _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest );
+    HRESULT __cdecl WeldVertices( _Inout_updates_all_(nFaces*3) uint32_t* indices, _In_ size_t nFaces,
+                                  _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
+                                  _Out_writes_opt_(nVerts) uint32_t* vertexRemap,
                                   _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest );
         // Welds vertices together based on a test function
 
