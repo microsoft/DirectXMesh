@@ -93,9 +93,17 @@ namespace
 
         auto faceRemapInverse = reinterpret_cast<uint32_t*>(temp.get());
 
+        memset(faceRemapInverse, 0xff, sizeof(uint32_t) * nFaces);
+
         for (uint32_t j = 0; j < nFaces; ++j)
         {
-            faceRemapInverse[faceRemap[j]] = (faceRemap[j] == UNUSED32) ? UNUSED32 : j;
+            if (faceRemap[j] != UNUSED32)
+            {
+                if (faceRemap[j] >= nFaces)
+                    return E_UNEXPECTED;
+
+                faceRemapInverse[faceRemap[j]] = j;
+            }
         }
 
         auto moved = reinterpret_cast<bool*>(temp.get() + sizeof(uint32_t) * nFaces);
@@ -184,6 +192,9 @@ namespace
         {
             if (vertexRemap[j] != UNUSED32)
             {
+                if (vertexRemap[j] >= nVerts)
+                    return E_UNEXPECTED;
+
                 vertexRemapInverse[vertexRemap[j]] = j;
             }
         }
@@ -293,6 +304,9 @@ namespace
         {
             if (vertexRemap[j] != UNUSED32)
             {
+                if (vertexRemap[j] >= nVerts)
+                    return E_UNEXPECTED;
+
                 vertexRemapInverse[vertexRemap[j]] = j;
             }
         }
@@ -353,6 +367,9 @@ namespace
         {
             if (vertexRemap[j] != UNUSED32)
             {
+                if (vertexRemap[j] >= nVerts)
+                    return E_UNEXPECTED;
+
                 vertexRemapInverse[vertexRemap[j]] = j;
             }
         }
@@ -702,6 +719,9 @@ HRESULT DirectX::FinalizeVBAndPointReps(
         {
             if (vertexRemap[j] != UNUSED32)
             {
+                if (vertexRemap[j] >= newVerts)
+                    return E_INVALIDARG;
+
                 vertexRemapInverse[vertexRemap[j]] = j;
             }
         }
