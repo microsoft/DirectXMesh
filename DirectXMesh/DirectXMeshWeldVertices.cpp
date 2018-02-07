@@ -112,34 +112,34 @@ namespace
             }
         }
 
-        if (weld)
+        if (!weld)
+            return S_FALSE;
+
+        // Apply map to indices
+        for (uint32_t j = 0; j < nFaces * 3; ++j)
         {
-            // Apply map to indices
-            for (uint32_t j = 0; j < nFaces * 3; ++j)
+            index_t i = indices[j];
+            if (i == index_t(-1))
+                continue;
+
+            indices[j] = index_t(vertexRemapInverse[i]);
+        }
+
+        // Generate inverse map if requested
+        if (vertexRemap)
+        {
+            memset(vertexRemap, 0xff, sizeof(uint32_t) * nVerts);
+
+            for (uint32_t j = 0; j < nVerts; ++j)
             {
-                index_t i = indices[j];
-                if (i == index_t(-1))
-                    continue;
-
-                indices[j] = index_t(vertexRemapInverse[i]);
-            }
-
-            // Generate inverse map if requested
-            if (vertexRemap)
-            {
-                memset(vertexRemap, 0xff, sizeof(uint32_t) * nVerts);
-
-                for (uint32_t j = 0; j < nVerts; ++j)
+                if (vertexRemapInverse[j] != UNUSED32)
                 {
-                    if (vertexRemapInverse[j] != UNUSED32)
-                    {
-                        vertexRemap[vertexRemapInverse[j]] = j;
-                    }
+                    vertexRemap[vertexRemapInverse[j]] = j;
                 }
             }
         }
 
-        return (weld) ? S_OK : S_FALSE;
+        return S_OK;
     }
 }
 
