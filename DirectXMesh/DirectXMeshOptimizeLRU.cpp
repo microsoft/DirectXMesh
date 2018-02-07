@@ -346,7 +346,6 @@ namespace
 
         float bestScore = -1.f;
 
-        const float maxValenceScore = FindVertexScore(1, kEvictedCacheIndex, lruCacheSize) * 3.f;
         uint32_t nextBestFace = 0;
 
         uint32_t curFace = 0;
@@ -569,7 +568,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     auto subsets = ComputeSubsets(attributes, nFaces);
 
-    assert(!subsets.empty());
+    if (subsets.empty())
+        return E_UNEXPECTED;
 
     for( auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
@@ -601,7 +601,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     auto subsets = ComputeSubsets(attributes, nFaces);
 
-    assert(!subsets.empty());
+    if (subsets.empty())
+        return E_UNEXPECTED;
 
     for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
