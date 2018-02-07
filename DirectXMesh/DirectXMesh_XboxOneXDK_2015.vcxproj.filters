@@ -66,5 +66,8 @@
     <ClCompile Include="DirectXMeshOptimizeTVC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DirectXMeshWeldVertices.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

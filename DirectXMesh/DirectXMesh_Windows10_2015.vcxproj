@@ -47,6 +47,7 @@
     <ClCompile Include="DirectXMeshValidate.cpp" />
     <ClCompile Include="DirectXMeshVBReader.cpp" />
     <ClCompile Include="DirectXMeshVBWriter.cpp" />
+    <ClCompile Include="DirectXMeshWeldVertices.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DirectXMesh.h" />

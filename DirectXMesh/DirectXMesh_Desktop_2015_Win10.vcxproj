@@ -381,6 +381,7 @@
   </ItemDefinitionGroup>
   <ItemGroup />
   <ItemGroup>
+    <ClCompile Include="DirectXMeshWeldVertices.cpp" />
     <CLInclude Include="DirectXMesh.h" />
     <CLInclude Include="DirectXMeshP.h" />
     <CLInclude Include="DirectXMesh.inl" />
