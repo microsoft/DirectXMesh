@@ -469,4 +469,4 @@ namespace DirectX
 
 #include "DirectXMesh.inl"
 
-}; // namespace
+} // namespace

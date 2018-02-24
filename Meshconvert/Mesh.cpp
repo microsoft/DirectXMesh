@@ -987,7 +987,7 @@ namespace VBO
 
     static_assert(sizeof(header_t) == 8, "VBO header size mismatch");
     static_assert(sizeof(vertex_t) == 32, "VBO vertex size mismatch");
-}; // namespace
+} // namespace
 
 
 //--------------------------------------------------------------------------------------
@@ -1348,7 +1348,7 @@ namespace VSD3DStarter
 
 #pragma pack(pop)
 
-}; // namespace
+} // namespace
 
 static_assert(sizeof(VSD3DStarter::Material) == 132, "CMO Mesh structure size incorrect");
 static_assert(sizeof(VSD3DStarter::SubMesh) == 20, "CMO Mesh structure size incorrect");
@@ -2061,7 +2061,7 @@ namespace DXUT
 
 #pragma pack(pop)
 
-}; // namespace
+} // namespace
 
 static_assert(sizeof(DXUT::D3DVERTEXELEMENT9) == 8, "Direct3D9 Decl structure size incorrect");
 static_assert(sizeof(DXUT::SDKMESH_HEADER) == 104, "SDK Mesh structure size incorrect");

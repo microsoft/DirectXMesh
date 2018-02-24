@@ -343,4 +343,4 @@ namespace DirectX
         return edge;
     }
 
-}; // namespace
+} // namespace
