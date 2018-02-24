@@ -4,6 +4,7 @@
 // Meshconvert command-line tool (sample for DirectXMesh library)
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkID=324981
 //--------------------------------------------------------------------------------------
