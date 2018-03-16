@@ -214,24 +214,24 @@ HRESULT VBReader::Impl::AddStream(const void* vb, size_t nVerts, size_t inputSlo
 
 //-------------------------------------------------------------------------------------
 #define LOAD_VERTS( type, func )\
-        for( size_t icount = 0; icount < count; ++icount )\
+        for(size_t icount = 0; icount < count; ++icount)\
         {\
-            if ( ( ptr + sizeof(type) ) > eptr )\
+            if ((ptr + sizeof(type)) > eptr)\
                 return E_UNEXPECTED;\
-            *buffer++ = func( reinterpret_cast<const type*>(ptr) );\
+            *buffer++ = func(reinterpret_cast<const type*>(ptr));\
             ptr += stride;\
         }\
         break;
 
 #define LOAD_VERTS4_X2( type, func, x2bias )\
-        for( size_t icount = 0; icount < count; ++icount )\
+        for(size_t icount = 0; icount < count; ++icount)\
         {\
-            if ( ( ptr + sizeof(type) ) > eptr )\
+            if ((ptr + sizeof(type)) > eptr)\
                 return E_UNEXPECTED;\
-            XMVECTOR v = func( reinterpret_cast<const type*>(ptr) );\
+            XMVECTOR v = func(reinterpret_cast<const type*>(ptr));\
             if (x2bias)\
             {\
-                v = XMVectorMultiplyAdd( v, g_XMTwo, g_XMNegativeOne );\
+                v = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);\
             }\
             *buffer++ = v;\
             ptr += stride;\
@@ -239,14 +239,14 @@ HRESULT VBReader::Impl::AddStream(const void* vb, size_t nVerts, size_t inputSlo
         break;
 
 #define LOAD_VERTS3_X2( type, func, x2bias )\
-        for( size_t icount = 0; icount < count; ++icount )\
+        for(size_t icount = 0; icount < count; ++icount)\
         {\
-            if ( ( ptr + sizeof(type) ) > eptr )\
+            if ((ptr + sizeof(type)) > eptr)\
                 return E_UNEXPECTED;\
-            XMVECTOR v = func( reinterpret_cast<const type*>(ptr) );\
+            XMVECTOR v = func(reinterpret_cast<const type*>(ptr));\
             if (x2bias)\
             {\
-                XMVECTOR v2 = XMVectorMultiplyAdd( v, g_XMTwo, g_XMNegativeOne );\
+                XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);\
                 v = XMVectorSelect(v, v2, g_XMSelect1110);\
             }\
             *buffer++ = v;\
@@ -255,14 +255,14 @@ HRESULT VBReader::Impl::AddStream(const void* vb, size_t nVerts, size_t inputSlo
         break;
 
 #define LOAD_VERTS2_X2( type, func, x2bias )\
-        for( size_t icount = 0; icount < count; ++icount )\
+        for(size_t icount = 0; icount < count; ++icount)\
         {\
-            if ( ( ptr + sizeof(type) ) > eptr )\
+            if ((ptr + sizeof(type)) > eptr)\
                 return E_UNEXPECTED;\
-            XMVECTOR v = func( reinterpret_cast<const type*>(ptr) );\
+            XMVECTOR v = func(reinterpret_cast<const type*>(ptr));\
             if (x2bias)\
             {\
-                XMVECTOR v2 = XMVectorMultiplyAdd( v, g_XMTwo, g_XMNegativeOne );\
+                XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);\
                 v = XMVectorSelect(v, v2, g_XMSelect1100);\
             }\
             *buffer++ = v;\

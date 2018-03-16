@@ -15,13 +15,13 @@
 // DXGI Format Utilities
 //=====================================================================================
 _Use_decl_annotations_
-inline bool __cdecl IsValidVB( DXGI_FORMAT fmt )
+inline bool __cdecl IsValidVB(DXGI_FORMAT fmt)
 {
-    return BytesPerElement( fmt ) != 0;
+    return BytesPerElement(fmt) != 0;
 }
 
 _Use_decl_annotations_
-inline bool __cdecl IsValidIB( DXGI_FORMAT fmt )
+inline bool __cdecl IsValidIB(DXGI_FORMAT fmt)
 {
-    return ( fmt == DXGI_FORMAT_R32_UINT || fmt == DXGI_FORMAT_R16_UINT ) != 0;
+    return (fmt == DXGI_FORMAT_R32_UINT || fmt == DXGI_FORMAT_R16_UINT) != 0;
 }

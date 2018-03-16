@@ -213,19 +213,19 @@ HRESULT VBWriter::Impl::AddStream(void* vb, size_t nVerts, size_t inputSlot, siz
 
 //-------------------------------------------------------------------------------------
 #define STORE_VERTS( type, func )\
-        for( size_t icount = 0; icount < count; ++icount )\
+        for(size_t icount = 0; icount < count; ++icount)\
         {\
-            if ( ( ptr + sizeof(type) ) > eptr )\
+            if ((ptr + sizeof(type)) > eptr)\
                 return E_UNEXPECTED;\
-            func( reinterpret_cast<type*>(ptr), *buffer++ );\
+            func(reinterpret_cast<type*>(ptr), *buffer++);\
             ptr += stride;\
         }\
         break;
 
 #define STORE_VERTS_X2( type, func, x2bias )\
-        for( size_t icount = 0; icount < count; ++icount )\
+        for(size_t icount = 0; icount < count; ++icount)\
         {\
-            if ( ( ptr + sizeof(type) ) > eptr )\
+            if ((ptr + sizeof(type)) > eptr)\
                 return E_UNEXPECTED;\
             XMVECTOR v = *buffer++;\
             if (x2bias)\
@@ -233,7 +233,7 @@ HRESULT VBWriter::Impl::AddStream(void* vb, size_t nVerts, size_t inputSlot, siz
                 v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);\
                 v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);\
             }\
-            func( reinterpret_cast<type*>(ptr), v );\
+            func(reinterpret_cast<type*>(ptr), v);\
             ptr += stride;\
         }\
         break;

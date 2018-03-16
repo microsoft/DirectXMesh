@@ -567,7 +567,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     if (subsets.empty())
         return E_UNEXPECTED;
 
-    for( auto it = subsets.cbegin(); it != subsets.cend(); ++it)
+    for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
         HRESULT hr = OptimizeFacesImpl<uint16_t>(
             &indices[it->first * 3], static_cast<uint32_t>(it->second * 3),
