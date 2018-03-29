@@ -41,22 +41,22 @@ public:
     // Methods
     void Clear();
 
-    HRESULT SetIndexData( _In_ size_t nFaces, _In_reads_(nFaces*3) const uint16_t* indices, _In_reads_opt_(nFaces) uint32_t* attributes = nullptr );
-    HRESULT SetIndexData( _In_ size_t nFaces, _In_reads_(nFaces*3) const uint32_t* indices, _In_reads_opt_(nFaces) uint32_t* attributes = nullptr );
+    HRESULT SetIndexData(_In_ size_t nFaces, _In_reads_(nFaces * 3) const uint16_t* indices, _In_reads_opt_(nFaces) uint32_t* attributes = nullptr);
+    HRESULT SetIndexData(_In_ size_t nFaces, _In_reads_(nFaces * 3) const uint32_t* indices, _In_reads_opt_(nFaces) uint32_t* attributes = nullptr);
 
-    HRESULT SetVertexData( _Inout_ DirectX::VBReader& reader, _In_ size_t nVerts );
+    HRESULT SetVertexData(_Inout_ DirectX::VBReader& reader, _In_ size_t nVerts);
 
-    HRESULT Validate( _In_ DWORD flags, _In_opt_ std::wstring* msgs ) const;
+    HRESULT Validate(_In_ DWORD flags, _In_opt_ std::wstring* msgs) const;
 
     HRESULT Clean();
 
-    HRESULT GenerateAdjacency( _In_ float epsilon );
+    HRESULT GenerateAdjacency(_In_ float epsilon);
 
-    HRESULT ComputeNormals( _In_ DWORD flags );
+    HRESULT ComputeNormals(_In_ DWORD flags);
 
-    HRESULT ComputeTangentFrame( _In_ bool bitangents );
+    HRESULT ComputeTangentFrame(_In_ bool bitangents);
 
-    HRESULT Optimize( bool lru );
+    HRESULT Optimize(bool lru);
 
     HRESULT ReverseWinding();
 
@@ -79,9 +79,9 @@ public:
     bool Is16BitIndexBuffer() const;
 
     const uint32_t* GetIndexBuffer() const { return mIndices.get(); }
-    std::unique_ptr<uint16_t []> GetIndexBuffer16() const;
+    std::unique_ptr<uint16_t[]> GetIndexBuffer16() const;
 
-    HRESULT GetVertexBuffer(_Inout_ DirectX::VBWriter& writer ) const;
+    HRESULT GetVertexBuffer(_Inout_ DirectX::VBWriter& writer) const;
 
     // Save mesh to file
     struct Material
@@ -97,12 +97,12 @@ public:
         std::wstring        texture;
     };
 
-    HRESULT ExportToVBO( _In_z_ const wchar_t* szFileName ) const;
-    HRESULT ExportToCMO( _In_z_ const wchar_t* szFileName, _In_ size_t nMaterials, _In_reads_opt_(nMaterials) const Material* materials ) const;
-    HRESULT ExportToSDKMESH( _In_z_ const wchar_t* szFileName, _In_ size_t nMaterials, _In_reads_opt_(nMaterials) const Material* materials  ) const;
+    HRESULT ExportToVBO(_In_z_ const wchar_t* szFileName) const;
+    HRESULT ExportToCMO(_In_z_ const wchar_t* szFileName, _In_ size_t nMaterials, _In_reads_opt_(nMaterials) const Material* materials) const;
+    HRESULT ExportToSDKMESH(_In_z_ const wchar_t* szFileName, _In_ size_t nMaterials, _In_reads_opt_(nMaterials) const Material* materials) const;
 
     // Create mesh from file
-    static HRESULT CreateFromVBO( _In_z_ const wchar_t* szFileName, _Inout_ std::unique_ptr<Mesh>& result );
+    static HRESULT CreateFromVBO(_In_z_ const wchar_t* szFileName, _Inout_ std::unique_ptr<Mesh>& result);
 
 private:
     size_t                                      mnFaces;
