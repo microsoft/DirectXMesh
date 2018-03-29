@@ -183,16 +183,7 @@ namespace
                     || (j0 == j2 && j0 != UNUSED32)
                     || (j1 == j2 && j1 != UNUSED32))
                 {
-                    uint32_t neighbor;
-
-                    if (j0 == j1 || j0 == j2)
-                    {
-                        neighbor = j0;
-                    }
-                    else
-                    {
-                        neighbor = j1;
-                    }
+                    uint32_t neighbor = (j0 == j1 || j0 == j2) ? j0 : j1;
 
                     // remove links then break bowties will clean up any remaining issues
                     for (uint32_t edge = 0; edge < 3; ++edge)

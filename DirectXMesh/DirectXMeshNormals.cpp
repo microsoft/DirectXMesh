@@ -24,7 +24,7 @@ namespace
         _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts,
         bool cw, _Out_writes_(nVerts) XMFLOAT3* normals)
     {
-        ScopedAlignedArrayXMVECTOR temp(reinterpret_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts, 16)));
+        ScopedAlignedArrayXMVECTOR temp(static_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts, 16)));
         if (!temp)
             return E_OUTOFMEMORY;
 
@@ -93,7 +93,7 @@ namespace
         _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts,
         bool cw, _Out_writes_(nVerts) XMFLOAT3* normals)
     {
-        ScopedAlignedArrayXMVECTOR temp(reinterpret_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts, 16)));
+        ScopedAlignedArrayXMVECTOR temp(static_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts, 16)));
         if (!temp)
             return E_OUTOFMEMORY;
 
@@ -183,7 +183,7 @@ namespace
         _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts,
         bool cw, _Out_writes_(nVerts) XMFLOAT3* normals)
     {
-        ScopedAlignedArrayXMVECTOR temp(reinterpret_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts, 16)));
+        ScopedAlignedArrayXMVECTOR temp(static_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts, 16)));
         if (!temp)
             return E_OUTOFMEMORY;
 

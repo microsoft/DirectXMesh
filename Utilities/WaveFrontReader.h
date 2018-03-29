@@ -37,10 +37,12 @@
 #include <directxmath.h>
 #include <directxcollision.h>
 
-#if !defined(DIRECTX_NOEXCEPT) && defined(_MSC_VER) && (_MSC_VER < 1900)
+#ifndef DIRECTX_NOEXCEPT
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
 #define DIRECTX_NOEXCEPT
 #else
 #define DIRECTX_NOEXCEPT noexcept
+#endif
 #endif
 
 template<class index_t>

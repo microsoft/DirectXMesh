@@ -107,7 +107,7 @@ public:
                     mTempSize = mVerts[j];
             }
 
-            mTempBuffer.reset(reinterpret_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * mTempSize, 16)));
+            mTempBuffer.reset(static_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * mTempSize, 16)));
             if (!mTempBuffer)
                 mTempSize = 0;
         }
@@ -135,7 +135,7 @@ HRESULT VBReader::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
 {
     Release();
 
-    uint32_t offsets[c_MaxSlot];
+    uint32_t offsets[c_MaxSlot] = {};
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__)
     {
@@ -290,7 +290,7 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
 
     uint32_t inputSlot = mInputDesc[it->second].InputSlot;
 
-    auto vb = reinterpret_cast<const uint8_t*>(mBuffers[inputSlot]);
+    auto vb = static_cast<const uint8_t*>(mBuffers[inputSlot]);
     if (!vb)
         return E_FAIL;
 
@@ -487,7 +487,7 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
         {
             if ((ptr + sizeof(uint8_t)) > eptr)
                 return E_UNEXPECTED;
-            auto i = *reinterpret_cast<const uint8_t*>(ptr);
+            const uint8_t i = *ptr;
             float f = static_cast<float>(i) / 255.f;
             if (x2bias)
             {
@@ -504,7 +504,7 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
         {
             if ((ptr + sizeof(uint8_t)) > eptr)
                 return E_UNEXPECTED;
-            auto i = *reinterpret_cast<const uint8_t*>(ptr);
+            const uint8_t i = *ptr;
             *buffer++ = XMVectorSet(static_cast<float>(i), 0.f, 0.f, 0.f);
             ptr += stride;
         }

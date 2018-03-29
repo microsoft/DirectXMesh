@@ -41,7 +41,7 @@ namespace
         static const float EPSILON = 0.0001f;
         static const XMVECTORF32 s_flips = { { { 1.f, -1.f, -1.f, 1.f } } };
 
-        ScopedAlignedArrayXMVECTOR temp(reinterpret_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts * 2, 16)));
+        ScopedAlignedArrayXMVECTOR temp(static_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts * 2, 16)));
         if (!temp)
             return E_OUTOFMEMORY;
 

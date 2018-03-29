@@ -321,7 +321,7 @@ namespace
             }
         }
 
-        uint32_t vertexCacheBuffer[(kMaxVertexCacheSize + 3) * 2];
+        uint32_t vertexCacheBuffer[(kMaxVertexCacheSize + 3) * 2] = {};
         uint32_t *cache0 = vertexCacheBuffer;
         uint32_t *cache1 = vertexCacheBuffer + (kMaxVertexCacheSize + 3);
         uint32_t entriesInCache0 = 0;

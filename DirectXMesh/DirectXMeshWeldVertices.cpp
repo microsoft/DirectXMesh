@@ -26,9 +26,9 @@ namespace
         if (!temp)
             return E_OUTOFMEMORY;
 
-        auto vertexRemapInverse = reinterpret_cast<uint32_t*>(temp.get());
+        auto vertexRemapInverse = temp.get();
 
-        auto wedgeList = reinterpret_cast<uint32_t*>(temp.get() + nVerts);
+        auto wedgeList = temp.get() + nVerts;
 
         for (uint32_t j = 0; j < nVerts; ++j)
         {
