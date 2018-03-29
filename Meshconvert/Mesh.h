@@ -31,9 +31,9 @@
 class Mesh
 {
 public:
-    Mesh() : mnFaces(0), mnVerts(0) {}
-    Mesh(Mesh&& moveFrom);
-    Mesh& operator= (Mesh&& moveFrom);
+    Mesh() DIRECTX_NOEXCEPT : mnFaces(0), mnVerts(0) {}
+    Mesh(Mesh&& moveFrom) DIRECTX_NOEXCEPT;
+    Mesh& operator= (Mesh&& moveFrom) DIRECTX_NOEXCEPT;
 
     Mesh(Mesh const&) = delete;
     Mesh& operator= (Mesh const&) = delete;

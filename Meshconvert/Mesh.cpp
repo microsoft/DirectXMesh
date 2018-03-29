@@ -82,13 +82,13 @@ namespace
 }
 
 // Move constructor
-Mesh::Mesh(Mesh&& moveFrom)
+Mesh::Mesh(Mesh&& moveFrom) DIRECTX_NOEXCEPT : mnFaces(0), mnVerts(0)
 {
     *this = std::move(moveFrom);
 }
 
 // Move operator
-Mesh& Mesh::operator= (Mesh&& moveFrom)
+Mesh& Mesh::operator= (Mesh&& moveFrom) DIRECTX_NOEXCEPT
 {
     if (this != &moveFrom)
     {
@@ -593,7 +593,6 @@ HRESULT Mesh::ComputeTangentFrame( _In_ bool bitangents )
 
 
 //--------------------------------------------------------------------------------------
-_Use_decl_annotations_
 HRESULT Mesh::Optimize( bool lru )
 {
     if (!mnFaces || !mIndices || !mnVerts || !mPositions)
@@ -2202,7 +2201,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
     if (!vb)
         return E_OUTOFMEMORY;
 
-    vbHeader.SizeBytes = mnVerts * stride;
+    vbHeader.SizeBytes = uint64_t(mnVerts) * uint64_t(stride);
     vbHeader.StrideBytes = stride;
 
     {
@@ -2223,12 +2222,12 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
     // Build index buffer
     SDKMESH_INDEX_BUFFER_HEADER ibHeader = {};
-    ibHeader.NumIndices = mnFaces * 3;
+    ibHeader.NumIndices = uint64_t(mnFaces) * 3;
 
     std::unique_ptr<uint16_t[]> ib16;
     if (Is16BitIndexBuffer())
     {
-        ibHeader.SizeBytes = mnFaces * 3 * sizeof(uint16_t);
+        ibHeader.SizeBytes = uint64_t(mnFaces) * 3 * sizeof(uint16_t);
         ibHeader.IndexType = IT_16BIT;
 
         ib16 = GetIndexBuffer16();
@@ -2237,7 +2236,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
     }
     else
     {
-        ibHeader.SizeBytes = mnFaces * 3 * sizeof(uint32_t);
+        ibHeader.SizeBytes = uint64_t(mnFaces) * 3 * sizeof(uint32_t);
         ibHeader.IndexType = IT_32BIT;
     }
 
@@ -2332,11 +2331,11 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
             s.PrimitiveType = PT_TRIANGLE_LIST;
             s.IndexStart = startIndex;
-            s.IndexCount = it->second * 3;
+            s.IndexCount = uint64_t(it->second) * 3;
             s.VertexCount = mnVerts;
             submeshes.push_back(s);
 
-            if ((startIndex + s.IndexCount) > mnFaces * 3)
+            if ((startIndex + s.IndexCount) > uint64_t(mnFaces) * 3)
                 return E_FAIL;
 
             startIndex += s.IndexCount;
@@ -2346,7 +2345,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
     {
         SDKMESH_SUBSET s = {};
         s.PrimitiveType = PT_TRIANGLE_LIST;
-        s.IndexCount = mnFaces * 3;
+        s.IndexCount = uint64_t(mnFaces) * 3;
         s.VertexCount = mnVerts;
         subsetArray.push_back(0);
         submeshes.push_back(s);
@@ -2380,7 +2379,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
                             + sizeof(SDKMESH_FRAME)
                             + header.NumMaterials * sizeof(SDKMESH_MATERIAL);
 
-    header.NonBufferDataSize = staticDataSize + subsetArray.size() * sizeof(UINT) + sizeof(UINT);
+    header.NonBufferDataSize = uint64_t(staticDataSize) + uint64_t(subsetArray.size()) * sizeof(UINT) + sizeof(UINT);
 
     header.BufferDataSize = roundup4k( vbHeader.SizeBytes ) + roundup4k( ibHeader.SizeBytes );
 
@@ -2388,7 +2387,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
     header.IndexStreamHeadersOffset = header.VertexStreamHeadersOffset + sizeof(SDKMESH_VERTEX_BUFFER_HEADER); 
     header.MeshDataOffset = header.IndexStreamHeadersOffset + sizeof(SDKMESH_INDEX_BUFFER_HEADER);
     header.SubsetDataOffset = header.MeshDataOffset + sizeof(SDKMESH_MESH);
-    header.FrameDataOffset = header.SubsetDataOffset + header.NumTotalSubsets * sizeof(SDKMESH_SUBSET);
+    header.FrameDataOffset = header.SubsetDataOffset + uint64_t(header.NumTotalSubsets) * sizeof(SDKMESH_SUBSET);
     header.MaterialDataOffset = header.FrameDataOffset + sizeof(SDKMESH_FRAME);
 
     HRESULT hr = write_file(hFile.get(), header);
@@ -2430,7 +2429,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
     meshHeader.NumSubsets = static_cast<UINT>(submeshes.size());
     meshHeader.SubsetOffset = offset;
-    offset += meshHeader.NumSubsets * sizeof(UINT);
+    offset += uint64_t(meshHeader.NumSubsets) * sizeof(UINT);
     meshHeader.FrameInfluenceOffset = offset;
     offset += sizeof(UINT);
 

@@ -37,6 +37,12 @@
 #include <directxmath.h>
 #include <directxcollision.h>
 
+#if !defined(DIRECTX_NOEXCEPT) && defined(_MSC_VER) && (_MSC_VER < 1900)
+#define DIRECTX_NOEXCEPT
+#else
+#define DIRECTX_NOEXCEPT noexcept
+#endif
+
 template<class index_t>
 class WaveFrontReader
 {
@@ -50,7 +56,7 @@ public:
         DirectX::XMFLOAT2 textureCoordinate;
     };
 
-    WaveFrontReader() : hasNormals(false), hasTexcoords(false) {}
+    WaveFrontReader() DIRECTX_NOEXCEPT : hasNormals(false), hasTexcoords(false) {}
 
     HRESULT Load( _In_z_ const wchar_t* szFileName, bool ccw = true )
     {
@@ -386,6 +392,8 @@ public:
 
     HRESULT LoadMTL( _In_z_ const wchar_t* szFileName )
     {
+        using namespace DirectX;
+
         // Assumes MTL is in CWD along with OBJ
         std::wifstream InFile( szFileName );
         if( !InFile )
@@ -570,7 +578,7 @@ public:
         wchar_t strName[MAX_PATH];
         wchar_t strTexture[MAX_PATH];
 
-        Material() :
+        Material() DIRECTX_NOEXCEPT :
             vAmbient( 0.2f, 0.2f, 0.2f ),
             vDiffuse( 0.8f, 0.8f, 0.8f ),
             vSpecular( 1.0f, 1.0f, 1.0f ),

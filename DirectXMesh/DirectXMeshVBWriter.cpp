@@ -56,7 +56,7 @@ namespace
 class VBWriter::Impl
 {
 public:
-    Impl() :
+    Impl() DIRECTX_NOEXCEPT :
         mStrides{},
         mBuffers{},
         mVerts{},
@@ -638,21 +638,21 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
 //=====================================================================================
 
 // Public constructor.
-VBWriter::VBWriter()
+VBWriter::VBWriter() DIRECTX_NOEXCEPT
     : pImpl(new Impl())
 {
 }
 
 
 // Move constructor.
-VBWriter::VBWriter(VBWriter&& moveFrom)
+VBWriter::VBWriter(VBWriter&& moveFrom) DIRECTX_NOEXCEPT
     : pImpl(std::move(moveFrom.pImpl))
 {
 }
 
 
 // Move assignment.
-VBWriter& VBWriter::operator= (VBWriter&& moveFrom)
+VBWriter& VBWriter::operator= (VBWriter&& moveFrom) DIRECTX_NOEXCEPT
 {
     pImpl = std::move(moveFrom.pImpl);
     return *this;

@@ -147,7 +147,7 @@ namespace
         IndexType   cachePos0;
         IndexType   cachePos1;
 
-        OptimizeVertexData() : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) { }
+        OptimizeVertexData() DIRECTX_NOEXCEPT : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) { }
     };
 
     template <typename T, typename IndexType>
