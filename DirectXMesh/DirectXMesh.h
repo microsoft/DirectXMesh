@@ -31,13 +31,6 @@
 
 #define DIRECTX_MESH_VERSION 120
 
-#ifndef DIRECTX_NOEXCEPT
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-#define DIRECTX_NOEXCEPT
-#else
-#define DIRECTX_NOEXCEPT noexcept
-#endif
-#endif
 
 namespace DirectX
 {
@@ -87,9 +80,9 @@ namespace DirectX
     class VBReader
     {
     public:
-        VBReader() DIRECTX_NOEXCEPT;
-        VBReader(VBReader&& moveFrom) DIRECTX_NOEXCEPT;
-        VBReader& operator= (VBReader&& moveFrom) DIRECTX_NOEXCEPT;
+        VBReader() throw();
+        VBReader(VBReader&& moveFrom) throw();
+        VBReader& operator= (VBReader&& moveFrom) throw();
 
         VBReader(VBReader const&) = delete;
         VBReader& operator= (VBReader const&) = delete;
@@ -143,9 +136,9 @@ namespace DirectX
     class VBWriter
     {
     public:
-        VBWriter() DIRECTX_NOEXCEPT;
-        VBWriter(VBWriter&& moveFrom) DIRECTX_NOEXCEPT;
-        VBWriter& operator= (VBWriter&& moveFrom) DIRECTX_NOEXCEPT;
+        VBWriter() throw();
+        VBWriter(VBWriter&& moveFrom) throw();
+        VBWriter& operator= (VBWriter&& moveFrom) throw();
 
         VBWriter(VBWriter const&) = delete;
         VBWriter& operator= (VBWriter const&) = delete;

@@ -82,13 +82,13 @@ namespace
 }
 
 // Move constructor
-Mesh::Mesh(Mesh&& moveFrom) DIRECTX_NOEXCEPT : mnFaces(0), mnVerts(0)
+Mesh::Mesh(Mesh&& moveFrom) throw() : mnFaces(0), mnVerts(0)
 {
     *this = std::move(moveFrom);
 }
 
 // Move operator
-Mesh& Mesh::operator= (Mesh&& moveFrom) DIRECTX_NOEXCEPT
+Mesh& Mesh::operator= (Mesh&& moveFrom) throw()
 {
     if (this != &moveFrom)
     {

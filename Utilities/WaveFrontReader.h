@@ -37,14 +37,6 @@
 #include <directxmath.h>
 #include <directxcollision.h>
 
-#ifndef DIRECTX_NOEXCEPT
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-#define DIRECTX_NOEXCEPT
-#else
-#define DIRECTX_NOEXCEPT noexcept
-#endif
-#endif
-
 template<class index_t>
 class WaveFrontReader
 {
@@ -58,7 +50,7 @@ public:
         DirectX::XMFLOAT2 textureCoordinate;
     };
 
-    WaveFrontReader() DIRECTX_NOEXCEPT : hasNormals(false), hasTexcoords(false) {}
+    WaveFrontReader() throw() : hasNormals(false), hasTexcoords(false) {}
 
     HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true)
     {
@@ -580,7 +572,7 @@ public:
         wchar_t strName[MAX_PATH];
         wchar_t strTexture[MAX_PATH];
 
-        Material() DIRECTX_NOEXCEPT :
+        Material() throw() :
         vAmbient(0.2f, 0.2f, 0.2f),
             vDiffuse(0.8f, 0.8f, 0.8f),
             vSpecular(1.0f, 1.0f, 1.0f),

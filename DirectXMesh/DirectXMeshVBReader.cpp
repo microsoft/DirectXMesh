@@ -56,7 +56,7 @@ namespace
 class VBReader::Impl
 {
 public:
-    Impl() DIRECTX_NOEXCEPT :
+    Impl() throw() :
         mStrides{},
         mBuffers{},
         mVerts{},
@@ -640,21 +640,21 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
 //=====================================================================================
 
 // Public constructor.
-VBReader::VBReader() DIRECTX_NOEXCEPT
+VBReader::VBReader() throw()
     : pImpl(new Impl())
 {
 }
 
 
 // Move constructor.
-VBReader::VBReader(VBReader&& moveFrom) DIRECTX_NOEXCEPT
+VBReader::VBReader(VBReader&& moveFrom) throw()
     : pImpl(std::move(moveFrom.pImpl))
 {
 }
 
 
 // Move assignment.
-VBReader& VBReader::operator= (VBReader&& moveFrom) DIRECTX_NOEXCEPT
+VBReader& VBReader::operator= (VBReader&& moveFrom) throw()
 {
     pImpl = std::move(moveFrom.pImpl);
     return *this;

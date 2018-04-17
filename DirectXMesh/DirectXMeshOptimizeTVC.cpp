@@ -22,7 +22,7 @@ namespace
     class mesh_status
     {
     public:
-        mesh_status() DIRECTX_NOEXCEPT :
+        mesh_status() throw() :
             mUnprocessed{},
             mFaceOffset(0),
             mFaceCount(0),
@@ -453,7 +453,7 @@ namespace
     class sim_vcache
     {
     public:
-        sim_vcache() DIRECTX_NOEXCEPT : mTail(0), mCacheSize(0) {}
+        sim_vcache() throw() : mTail(0), mCacheSize(0) {}
 
         HRESULT initialize(uint32_t cacheSize)
         {
