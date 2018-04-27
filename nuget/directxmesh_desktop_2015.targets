@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <directxmesh-LibPath>$(MSBuildThisFileDirectory)..\..\lib\$(Platform)\$(Configuration)</directxmesh-LibPath>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(directxmesh-LibPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>DirectXMesh.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>HAS_DIRECTXMESH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+</Project>

@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata minClientVersion="2.8.6">
+        <id>directxmesh_uwp</id>
+        <version>0.0.0-SpecifyVersionOnCommandline</version>
+        <title>DirectXMesh Library (UWP)</title>
+        <authors>Microsoft</authors>
+        <owners>microsoft,directxtk</owners>
+        <summary>DirectXMesh geometry processing library</summary>
+        <description>This version is for Universal Windows apps on Windows 10 using Visual Studio 2015 Update 3 or Visual Studio 2017.
+
+DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, and vertex cache optimization.</description>
+        <releaseNotes>Matches the April 23, 2018 release on GitHub.</releaseNotes>
+        <projectUrl>http://go.microsoft.com/fwlink/?LinkID=324981</projectUrl>
+        <iconUrl>https://github.com/Microsoft/DirectXMesh/wiki/X_jpg.jpg</iconUrl>
+        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+        <tags>DirectX  DirectXMesh  native nativepackage</tags>
+    </metadata>
+
+    <files>
+
+        <file target="docs" src="Readme.*" />
+
+        <file target="include" src="DirectXMesh\DirectXMesh.h" />
+        <file target="include" src="DirectXMesh\DirectXMesh.inl" />
+
+        <file target="lib\ARM\Debug" src="DirectXMesh\Bin\Windows10\ARM\Debug\*.lib" />
+        <file target="lib\ARM\Debug" src="DirectXMesh\Bin\Windows10\ARM\Debug\*.pdb" />
+
+        <file target="lib\ARM\Release" src="DirectXMesh\Bin\Windows10\ARM\Release\*.lib" />
+        <file target="lib\ARM\Release" src="DirectXMesh\Bin\Windows10\ARM\Release\*.pdb" />
+      
+        <file target="lib\Win32\Debug" src="DirectXMesh\Bin\Windows10\Win32\Debug\*.lib" />
+        <file target="lib\Win32\Debug" src="DirectXMesh\Bin\Windows10\Win32\Debug\*.pdb" />
+
+        <file target="lib\Win32\Release" src="DirectXMesh\Bin\Windows10\Win32\Release\*.lib" />
+        <file target="lib\Win32\Release" src="DirectXMesh\Bin\Windows10\Win32\Release\*.pdb" />
+
+        <file target="lib\x64\Debug" src="DirectXMesh\Bin\Windows10\x64\Debug\*.lib" />
+        <file target="lib\x64\Debug" src="DirectXMesh\Bin\Windows10\x64\Debug\*.pdb" />
+
+        <file target="lib\x64\Release" src="DirectXMesh\Bin\Windows10\x64\Release\*.lib" />
+        <file target="lib\x64\Release" src="DirectXMesh\Bin\Windows10\x64\Release\*.pdb" />
+
+        <file src="nuget/directxmesh_uwp.targets" target="build\native" />
+      
+    </files>
+</package>
