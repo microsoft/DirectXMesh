@@ -31,9 +31,9 @@
 class Mesh
 {
 public:
-    Mesh() throw() : mnFaces(0), mnVerts(0) {}
-    Mesh(Mesh&& moveFrom) throw();
-    Mesh& operator= (Mesh&& moveFrom) throw();
+    Mesh() noexcept : mnFaces(0), mnVerts(0) {}
+    Mesh(Mesh&& moveFrom) noexcept;
+    Mesh& operator= (Mesh&& moveFrom) noexcept;
 
     Mesh(Mesh const&) = delete;
     Mesh& operator= (Mesh const&) = delete;

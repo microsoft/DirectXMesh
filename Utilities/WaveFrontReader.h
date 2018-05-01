@@ -50,7 +50,7 @@ public:
         DirectX::XMFLOAT2 textureCoordinate;
     };
 
-    WaveFrontReader() throw() : hasNormals(false), hasTexcoords(false) {}
+    WaveFrontReader() noexcept : hasNormals(false), hasTexcoords(false) {}
 
     HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true)
     {
@@ -572,15 +572,16 @@ public:
         wchar_t strName[MAX_PATH];
         wchar_t strTexture[MAX_PATH];
 
-        Material() throw() :
+        Material() noexcept :
         vAmbient(0.2f, 0.2f, 0.2f),
             vDiffuse(0.8f, 0.8f, 0.8f),
             vSpecular(1.0f, 1.0f, 1.0f),
             nShininess(0),
             fAlpha(1.f),
-            bSpecular(false)
+            bSpecular(false),
+            strName{},
+            strTexture{}
         {
-            memset(strName, 0, sizeof(strName)); memset(strTexture, 0, sizeof(strTexture));
         }
     };
 

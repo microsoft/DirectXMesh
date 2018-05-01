@@ -340,8 +340,7 @@ void DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl,
     if (strides)
         memset(strides, 0, sizeof(uint32_t) * D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT);
 
-    uint32_t prevABO[D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
-    memset(prevABO, 0, sizeof(uint32_t) * D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT);
+    uint32_t prevABO[D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = {};
 
     for (size_t j = 0; j < vbDecl.NumElements; ++j)
     {

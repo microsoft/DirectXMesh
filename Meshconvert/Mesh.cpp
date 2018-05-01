@@ -82,13 +82,13 @@ namespace
 }
 
 // Move constructor
-Mesh::Mesh(Mesh&& moveFrom) throw() : mnFaces(0), mnVerts(0)
+Mesh::Mesh(Mesh&& moveFrom) noexcept : mnFaces(0), mnVerts(0)
 {
     *this = std::move(moveFrom);
 }
 
 // Move operator
-Mesh& Mesh::operator= (Mesh&& moveFrom) throw()
+Mesh& Mesh::operator= (Mesh&& moveFrom) noexcept
 {
     if (this != &moveFrom)
     {
@@ -1513,8 +1513,7 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
         if (FAILED(hr))
             return hr;
 
-        VSD3DStarter::Material mdata;
-        memset(&mdata, 0, sizeof(mdata));
+        VSD3DStarter::Material mdata = {};
 
         mdata.Ambient.x = m.ambientColor.x;
         mdata.Ambient.y = m.ambientColor.y;

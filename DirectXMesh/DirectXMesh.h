@@ -80,9 +80,9 @@ namespace DirectX
     class VBReader
     {
     public:
-        VBReader() throw();
-        VBReader(VBReader&& moveFrom) throw();
-        VBReader& operator= (VBReader&& moveFrom) throw();
+        VBReader() noexcept;
+        VBReader(VBReader&& moveFrom) noexcept;
+        VBReader& operator= (VBReader&& moveFrom) noexcept;
 
         VBReader(VBReader const&) = delete;
         VBReader& operator= (VBReader const&) = delete;
@@ -136,9 +136,9 @@ namespace DirectX
     class VBWriter
     {
     public:
-        VBWriter() throw();
-        VBWriter(VBWriter&& moveFrom) throw();
-        VBWriter& operator= (VBWriter&& moveFrom) throw();
+        VBWriter() noexcept;
+        VBWriter(VBWriter&& moveFrom) noexcept;
+        VBWriter& operator= (VBWriter&& moveFrom) noexcept;
 
         VBWriter(VBWriter const&) = delete;
         VBWriter& operator= (VBWriter const&) = delete;

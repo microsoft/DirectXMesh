@@ -147,7 +147,7 @@ namespace
         IndexType   cachePos0;
         IndexType   cachePos1;
 
-        OptimizeVertexData() throw() : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) { }
+        OptimizeVertexData() noexcept : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) { }
     };
 
     template <typename T, typename IndexType>
@@ -567,6 +567,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     if (subsets.empty())
         return E_UNEXPECTED;
 
+    memset(faceRemap, 0, sizeof(uint32_t) * nFaces);
+
     for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
         HRESULT hr = OptimizeFacesImpl<uint16_t>(
@@ -599,6 +601,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     if (subsets.empty())
         return E_UNEXPECTED;
+
+    memset(faceRemap, 0, sizeof(uint32_t) * nFaces);
 
     for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
