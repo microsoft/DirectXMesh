@@ -147,7 +147,7 @@ namespace
         IndexType   cachePos0;
         IndexType   cachePos1;
 
-        OptimizeVertexData() throw() : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) { }
+        OptimizeVertexData() noexcept : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) { }
     };
 
     template <typename T, typename IndexType>
