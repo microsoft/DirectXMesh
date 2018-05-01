@@ -638,7 +638,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         assert(inMesh->GetPositionBuffer() != 0);
         assert(inMesh->GetIndexBuffer() != 0);
 
-        wprintf(L"\n%Iu vertices, %Iu faces", nVerts, nFaces);
+        wprintf(L"\n%zu vertices, %zu faces", nVerts, nFaces);
 
         if (dwOptions & (1 << OPT_FLIPU))
         {
@@ -704,7 +704,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 size_t nNewVerts = inMesh->GetVertexCount();
                 if (nVerts != nNewVerts)
                 {
-                    wprintf(L" [%Iu vertex dups] ", nNewVerts - nVerts);
+                    wprintf(L" [%zu vertex dups] ", nNewVerts - nVerts);
                     nVerts = nNewVerts;
                 }
             }
@@ -897,7 +897,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             return 1;
         }
 
-        wprintf(L" %Iu vertices, %Iu faces written:\n'%ls'\n", nVerts, nFaces, outputPath);
+        wprintf(L" %zu vertices, %zu faces written:\n'%ls'\n", nVerts, nFaces, outputPath);
     }
 
     return 0;

@@ -567,6 +567,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     if (subsets.empty())
         return E_UNEXPECTED;
 
+    memset(faceRemap, 0, sizeof(uint32_t) * nFaces);
+
     for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
         HRESULT hr = OptimizeFacesImpl<uint16_t>(
@@ -599,6 +601,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     if (subsets.empty())
         return E_UNEXPECTED;
+
+    memset(faceRemap, 0, sizeof(uint32_t) * nFaces);
 
     for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {

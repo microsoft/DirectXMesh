@@ -62,7 +62,7 @@ namespace
                     result = false;
 
                     wchar_t buff[128];
-                    swprintf_s(buff, L"An invalid index value (%u) was found on face %Iu\n", i, face);
+                    swprintf_s(buff, L"An invalid index value (%u) was found on face %zu\n", i, face);
                     *msgs += buff;
                 }
 
@@ -77,7 +77,7 @@ namespace
                         result = false;
 
                         wchar_t buff[128];
-                        swprintf_s(buff, L"An invalid neighbor index value (%u) was found on face %Iu\n", j, face);
+                        swprintf_s(buff, L"An invalid neighbor index value (%u) was found on face %zu\n", j, face);
                         *msgs += buff;
                     }
                 }
@@ -103,7 +103,7 @@ namespace
                         result = false;
 
                         wchar_t buff[128];
-                        swprintf_s(buff, L"An unused face (%Iu) contains 'valid' but ignored vertices (%u,%u,%u)\n", face, i0, i1, i2);
+                        swprintf_s(buff, L"An unused face (%zu) contains 'valid' but ignored vertices (%u,%u,%u)\n", face, i0, i1, i2);
                         *msgs += buff;
                     }
 
@@ -120,7 +120,7 @@ namespace
                                 result = false;
 
                                 wchar_t buff[128];
-                                swprintf_s(buff, L"An unused face (%Iu) has a neighbor %u\n", face, k);
+                                swprintf_s(buff, L"An unused face (%zu) has a neighbor %u\n", face, k);
                                 *msgs += buff;
                             }
                         }
@@ -152,7 +152,7 @@ namespace
                         bad = i0;
 
                     wchar_t buff[128];
-                    swprintf_s(buff, L"A point (%u) was found more than once in triangle %Iu\n", bad, face);
+                    swprintf_s(buff, L"A point (%u) was found more than once in triangle %zu\n", bad, face);
                     *msgs += buff;
 
                     if (adjacency)
@@ -164,7 +164,7 @@ namespace
                             {
                                 result = false;
 
-                                swprintf_s(buff, L"A degenerate face (%Iu) has a neighbor %u\n", face, k);
+                                swprintf_s(buff, L"A degenerate face (%zu) has a neighbor %u\n", face, k);
                                 *msgs += buff;
                             }
                         }
@@ -195,7 +195,7 @@ namespace
                         result = false;
 
                         wchar_t buff[256];
-                        swprintf_s(buff, L"A neighbor triangle (%u) does not reference back to this face (%Iu) as expected\n", k, face);
+                        swprintf_s(buff, L"A neighbor triangle (%u) does not reference back to this face (%zu) as expected\n", k, face);
                         *msgs += buff;
                     }
                 }
@@ -226,7 +226,7 @@ namespace
                         bad = j1;
 
                     wchar_t buff[256];
-                    swprintf_s(buff, L"A neighbor triangle (%u) was found more than once on triangle %Iu\n"
+                    swprintf_s(buff, L"A neighbor triangle (%u) was found more than once on triangle %zu\n"
                         L"\t(likley problem is that two triangles share same points with opposite direction)\n", bad, face);
                     *msgs += buff;
                 }
