@@ -38,7 +38,7 @@ DirectXMesh, a shared source library for performing various geometry content pro
         <file target="lib\x64\Release" src="DirectXMesh\Bin\Desktop_2015\x64\Release\*.lib" />
         <file target="lib\x64\Release" src="DirectXMesh\Bin\Desktop_2015\x64\Release\*.pdb" />
 
-        <file src="nuget/directxmesh_desktop_2015.targets" target="build\native" />
+        <file src=".nuget/directxmesh_desktop_2015.targets" target="build\native" />
       
     </files>
 </package>
