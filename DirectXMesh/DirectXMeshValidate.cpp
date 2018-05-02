@@ -291,7 +291,7 @@ namespace
                 continue;
             }
 
-            for (size_t point = 0; point < 3; ++point)
+            for (uint32_t point = 0; point < 3; ++point)
             {
                 if (faceSeen[face * 3 + point])
                     continue;

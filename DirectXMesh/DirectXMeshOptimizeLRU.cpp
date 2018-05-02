@@ -179,8 +179,8 @@ namespace
 
         bool operator()(T a, T b) const
         {
-            const OptimizeVertexData<IndexType> *vA = _vertexData + a * 3;
-            const OptimizeVertexData<IndexType> *vB = _vertexData + b * 3;
+            const OptimizeVertexData<IndexType> *vA = _vertexData + size_t(a) * 3;
+            const OptimizeVertexData<IndexType> *vB = _vertexData + size_t(b) * 3;
 
             int aValence = vA[0].activeFaceListSize + vA[1].activeFaceListSize + vA[2].activeFaceListSize;
             int bValence = vB[0].activeFaceListSize + vB[1].activeFaceListSize + vB[2].activeFaceListSize;
@@ -311,12 +311,12 @@ namespace
         {
             for (uint32_t j = 0; j < 3; ++j)
             {
-                uint32_t v = vertexRemap[i + j];
+                uint32_t v = vertexRemap[size_t(i) + size_t(j)];
                 if (v == UNUSED32)
                     continue;
 
                 OptimizeVertexData<IndexType>& vertexData = vertexDataList[v];
-                activeFaceList[vertexData.activeFaceListStart + vertexData.activeFaceListSize] = i;
+                activeFaceList[size_t(vertexData.activeFaceListStart) + vertexData.activeFaceListSize] = i;
                 vertexData.activeFaceListSize++;
             }
         }
@@ -327,7 +327,7 @@ namespace
         uint32_t entriesInCache0 = 0;
 
         uint32_t bestFace = 0;
-        for (uint32_t i = 0; i < indexCount; i += 3)
+        for (size_t i = 0; i < indexCount; i += 3)
         {
             if (vertexRemap[i] == UNUSED32
                 || vertexRemap[i + 1] == UNUSED32
@@ -345,7 +345,7 @@ namespace
         uint32_t nextBestFace = 0;
 
         uint32_t curFace = 0;
-        for (uint32_t i = 0; i < indexCount; i += 3)
+        for (size_t i = 0; i < indexCount; i += 3)
         {
             if (vertexRemap[i] == UNUSED32
                 || vertexRemap[i + 1] == UNUSED32
@@ -364,9 +364,9 @@ namespace
                     if (processedFaceList[faceIndex] == 0)
                     {
                         uint32_t face = faceIndex * 3;
-                        uint32_t i0 = vertexRemap[face + 0];
-                        uint32_t i1 = vertexRemap[face + 1];
-                        uint32_t i2 = vertexRemap[face + 2];
+                        uint32_t i0 = vertexRemap[face];
+                        uint32_t i1 = vertexRemap[size_t(face) + 1];
+                        uint32_t i2 = vertexRemap[size_t(face) + 2];
                         if (i0 != UNUSED32 && i1 != UNUSED32 && i2 != UNUSED32)
                         {
                             // we're searching a pre-sorted list, first one we find will be the best
@@ -392,7 +392,7 @@ namespace
             assert(vertexRemap[bestFace + 1] != UNUSED32);
             assert(vertexRemap[bestFace + 2] != UNUSED32);
 
-            for (uint32_t v = 0; v < 3; ++v)
+            for (size_t v = 0; v < 3; ++v)
             {
                 OptimizeVertexData<IndexType>& vertexData = vertexDataList[vertexRemap[bestFace + v]];
 
@@ -410,7 +410,7 @@ namespace
 
                 assert(vertexData.activeFaceListSize > 0);
                 uint32_t* begin = activeFaceList.get() + vertexData.activeFaceListStart;
-                uint32_t* end = activeFaceList.get() + (vertexData.activeFaceListStart + vertexData.activeFaceListSize);
+                uint32_t* end = activeFaceList.get() + (size_t(vertexData.activeFaceListStart) + vertexData.activeFaceListSize);
                 uint32_t* it = std::find(begin, end, bestFace);
 
                 assert(it != end);
@@ -471,12 +471,12 @@ namespace
 
                 for (uint32_t j = 0; j < vertexData.activeFaceListSize; ++j)
                 {
-                    uint32_t face = activeFaceList[vertexData.activeFaceListStart + j];
+                    uint32_t face = activeFaceList[size_t(vertexData.activeFaceListStart) + j];
                     float faceScore = 0.f;
 
                     for (uint32_t v = 0; v < 3; v++)
                     {
-                        OptimizeVertexData<IndexType>& faceVertexData = vertexDataList[vertexRemap[face + v]];
+                        OptimizeVertexData<IndexType>& faceVertexData = vertexDataList[vertexRemap[size_t(face) + v]];
                         faceScore += faceVertexData.score;
                     }
 

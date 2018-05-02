@@ -175,7 +175,7 @@ namespace
             {
                 uint32_t hashKey = (*reinterpret_cast<const uint32_t*>(&positions[vert].x)
                     + *reinterpret_cast<const uint32_t*>(&positions[vert].y)
-                    + *reinterpret_cast<const uint32_t*>(&positions[vert].z)) % hashSize;
+                    + *reinterpret_cast<const uint32_t*>(&positions[vert].z)) % uint32_t(hashSize);
 
                 uint32_t found = UNUSED32;
 
@@ -272,7 +272,7 @@ namespace
 
                     XMVECTOR outer = XMLoadFloat3(&positions[tailIndex]);
 
-                    for (size_t current = tail + 1; current < head; ++current)
+                    for (uint32_t current = tail + 1; current < head; ++current)
                     {
                         uint32_t curIndex = xorder[current];
                         assert(curIndex < nVerts);

@@ -123,7 +123,7 @@ namespace
 
                 for (uint32_t face = 0; face < nFaces; ++face)
                 {
-                    for (size_t point = 0; point < 3; ++point)
+                    for (uint32_t point = 0; point < 3; ++point)
                     {
                         uint32_t k = adjacency[face * 3 + point];
                         if (k != UNUSED32)
@@ -356,7 +356,8 @@ namespace
                         if (it == range.second)
                         {
                             // Duplicate the vert
-                            dups.insert(std::pair<uint32_t, size_t>(j, curNewVert));
+                            auto dv = std::pair<uint32_t, size_t>(j, curNewVert);
+                            dups.insert(dv);
 
                             indicesNew[face * 3 + point] = index_t(curNewVert);
                             ++curNewVert;

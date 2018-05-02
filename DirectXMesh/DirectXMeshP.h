@@ -183,8 +183,8 @@ namespace DirectX
             {
                 uint32_t prevFace = m_currentFace;
 
-                assert((m_currentFace * 3 + m_nextEdge) < (m_nFaces * 3));
-                _Analysis_assume_((m_currentFace * 3 + m_nextEdge) < (m_nFaces * 3));
+                assert((size_t(m_currentFace) * 3 + m_nextEdge) < (m_nFaces * 3));
+                _Analysis_assume_((size_t(m_currentFace) * 3 + m_nextEdge) < (m_nFaces * 3));
 
                 m_currentFace = m_adjacency[m_currentFace * 3 + m_nextEdge];
 
@@ -196,8 +196,8 @@ namespace DirectX
                 }
                 else if (m_currentFace != UNUSED32)
                 {
-                    assert((m_currentFace * 3 + 2) < (m_nFaces * 3));
-                    _Analysis_assume_((m_currentFace * 3 + 2) < (m_nFaces * 3));
+                    assert((size_t(m_currentFace) * 3 + 2) < (m_nFaces * 3));
+                    _Analysis_assume_((size_t(m_currentFace) * 3 + 2) < (m_nFaces * 3));
 
                     if (m_adjacency[m_currentFace * 3] == prevFace)
                         m_nextEdge = 0;
