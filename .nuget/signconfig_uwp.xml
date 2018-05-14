@@ -1,3 +1,7 @@
-<job platform="AnyCPU" configuration="Release" dest="__RELBINPATH__\signed" certSubject="NuGet" jobname="NugetSigningTest"> 
- <file src="__RELBINPATH__\directxmesh_uwp.nupkg" signType="CP-401405" dest="__RELBINPATH__\signed\directxmesh_uwp.nupkg" /> 
-/job> 
+<?xml version="1.0" encoding="utf-8" ?>
+
+<SignConfigXML>
+  <job platform="AnyCPU" configuration="Release" dest="__RELBINPATH__\signed" certSubject="NuGet" jobname="NugetSigningTest">
+    <file src="__RELBINPATH__\directxmesh_uwp.nupkg" signType="CP-401405" dest="__RELBINPATH__\signed\directxmesh_uwp.nupkg" />
+  </job>
+</SignConfigXML>
