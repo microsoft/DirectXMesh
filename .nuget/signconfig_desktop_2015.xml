@@ -1,0 +1,3 @@
+<job platform="AnyCPU" configuration="Release" dest="__RELBINPATH__\signed" certSubject="NuGet" jobname="NugetSigningTest"> 
+ <file src="__RELBINPATH__\directxmesh_desktop_2015.nupkg" signType="CP-401405" dest="__RELBINPATH__\signed\directxmesh_desktop_2015.nupkg" /> 
+/job> 
