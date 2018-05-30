@@ -502,6 +502,8 @@ public:
 
     HRESULT LoadVBO(_In_z_ const wchar_t* szFileName)
     {
+        using namespace DirectX;
+
         Clear();
 
         wchar_t fname[_MAX_FNAME] = {};
