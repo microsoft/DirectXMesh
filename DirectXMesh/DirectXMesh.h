@@ -80,7 +80,7 @@ namespace DirectX
     class VBReader
     {
     public:
-        VBReader() noexcept;
+        VBReader() noexcept(false);
         VBReader(VBReader&& moveFrom) noexcept;
         VBReader& operator= (VBReader&& moveFrom) noexcept;
 
@@ -136,7 +136,7 @@ namespace DirectX
     class VBWriter
     {
     public:
-        VBWriter() noexcept;
+        VBWriter() noexcept(false);
         VBWriter(VBWriter&& moveFrom) noexcept;
         VBWriter& operator= (VBWriter&& moveFrom) noexcept;
 

@@ -643,7 +643,7 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
 //=====================================================================================
 
 // Public constructor.
-VBReader::VBReader() noexcept
+VBReader::VBReader() noexcept(false)
     : pImpl(std::make_unique<Impl>())
 {
 }

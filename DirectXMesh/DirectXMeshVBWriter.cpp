@@ -641,7 +641,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
 //=====================================================================================
 
 // Public constructor.
-VBWriter::VBWriter() noexcept
+VBWriter::VBWriter() noexcept(false)
     : pImpl(std::make_unique<Impl>())
 {
 }
