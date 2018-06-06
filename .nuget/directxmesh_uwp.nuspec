@@ -7,7 +7,7 @@
         <authors>Microsoft</authors>
         <owners>microsoft,directxtk</owners>
         <summary>DirectXMesh geometry processing library</summary>
-        <description>This version is for Universal Windows apps on Windows 10 using Visual Studio 2015 Update 3 or Visual Studio 2017.
+        <description>This version is for Universal Windows Platform apps on Windows 10 using Visual Studio 2015 Update 3 or Visual Studio 2017.
 
 DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, and vertex cache optimization.</description>
         <releaseNotes>Matches the May 31, 2018 release on GitHub.</releaseNotes>
