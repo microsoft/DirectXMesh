@@ -25,4 +25,4 @@ struct handle_closer { void operator()(HANDLE h) { assert(h != INVALID_HANDLE_VA
 
 typedef std::unique_ptr<void, handle_closer> ScopedHandle;
 
-inline HANDLE safe_handle(HANDLE h) { return (h == INVALID_HANDLE_VALUE) ? 0 : h; }
+inline HANDLE safe_handle(HANDLE h) { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
