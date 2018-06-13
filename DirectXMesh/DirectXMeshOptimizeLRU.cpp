@@ -100,16 +100,6 @@ namespace
         return TRUE;
     }
 
-    inline float FindVertexCacheScore(uint32_t cachePosition, uint32_t maxSizeVertexCache)
-    {
-        return s_vertexCacheScores[maxSizeVertexCache][cachePosition];
-    }
-
-    inline float FindVertexValenceScore(uint32_t numActiveTris)
-    {
-        return s_vertexValenceScores[numActiveTris];
-    }
-
     float FindVertexScore(uint32_t numActiveFaces, uint32_t cachePosition, uint32_t vertexCacheSize)
     {
         if (numActiveFaces == 0)

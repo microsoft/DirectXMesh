@@ -70,6 +70,8 @@
 #include <d3d11_1.h>
 #endif
 
+#define _XM_NO_XMVECTOR_OVERLOADS_
+
 #include <directxmath.h>
 #include <directxpackedvector.h>
 
@@ -300,8 +302,8 @@ namespace DirectX
             return ret;
         }
 
-        bool done() const { return (m_currentFace == UNUSED32); };
-        uint32_t getpoint() const { return m_clockWise ? m_currentEdge : ((m_currentEdge + 1) % 3); };
+        bool done() const { return (m_currentFace == UNUSED32); }
+        uint32_t getpoint() const { return m_clockWise ? m_currentEdge : ((m_currentEdge + 1) % 3); }
 
     private:
         uint32_t        m_face;
@@ -323,7 +325,7 @@ namespace DirectX
     template<class index_t>
     inline uint32_t find_edge(_In_reads_(3) const index_t* indices, index_t search)
     {
-        assert(indices != 0);
+        assert(indices != nullptr);
 
         uint32_t edge = 0;
 

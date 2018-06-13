@@ -37,8 +37,8 @@ namespace
         _Out_writes_(nFaces * 3) index_t* ibout,
         _Out_writes_opt_(nFaces * 3) uint32_t* adjout)
     {
-        assert(ibin != 0 && faceRemap != 0 && ibout != 0 && ibin != ibout);
-        _Analysis_assume_(ibin != 0 && faceRemap != 0 && ibout != 0 && ibin != ibout);
+        assert(ibin != nullptr && faceRemap != nullptr && ibout != nullptr && ibin != ibout);
+        _Analysis_assume_(ibin != nullptr && faceRemap != nullptr && ibout != nullptr && ibin != ibout);
 
         assert((!adjin && !adjout) || ((adjin && adjout) && adjin != adjout));
         _Analysis_assume_((!adjin && !adjout) || ((adjin && adjout) && adjin != adjout));
@@ -80,8 +80,8 @@ namespace
         _Inout_updates_all_opt_(nFaces * 3) uint32_t* adj,
         _In_reads_(nFaces) const uint32_t* faceRemap)
     {
-        assert(ib != 0 && faceRemap != 0);
-        _Analysis_assume_(ib != 0 && faceRemap != 0);
+        assert(ib != nullptr && faceRemap != nullptr);
+        _Analysis_assume_(ib != nullptr && faceRemap != nullptr);
 
         std::unique_ptr<uint8_t[]> temp(new (std::nothrow) uint8_t[(sizeof(bool) + sizeof(uint32_t)) * nFaces]);
         if (!temp)

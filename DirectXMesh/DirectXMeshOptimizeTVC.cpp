@@ -325,7 +325,7 @@ namespace
             return iret;
         }
 
-        const uint32_t get_neighbors(uint32_t face, uint32_t n) const
+        uint32_t get_neighbors(uint32_t face, uint32_t n) const
         {
             assert(face < mTotalFaces);
             assert(n < 3);
@@ -473,7 +473,7 @@ namespace
 
         void clear()
         {
-            assert(mFIFO != 0);
+            assert(mFIFO != nullptr);
             mTail = 0;
             memset(mFIFO.get(), 0xff, sizeof(uint32_t) * mCacheSize);
         }
@@ -481,7 +481,7 @@ namespace
         bool access(uint32_t vertex)
         {
             assert(vertex != UNUSED32);
-            assert(mFIFO != 0);
+            assert(mFIFO != nullptr);
 
             for (size_t ptr = 0; ptr < mCacheSize; ++ptr)
             {

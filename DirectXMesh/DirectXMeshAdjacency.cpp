@@ -49,7 +49,7 @@ namespace
             // Create the heap
             uint32_t iulLim = uint32_t(nVerts);
 
-            for (uint32_t vert = uint32_t(nVerts >> 1); --vert != -1; )
+            for (uint32_t vert = uint32_t(nVerts >> 1); --vert != uint32_t(-1); )
             {
                 // Percolate down
                 uint32_t iulI = vert;
@@ -82,7 +82,7 @@ namespace
             }
 
             // Sort the heap
-            while (--iulLim != -1)
+            while (--iulLim != uint32_t(-1))
             {
                 uint32_t ulT = index[iulLim];
                 index[iulLim] = index[0];
@@ -179,7 +179,7 @@ namespace
 
                 uint32_t found = UNUSED32;
 
-                for (auto current = hashTable[hashKey]; current != 0; current = current->next)
+                for (auto current = hashTable[hashKey]; current != nullptr; current = current->next)
                 {
                     if (current->v.x == positions[vert].x
                         && current->v.y == positions[vert].y
@@ -446,7 +446,7 @@ namespace
 
                 uint32_t foundFace = UNUSED32;
 
-                while (current != 0)
+                while (current != nullptr)
                 {
                     if ((current->v2 == vb) && (current->v1 == va))
                     {
@@ -464,13 +464,13 @@ namespace
                 float bestDiff = -2.f;
 
                 // Scan for additional matches
-                if (current != 0)
+                if (current)
                 {
                     prev = current;
                     current = current->next;
 
                     // find 'better' match
-                    while (current != 0)
+                    while (current != nullptr)
                     {
                         if ((current->v2 == vb) && (current->v1 == va))
                         {
@@ -525,10 +525,10 @@ namespace
 
                 if (foundFace != UNUSED32)
                 {
-                    assert(found != 0);
+                    assert(found != nullptr);
 
                     // remove found face from hash table
-                    if (foundPrev != 0)
+                    if (foundPrev != nullptr)
                     {
                         foundPrev->next = found->next;
                     }
@@ -546,12 +546,12 @@ namespace
                     current = hashTable[hashKey2];
                     prev = nullptr;
 
-                    while (current != 0)
+                    while (current != nullptr)
                     {
                         if ((current->face == uint32_t(face)) && (current->v2 == va) && (current->v1 == vb))
                         {
                             // trim edge from hash table
-                            if (prev != 0)
+                            if (prev != nullptr)
                             {
                                 prev->next = current->next;
                             }
