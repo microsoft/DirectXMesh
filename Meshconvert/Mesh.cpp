@@ -2076,7 +2076,7 @@ static_assert(sizeof(DXUT::SDKANIMATION_FRAME_DATA) == 112, "SDK Mesh structure 
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const
+HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, const Material* materials, bool force32bit) const
 {
     using namespace DXUT;
 
@@ -2224,7 +2224,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
     ibHeader.NumIndices = uint64_t(mnFaces) * 3;
 
     std::unique_ptr<uint16_t[]> ib16;
-    if (Is16BitIndexBuffer())
+    if (!force32bit && Is16BitIndexBuffer())
     {
         ibHeader.SizeBytes = uint64_t(mnFaces) * 3 * sizeof(uint16_t);
         ibHeader.IndexType = IT_16BIT;

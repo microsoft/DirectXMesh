@@ -52,6 +52,7 @@ enum OPTIONS
     OPT_CMO,
     OPT_VBO,
     OPT_CLOCKWISE,
+    OPT_FORCE_32BIT_IB,
     OPT_OVERWRITE,
     OPT_NODDS,
     OPT_FLIP,
@@ -98,6 +99,7 @@ const SValue g_pOptions[] =
     { L"cmo",       OPT_CMO },
     { L"vbo",       OPT_VBO },
     { L"cw",        OPT_CLOCKWISE },
+    { L"ib32",      OPT_FORCE_32BIT_IB },
     { L"y",         OPT_OVERWRITE },
     { L"nodds",     OPT_NODDS },
     { L"flip",      OPT_FLIP },
@@ -248,6 +250,7 @@ namespace
         wprintf(L"   -t                  generate tangents\n");
         wprintf(L"   -tb                 generate tangents & bi-tangents\n");
         wprintf(L"   -cw                 faces are clockwise (defaults to counter-clockwise)\n");
+        wprintf(L"   -ib32               use 32-bit index buffer (SDKMESH only)\n");
         wprintf(L"   -op | -oplru        vertex cache optimize the mesh (implies -c)\n");
         wprintf(L"   -c                  mesh cleaning including vertex dups for atttribute sets\n");
         wprintf(L"   -ta | -ga           generate topological vs. geometric adjancecy (def: ta)\n");
@@ -852,7 +855,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            if (!inMesh->Is16BitIndexBuffer())
+            if (!inMesh->Is16BitIndexBuffer() || (dwOptions & (1 << OPT_FORCE_32BIT_IB)))
             {
                 wprintf(L"\nERROR: VBO only supports 16-bit indices\n");
                 return 1;
@@ -862,7 +865,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else if (!_wcsicmp(outputExt, L".sdkmesh"))
         {
-            hr = inMesh->ExportToSDKMESH(outputPath, inMaterial.size(), inMaterial.empty() ? nullptr : inMaterial.data());
+            hr = inMesh->ExportToSDKMESH(
+                outputPath,
+                inMaterial.size(), inMaterial.empty() ? nullptr : inMaterial.data(),
+                (dwOptions & (1 << OPT_FORCE_32BIT_IB)) ? true : false);
         }
         else if (!_wcsicmp(outputExt, L".cmo"))
         {
@@ -872,7 +878,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            if (!inMesh->Is16BitIndexBuffer())
+            if (!inMesh->Is16BitIndexBuffer() || (dwOptions & (1 << OPT_FORCE_32BIT_IB)))
             {
                 wprintf(L"\nERROR: Visual Studio CMO only supports 16-bit indices\n");
                 return 1;
