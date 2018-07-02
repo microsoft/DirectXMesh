@@ -379,8 +379,8 @@ namespace
 
             // add bestFace to LRU cache
             assert(vertexRemap[bestFace] != UNUSED32);
-            assert(vertexRemap[bestFace + 1] != UNUSED32);
-            assert(vertexRemap[bestFace + 2] != UNUSED32);
+            assert(vertexRemap[size_t(bestFace) + 1] != UNUSED32);
+            assert(vertexRemap[size_t(bestFace) + 2] != UNUSED32);
 
             for (size_t v = 0; v < 3; ++v)
             {
