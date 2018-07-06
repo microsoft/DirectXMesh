@@ -561,6 +561,17 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
+        if (it->first >= nFaces)
+            return E_UNEXPECTED;
+
+        if ((uint64_t(it->first) + uint64_t(it->second)) >= UINT32_MAX)
+            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+
+        uint32_t faceMax = uint32_t(it->first + it->second);
+
+        if (faceMax > nFaces)
+            return E_UNEXPECTED;
+
         HRESULT hr = OptimizeFacesImpl<uint16_t>(
             &indices[it->first * 3], static_cast<uint32_t>(it->second * 3),
             &faceRemap[it->first], lruCacheSize, uint32_t(it->first));
@@ -596,6 +607,17 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
     {
+        if (it->first >= nFaces)
+            return E_UNEXPECTED;
+
+        if ((uint64_t(it->first) + uint64_t(it->second)) >= UINT32_MAX)
+            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+
+        uint32_t faceMax = uint32_t(it->first + it->second);
+
+        if (faceMax > nFaces)
+            return E_UNEXPECTED;
+
         HRESULT hr = OptimizeFacesImpl<uint32_t>(
             &indices[it->first * 3], static_cast<uint32_t>(it->second * 3),
             &faceRemap[it->first], lruCacheSize, uint32_t(it->first));
