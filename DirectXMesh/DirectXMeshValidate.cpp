@@ -225,7 +225,7 @@ namespace
                     else
                         bad = j1;
 
-                    wchar_t buff[256];
+                    wchar_t buff[256] = {};
                     swprintf_s(buff, L"A neighbor triangle (%u) was found more than once on triangle %zu\n"
                         L"\t(likley problem is that two triangles share same points with opposite direction)\n", bad, face);
                     *msgs += buff;
@@ -338,7 +338,7 @@ namespace
 
                         vertexBowtie[j] = true;
 
-                        wchar_t buff[256];
+                        wchar_t buff[256] = {};
                         swprintf_s(buff, L"\nBowtie found around vertex %u shared by faces %u and %u\n", j, curFace, faceUsing[j]);
                         *msgs += buff;
                     }
