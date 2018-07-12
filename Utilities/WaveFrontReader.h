@@ -137,7 +137,7 @@ public:
                 INT iPosition, iTexCoord, iNormal;
                 Vertex vertex;
 
-                DWORD faceIndex[MAX_POLY];
+                uint32_t faceIndex[MAX_POLY];
                 size_t iFace = 0;
                 for (;;)
                 {
@@ -151,7 +151,7 @@ public:
 
                     InFile >> iPosition;
 
-                    UINT vertexIndex = 0;
+                    uint32_t vertexIndex = 0;
                     if (!iPosition)
                     {
                         // 0 is not allowed for index
@@ -160,7 +160,7 @@ public:
                     else if (iPosition < 0)
                     {
                         // Negative values are relative indices
-                        vertexIndex = UINT(positions.size() + iPosition);
+                        vertexIndex = uint32_t(positions.size() + iPosition);
                     }
                     else
                     {
@@ -182,7 +182,7 @@ public:
                             // Optional texture coordinate
                             InFile >> iTexCoord;
 
-                            UINT coordIndex = 0;
+                            uint32_t coordIndex = 0;
                             if (!iTexCoord)
                             {
                                 // 0 is not allowed for index
@@ -191,7 +191,7 @@ public:
                             else if (iTexCoord < 0)
                             {
                                 // Negative values are relative indices
-                                coordIndex = UINT(texCoords.size() + iTexCoord);
+                                coordIndex = uint32_t(texCoords.size() + iTexCoord);
                             }
                             else
                             {
@@ -212,7 +212,7 @@ public:
                             // Optional vertex normal
                             InFile >> iNormal;
 
-                            UINT normIndex = 0;
+                            uint32_t normIndex = 0;
                             if (!iNormal)
                             {
                                 // 0 is not allowed for index
@@ -221,7 +221,7 @@ public:
                             else if (iNormal < 0)
                             {
                                 // Negative values are relative indices
-                                normIndex = UINT(normals.size() + iNormal);
+                                normIndex = uint32_t(normals.size() + iNormal);
                             }
                             else
                             {
@@ -240,8 +240,8 @@ public:
                     // list. Store the index in the Indices array. The Vertices and Indices
                     // lists will eventually become the Vertex Buffer and Index Buffer for
                     // the mesh.
-                    DWORD index = AddVertex(vertexIndex, &vertex, vertexCache);
-                    if (index == (DWORD)-1)
+                    uint32_t index = AddVertex(vertexIndex, &vertex, vertexCache);
+                    if (index == uint32_t(-1))
                         return E_OUTOFMEMORY;
 
 #pragma warning( suppress : 4127 )
@@ -288,12 +288,12 @@ public:
                 }
 
                 // Convert polygons to triangles
-                DWORD i0 = faceIndex[0];
-                DWORD i1 = faceIndex[1];
+                uint32_t i0 = faceIndex[0];
+                uint32_t i1 = faceIndex[1];
 
                 for (size_t j = 2; j < iFace; ++j)
                 {
-                    DWORD index = faceIndex[j];
+                    uint32_t index = faceIndex[j];
                     indices.emplace_back(static_cast<index_t>(i0));
                     if (ccw)
                     {
@@ -599,9 +599,9 @@ public:
     DirectX::BoundingBox    bounds;
 
 private:
-    typedef std::unordered_multimap<UINT, UINT> VertexCache;
+    typedef std::unordered_multimap<uint32_t, uint32_t> VertexCache;
 
-    DWORD AddVertex(UINT hash, Vertex* pVertex, VertexCache& cache)
+    uint32_t AddVertex(uint32_t hash, const Vertex* pVertex, VertexCache& cache)
     {
         auto f = cache.equal_range(hash);
 
@@ -615,7 +615,7 @@ private:
             }
         }
 
-        DWORD index = static_cast<UINT>(vertices.size());
+        auto index = static_cast<uint32_t>(vertices.size());
         vertices.emplace_back(*pVertex);
 
         VertexCache::value_type entry(hash, index);
