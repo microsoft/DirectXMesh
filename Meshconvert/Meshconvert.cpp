@@ -230,6 +230,13 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename,
     std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial,
     bool ccw, bool dds);
 
+HRESULT LoadFrom_glTF(const wchar_t* szFilename,
+    std::unique_ptr<Mesh>& inMesh,
+    std::vector<Mesh::Material>& inMaterial);
+HRESULT LoadFrom_glTFBinary(const wchar_t* szFilename,
+    std::unique_ptr<Mesh>& inMesh,
+    std::vector<Mesh::Material>& inMaterial);
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -671,6 +678,14 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         {
             wprintf(L"\nERROR: Autodesk FBX files not supported\n");
             return 1;
+        }
+        else if (_wcsicmp(ext, L".gltf") == 0)
+        {
+            hr = LoadFrom_glTF(pConv->szSrc, inMesh, inMaterial);
+        }
+        else if (_wcsicmp(ext, L".glb") == 0)
+        {
+            hr = LoadFrom_glTFBinary(pConv->szSrc, inMesh, inMaterial);
         }
         else
         {
