@@ -228,6 +228,7 @@ if(BUILD_TOOLS AND WIN32)
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
+    Meshconvert/Mesh_glTF.cpp
     Meshconvert/CMO.h
     Meshconvert/SDKMesh.h
     Meshconvert/vbo.h)
