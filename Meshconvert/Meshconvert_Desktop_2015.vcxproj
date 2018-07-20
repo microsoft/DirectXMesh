@@ -310,6 +310,7 @@
   <ItemGroup>
     <ClCompile Include="Meshconvert.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshOBJ.cpp" />
     <ClInclude Include="..\Utilities\WaveFrontReader.h" />
     <CLInclude Include="Mesh.h" />
   </ItemGroup>

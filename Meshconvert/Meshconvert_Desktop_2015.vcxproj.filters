@@ -5,16 +5,17 @@
       <UniqueIdentifier>{8e114980-c1a3-4ada-ad7c-83caadf5daeb}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Utilities\WaveFrontReader.h" />
+    <Filter Include="Wavefront OBJ">
+      <UniqueIdentifier>{25453828-f860-4040-8221-d5882d9995ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Meshconvert.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <CLInclude Include="Mesh.h" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="MeshOBJ.cpp">
+      <Filter>Wavefront OBJ</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Meshconvert.rc">
@@ -22,5 +23,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Utilities\WaveFrontReader.h">
+      <Filter>Wavefront OBJ</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
