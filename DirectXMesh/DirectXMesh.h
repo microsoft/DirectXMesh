@@ -29,7 +29,7 @@
 
 #include <directxmath.h>
 
-#define DIRECTX_MESH_VERSION 120
+#define DIRECTX_MESH_VERSION 130
 
 
 namespace DirectX
