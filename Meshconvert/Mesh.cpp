@@ -2276,7 +2276,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
             memset(m, 0, sizeof(SDKMESH_MATERIAL));
 
-            int result = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS,
+            int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
                 m0->name.c_str(), -1,
                 m->Name, MAX_MATERIAL_NAME, nullptr, FALSE);
             if (!result)
@@ -2284,7 +2284,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
                 *m->Name = 0;
             }
 
-            result = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS,
+            result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
                 m0->texture.c_str(), -1,
                 m->DiffuseTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
             if (!result)
