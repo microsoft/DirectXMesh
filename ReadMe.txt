@@ -3,7 +3,7 @@ DIRECTX MESH LIBRARY (DirectXMesh)
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-August 17, 2018
+October 25, 2018
 
 This package contains DirectXMesh, a shared source library for performing various geometry
 content processing operations including generating normals and tangent frames, triangle
@@ -71,6 +71,10 @@ RELEASE NOTES
 ---------------
 RELEASE HISTORY
 ---------------
+
+October 25, 2018
+    Use UTF-8 instead of ANSI for narrow strings
+    Minor project fix
 
 August 17, 2018
     Updated for VS 2017 15.8
