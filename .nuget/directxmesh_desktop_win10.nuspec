@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata minClientVersion="2.8.6">
-        <id>directxmesh_desktop_2015</id>
+        <id>directxmesh_desktop_win10</id>
         <version>0.0.0-SpecifyVersionOnCommandline</version>
         <title>DirectXMesh Library (VS 2015/VS 2017 Win32 for Windows 10)</title>
         <authors>Microsoft</authors>
