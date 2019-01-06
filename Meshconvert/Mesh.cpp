@@ -1744,7 +1744,7 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
 //======================================================================================
 
 _Use_decl_annotations_
-HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, const Material* materials, bool force32bit) const
+HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, const Material* materials, bool force32bit, bool version2) const
 {
     using namespace DXUT;
 
@@ -1908,9 +1908,86 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
     }
 
     // Build materials buffer
-    // TODO - v2
     std::unique_ptr<SDKMESH_MATERIAL[]> mats;
-    if (!nMaterials)
+    if (version2)
+    {
+        if (!nMaterials)
+        {
+            mats.reset(new (std::nothrow) SDKMESH_MATERIAL[1]);
+            if (!mats)
+                return E_OUTOFMEMORY;
+
+            auto mat2 = reinterpret_cast<SDKMESH_MATERIAL_V2*>(mats.get());
+            memset(mat2, 0, sizeof(SDKMESH_MATERIAL_V2));
+
+            strcpy_s(mat2->Name, "default");
+            mat2->Alpha = 1.f;
+        }
+        else
+        {
+            mats.reset(new (std::nothrow) SDKMESH_MATERIAL[nMaterials]);
+            if (!mats)
+                return E_OUTOFMEMORY;
+
+            for (size_t j = 0; j < nMaterials; ++j)
+            {
+                auto m0 = &materials[j];
+                auto m2 = reinterpret_cast<SDKMESH_MATERIAL_V2*>(&mats[j]);
+
+                memset(m2, 0, sizeof(SDKMESH_MATERIAL_V2));
+
+                int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                    m0->name.c_str(), -1,
+                    m2->Name, MAX_MATERIAL_NAME, nullptr, FALSE);
+                if (!result)
+                {
+                    *m2->Name = 0;
+                }
+
+                m2->Alpha = m0->alpha;
+
+                result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                    m0->texture.c_str(), -1,
+                    m2->AlbetoTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
+                if (!result)
+                {
+                    *m2->AlbetoTexture = 0;
+                }
+
+                // Derive other PBR texture names from base texture
+                {
+                    char drive[_MAX_DRIVE] = {};
+                    char dir[MAX_PATH] = {};
+                    char fname[_MAX_FNAME] = {};
+                    char ext[_MAX_EXT] = {};
+                    _splitpath_s(m2->AlbetoTexture, drive, dir, fname, ext);
+
+                    std::string basename = fname;
+                    size_t pos = basename.find_last_of('_');
+                    if (pos != std::string::npos)
+                    {
+                        basename = basename.substr(0, pos);
+                    }
+
+                    strcpy_s(fname, basename.c_str());
+                    strcat_s(fname, "_normal");
+                    _makepath_s(m2->NormalTexture, drive, dir, fname, ext);
+
+                    strcpy_s(fname, basename.c_str());
+                    strcat_s(fname, "_occlusionRoughnessMetallic");
+                    _makepath_s(m2->RMATexture, drive, dir, fname, ext);
+
+                    if (m0->emissiveColor.x > 0 || m0->emissiveColor.y > 0 || m0->emissiveColor.z > 0)
+                    {
+                        strcpy_s(fname, basename.c_str());
+                        strcat_s(fname, "_emissive");
+                        _makepath_s(m2->EmissiveTexture, drive, dir, fname, ext);
+                    }
+                }
+            }
+        }
+    }
+    else if (!nMaterials)
     {
         mats.reset(new (std::nothrow) SDKMESH_MATERIAL[1]);
         if (!mats)
@@ -2030,8 +2107,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
     // Write file header
     SDKMESH_HEADER header = {};
-    header.Version = SDKMESH_FILE_VERSION;
-    // TODO - v2
+    header.Version = (version2) ? SDKMESH_FILE_VERSION_V2 : SDKMESH_FILE_VERSION;
     header.IsBigEndian = 0;
 
     header.NumVertexBuffers = 1;
