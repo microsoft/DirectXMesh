@@ -1969,19 +1969,22 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
                         basename = basename.substr(0, pos);
                     }
 
-                    strcpy_s(fname, basename.c_str());
-                    strcat_s(fname, "_normal");
-                    _makepath_s(m2->NormalTexture, drive, dir, fname, ext);
-
-                    strcpy_s(fname, basename.c_str());
-                    strcat_s(fname, "_occlusionRoughnessMetallic");
-                    _makepath_s(m2->RMATexture, drive, dir, fname, ext);
-
-                    if (m0->emissiveColor.x > 0 || m0->emissiveColor.y > 0 || m0->emissiveColor.z > 0)
+                    if (!basename.empty())
                     {
                         strcpy_s(fname, basename.c_str());
-                        strcat_s(fname, "_emissive");
-                        _makepath_s(m2->EmissiveTexture, drive, dir, fname, ext);
+                        strcat_s(fname, "_normal");
+                        _makepath_s(m2->NormalTexture, drive, dir, fname, ext);
+
+                        strcpy_s(fname, basename.c_str());
+                        strcat_s(fname, "_occlusionRoughnessMetallic");
+                        _makepath_s(m2->RMATexture, drive, dir, fname, ext);
+
+                        if (m0->emissiveColor.x > 0 || m0->emissiveColor.y > 0 || m0->emissiveColor.z > 0)
+                        {
+                            strcpy_s(fname, basename.c_str());
+                            strcat_s(fname, "_emissive");
+                            _makepath_s(m2->EmissiveTexture, drive, dir, fname, ext);
+                        }
                     }
                 }
             }
