@@ -448,11 +448,19 @@ public:
                 InFile >> r >> g >> b;
                 curMaterial->vSpecular = XMFLOAT3(r, g, b);
             }
-            else if (0 == wcscmp(strCommand.c_str(), L"d") ||
-                0 == wcscmp(strCommand.c_str(), L"Tr"))
+            else if (0 == wcscmp(strCommand.c_str(), L"d"))
             {
                 // Alpha
-                InFile >> curMaterial->fAlpha;
+                float alpha;
+                InFile >> alpha;
+                curMaterial->fAlpha = std::min(1.f, std::max(0.f, alpha));
+            }
+            else if (0 == wcscmp(strCommand.c_str(), L"Tr"))
+            {
+                // Transparency (inverse of alpha)
+                float invAlpha;
+                InFile >> invAlpha;
+                curMaterial->fAlpha = std::min(1.f, std::max(0.f, 1.f - invAlpha));
             }
             else if (0 == wcscmp(strCommand.c_str(), L"Ns"))
             {
