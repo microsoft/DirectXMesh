@@ -95,6 +95,9 @@ public:
         DirectX::XMFLOAT3   specularColor;
         DirectX::XMFLOAT3   emissiveColor;
         std::wstring        texture;
+        std::wstring        normalTexture;
+        std::wstring        specularTexture;
+        std::wstring        emissiveTexture;
 
         Material() noexcept :
             perVertexColor(false),
