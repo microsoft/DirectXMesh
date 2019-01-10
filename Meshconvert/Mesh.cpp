@@ -1994,7 +1994,29 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
                     }
                 }
 
-                // TODO - check for overrides
+                // Allow normal texture material property to override derived name
+                if (!m0->normalTexture.empty())
+                {
+                    int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                        m0->normalTexture.c_str(), -1,
+                        m2->NormalTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
+                    if (!result)
+                    {
+                        *m2->NormalTexture = 0;
+                    }
+                }
+
+                // Allow emissive texture material property to override drived name
+                if (!m0->emissiveTexture.empty())
+                {
+                    int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                        m0->emissiveTexture.c_str(), -1,
+                        m2->EmissiveTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
+                    if (!result)
+                    {
+                        *m2->EmissiveTexture = 0;
+                    }
+                }
             }
         }
     }
