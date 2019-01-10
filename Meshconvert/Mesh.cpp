@@ -1936,22 +1936,28 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
                 memset(m2, 0, sizeof(SDKMESH_MATERIAL_V2));
 
-                int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
-                    m0->name.c_str(), -1,
-                    m2->Name, MAX_MATERIAL_NAME, nullptr, FALSE);
-                if (!result)
+                if (!m0->name.empty())
                 {
-                    *m2->Name = 0;
+                    int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                        m0->name.c_str(), -1,
+                        m2->Name, MAX_MATERIAL_NAME, nullptr, FALSE);
+                    if (!result)
+                    {
+                        *m2->Name = 0;
+                    }
                 }
 
                 m2->Alpha = m0->alpha;
 
-                result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
-                    m0->texture.c_str(), -1,
-                    m2->AlbetoTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
-                if (!result)
+                if (!m0->texture.empty())
                 {
-                    *m2->AlbetoTexture = 0;
+                    int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                        m0->texture.c_str(), -1,
+                        m2->AlbetoTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
+                    if (!result)
+                    {
+                        *m2->AlbetoTexture = 0;
+                    }
                 }
 
                 // Derive other PBR texture names from base texture
@@ -1987,6 +1993,8 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
                         }
                     }
                 }
+
+                // TODO - check for overrides
             }
         }
     }
