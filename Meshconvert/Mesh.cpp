@@ -2016,20 +2016,48 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
             memset(m, 0, sizeof(SDKMESH_MATERIAL));
 
-            int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
-                m0->name.c_str(), -1,
-                m->Name, MAX_MATERIAL_NAME, nullptr, FALSE);
-            if (!result)
+            if (!m0->name.empty())
             {
-                *m->Name = 0;
+                int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                    m0->name.c_str(), -1,
+                    m->Name, MAX_MATERIAL_NAME, nullptr, FALSE);
+                if (!result)
+                {
+                    *m->Name = 0;
+                }
             }
 
-            result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
-                m0->texture.c_str(), -1,
-                m->DiffuseTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
-            if (!result)
+            if (!m0->texture.empty())
             {
-                *m->DiffuseTexture = 0;
+                int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                    m0->texture.c_str(), -1,
+                    m->DiffuseTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
+                if (!result)
+                {
+                    *m->DiffuseTexture = 0;
+                }
+            }
+
+            if (!m0->normalTexture.empty())
+            {
+                int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                    m0->normalTexture.c_str(), -1,
+                    m->NormalTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
+                if (!result)
+                {
+                    *m->NormalTexture = 0;
+                }
+            }
+
+            if (!m0->specularTexture.empty())
+            {
+                int result = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS,
+                    m0->specularTexture.c_str(), -1,
+                    m->SpecularTexture, MAX_TEXTURE_NAME, nullptr, FALSE);
+                if (!result)
+                {
+                    *m->SpecularTexture = 0;
+                }
             }
 
             m->Diffuse.x = m0->diffuseColor.x;
