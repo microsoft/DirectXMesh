@@ -26,5 +26,6 @@
     <ClInclude Include="..\Utilities\WaveFrontReader.h">
       <Filter>Wavefront OBJ</Filter>
     </ClInclude>
+    <ClInclude Include="SDKMesh.h" />
   </ItemGroup>
 </Project>

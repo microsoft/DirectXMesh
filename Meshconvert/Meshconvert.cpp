@@ -48,6 +48,7 @@ enum OPTIONS
     OPT_GEOMETRIC_ADJ,
     OPT_OUTPUTFILE,
     OPT_SDKMESH,
+    OPT_SDKMESH_V2,
     OPT_CMO,
     OPT_VBO,
     OPT_CLOCKWISE,
@@ -95,6 +96,7 @@ const SValue g_pOptions[] =
     { L"ga",        OPT_GEOMETRIC_ADJ },
     { L"o",         OPT_OUTPUTFILE },
     { L"sdkmesh",   OPT_SDKMESH },
+    { L"sdkmesh2",  OPT_SDKMESH_V2 },
     { L"cmo",       OPT_CMO },
     { L"vbo",       OPT_VBO },
     { L"cw",        OPT_CLOCKWISE },
@@ -244,6 +246,12 @@ namespace
 
         wprintf(L"Usage: meshconvert <options> <files>\n");
         wprintf(L"\n");
+        wprintf(L"   Input file type must be Wavefront OBJ\n\n");
+        wprintf(L"   Output file type:\n");
+        wprintf(L"       -sdkmesh        DirectX SDK .sdkmesh format (default)\n");
+        wprintf(L"       -sdkmesh2       .sdkmesh format version 2 (PBR materials)\n");
+        wprintf(L"       -cmo            Visual Studio Content Pipeline .cmo format\n");
+        wprintf(L"       -vbo            Vertex Buffer Object (.vbo) format\n\n");
         wprintf(L"   -r                  wildcard filename search is recursive\n");
         wprintf(L"   -n | -na | -ne      generate normals weighted by angle/area/equal\n");
         wprintf(L"   -t                  generate tangents\n");
@@ -253,7 +261,6 @@ namespace
         wprintf(L"   -op | -oplru        vertex cache optimize the mesh (implies -c)\n");
         wprintf(L"   -c                  mesh cleaning including vertex dups for atttribute sets\n");
         wprintf(L"   -ta | -ga           generate topological vs. geometric adjancecy (def: ta)\n");
-        wprintf(L"   -sdkmesh|-cmo|-vbo  output file type\n");
         wprintf(L"   -nodds              prevents extension renaming in exported materials\n");
         wprintf(L"   -flip               reverse winding of faces\n");
         wprintf(L"   -flipu              inverts the u texcoords\n");
@@ -374,10 +381,15 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_SDKMESH:
+            case OPT_SDKMESH_V2:
                 if (dwOptions & ((1 << OPT_VBO) | (1 << OPT_CMO)))
                 {
                     wprintf(L"Can only use one of sdkmesh, cmo, or vbo\n");
                     return 1;
+                }
+                if (dwOption == OPT_SDKMESH_V2)
+                {
+                    dwOptions |= (1 << OPT_SDKMESH);
                 }
                 break;
 
@@ -765,7 +777,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ExportToSDKMESH(
                 outputPath,
                 inMaterial.size(), inMaterial.empty() ? nullptr : inMaterial.data(),
-                (dwOptions & (1 << OPT_FORCE_32BIT_IB)) ? true : false);
+                (dwOptions & (1 << OPT_FORCE_32BIT_IB)) ? true : false,
+                (dwOptions & (1 << OPT_SDKMESH_V2)) ? true : false);
         }
         else if (!_wcsicmp(outputExt, L".cmo"))
         {
