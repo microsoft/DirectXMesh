@@ -509,6 +509,12 @@ public:
                 LoadTexturePath(InFile, curMaterial->strEmissiveTexture, MAX_PATH);
                 curMaterial->bEmissive = true;
             }
+            else if (0 == wcscmp(strCommand.c_str(), L"map_RMA")
+                || 0 == wcscmp(strCommand.c_str(), L"map_occlusionRoughnessMetallic"))
+            {
+                // RMA texture
+                LoadTexturePath(InFile, curMaterial->strRMATexture, MAX_PATH);
+            }
             else
             {
                 // Unimplemented or unrecognized command
@@ -614,6 +620,7 @@ public:
         wchar_t strNormalTexture[MAX_PATH];
         wchar_t strSpecularTexture[MAX_PATH];
         wchar_t strEmissiveTexture[MAX_PATH];
+        wchar_t strRMATexture[MAX_PATH];
 
         Material() noexcept :
         vAmbient(0.2f, 0.2f, 0.2f),
@@ -628,7 +635,8 @@ public:
             strTexture{},
             strNormalTexture{},
             strSpecularTexture{},
-            strEmissiveTexture{}
+            strEmissiveTexture{},
+            strRMATexture{}
         {
         }
     };
