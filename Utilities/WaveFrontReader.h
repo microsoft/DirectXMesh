@@ -510,7 +510,7 @@ public:
                 curMaterial->bEmissive = true;
             }
             else if (0 == wcscmp(strCommand.c_str(), L"map_RMA")
-                || 0 == wcscmp(strCommand.c_str(), L"map_occlusionRoughnessMetallic"))
+                || 0 == wcscmp(strCommand.c_str(), L"map_ORM"))
             {
                 // RMA texture
                 LoadTexturePath(InFile, curMaterial->strRMATexture, MAX_PATH);
