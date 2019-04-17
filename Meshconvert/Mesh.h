@@ -98,6 +98,7 @@ public:
         std::wstring        normalTexture;
         std::wstring        specularTexture;
         std::wstring        emissiveTexture;
+        std::wstring        rmaTexture;
 
         Material() noexcept :
             perVertexColor(false),
