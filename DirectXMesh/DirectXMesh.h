@@ -232,7 +232,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Normals, Tangents, and Bi-Tangents Computation
 
-    enum CNORM_FLAGS
+    enum CNORM_FLAGS : uint32_t
     {
         CNORM_DEFAULT                   = 0x0,
             // Default is to compute normals using weight-by-angle
@@ -304,7 +304,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh clean-up and validation
 
-    enum VALIDATE_FLAGS
+    enum VALIDATE_FLAGS : uint32_t
     {
         VALIDATE_DEFAULT                = 0x0,
 
@@ -369,7 +369,7 @@ namespace DirectX
         _Out_writes_(nFaces) uint32_t* faceRemap);
         // Reorders faces by attribute id
 
-    enum OPTFACES
+    enum OPTFACES : uint32_t
     {
         OPTFACES_V_DEFAULT      = 12,
         OPTFACES_R_DEFAULT      = 7,
