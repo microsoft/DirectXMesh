@@ -16,7 +16,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/CMake")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/CMake")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/CMake")
 
-# Add source to this project's executable.
 add_library (directxmesh STATIC
     DirectXMesh.h
     DirectXMeshP.h
@@ -44,4 +43,5 @@ if ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
     target_compile_options( directxmesh PRIVATE /Wall /fp:fast /permissive- /Zc:__cplusplus )
 endif()
 
+# Windows 10 is used here to build the DirectX 12 code paths as well as 11
 add_compile_definitions(_UNICODE UNICODE _WIN32_WINNT=0x0A00)
