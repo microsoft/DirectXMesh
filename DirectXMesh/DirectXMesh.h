@@ -26,7 +26,7 @@
 #endif
 #endif
 
-#include <directxmath.h>
+#include <DirectXMath.h>
 
 #define DIRECTX_MESH_VERSION 130
 
