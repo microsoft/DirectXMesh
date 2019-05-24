@@ -36,11 +36,16 @@ add_library (directxmesh STATIC
     DirectXMeshWeldVertices.cpp
 )
 
+target_compile_options( directxmesh PRIVATE /fp:fast )
+
 if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
     target_compile_options( directxmesh PRIVATE -Wall -Wpedantic -Wextra )
+    if (${CMAKE_SIZEOF_VOID_P} EQUAL "4")
+        target_compile_options( directxmesh PRIVATE /arch:SSE2 )
+    endif()
 endif()
 if ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
-    target_compile_options( directxmesh PRIVATE /Wall /fp:fast /permissive- /Zc:__cplusplus )
+    target_compile_options( directxmesh PRIVATE /Wall /permissive- /Zc:__cplusplus )
 endif()
 
 # Windows 10 is used here to build the DirectX 12 code paths as well as 11
