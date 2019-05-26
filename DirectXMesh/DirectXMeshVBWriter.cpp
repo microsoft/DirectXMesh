@@ -565,7 +565,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
             }
             v = XMVectorMultiply(v, s_Scale);
             XMStoreU555(reinterpret_cast<XMU555*>(ptr), v);
-            reinterpret_cast<XMU555*>(ptr)->w = (XMVectorGetW(v) > 0.5f) ? 1 : 0;
+            reinterpret_cast<XMU555*>(ptr)->w = (XMVectorGetW(v) > 0.5f) ? 1u : 0u;
             ptr += stride;
         }
     }
