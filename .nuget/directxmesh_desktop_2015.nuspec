@@ -13,7 +13,7 @@ DirectXMesh, a shared source library for performing various geometry content pro
         <releaseNotes>Matches the May 30, 2019 release on GitHub.</releaseNotes>
         <projectUrl>http://go.microsoft.com/fwlink/?LinkID=324981</projectUrl>
         <iconUrl>https://github.com/Microsoft/DirectXMesh/wiki/X_jpg.jpg</iconUrl>
-        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <license type="expression">MIT</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <copyright>© Microsoft Corporation. All rights reserved.</copyright>
         <tags>DirectX  DirectXMesh  native nativepackage</tags>
