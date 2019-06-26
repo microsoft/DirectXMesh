@@ -337,7 +337,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         break;
 
     case DXGI_FORMAT_R10G10B10A2_UINT:
-        STORE_VERTS(XMUDEC4, XMStoreUDec4);
+        STORE_VERTS(XMUDEC4, XMStoreUDec4)
 
     case DXGI_FORMAT_R11G11B10_FLOAT:
         STORE_VERTS_X2(XMFLOAT3PK, XMStoreFloat3PK, x2bias)
@@ -626,7 +626,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
 
     case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
         // Xbox One specific format
-        STORE_VERTS(XMXDECN4, XMStoreXDecN4);
+        STORE_VERTS(XMXDECN4, XMStoreXDecN4)
 
     default:
         return E_FAIL;
