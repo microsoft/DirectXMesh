@@ -26,29 +26,29 @@ DirectXMesh, a shared source library for performing various geometry content pro
         <file target="include" src="DirectXMesh\DirectXMesh.h" />
         <file target="include" src="DirectXMesh\DirectXMesh.inl" />
 
-        <file target="lib\ARM\Debug" src="DirectXMesh\Bin\Windows10\ARM\Debug\*.lib" />
-        <file target="lib\ARM\Debug" src="DirectXMesh\Bin\Windows10\ARM\Debug\*.pdb" />
+        <file target="lib\ARM\Debug" src="DirectXMesh\Bin\Windows10_2017\ARM\Debug\*.lib" />
+        <file target="lib\ARM\Debug" src="DirectXMesh\Bin\Windows10_2017\ARM\Debug\*.pdb" />
 
-        <file target="lib\ARM\Release" src="DirectXMesh\Bin\Windows10\ARM\Release\*.lib" />
-        <file target="lib\ARM\Release" src="DirectXMesh\Bin\Windows10\ARM\Release\*.pdb" />
+        <file target="lib\ARM\Release" src="DirectXMesh\Bin\Windows10_2017\ARM\Release\*.lib" />
+        <file target="lib\ARM\Release" src="DirectXMesh\Bin\Windows10_2017\ARM\Release\*.pdb" />
       
-        <file target="lib\ARM64\Debug" src="DirectXMesh\Bin\Windows10\ARM64\Debug\*.lib" />
-        <file target="lib\ARM64\Debug" src="DirectXMesh\Bin\Windows10\ARM64\Debug\*.pdb" />
+        <file target="lib\ARM64\Debug" src="DirectXMesh\Bin\Windows10_2017\ARM64\Debug\*.lib" />
+        <file target="lib\ARM64\Debug" src="DirectXMesh\Bin\Windows10_2017\ARM64\Debug\*.pdb" />
 
-        <file target="lib\ARM64\Release" src="DirectXMesh\Bin\Windows10\ARM64\Release\*.lib" />
-        <file target="lib\ARM64\Release" src="DirectXMesh\Bin\Windows10\ARM64\Release\*.pdb" />
+        <file target="lib\ARM64\Release" src="DirectXMesh\Bin\Windows10_2017\ARM64\Release\*.lib" />
+        <file target="lib\ARM64\Release" src="DirectXMesh\Bin\Windows10_2017\ARM64\Release\*.pdb" />
 
-        <file target="lib\Win32\Debug" src="DirectXMesh\Bin\Windows10\Win32\Debug\*.lib" />
-        <file target="lib\Win32\Debug" src="DirectXMesh\Bin\Windows10\Win32\Debug\*.pdb" />
+        <file target="lib\Win32\Debug" src="DirectXMesh\Bin\Windows10_2017\Win32\Debug\*.lib" />
+        <file target="lib\Win32\Debug" src="DirectXMesh\Bin\Windows10_2017\Win32\Debug\*.pdb" />
 
-        <file target="lib\Win32\Release" src="DirectXMesh\Bin\Windows10\Win32\Release\*.lib" />
-        <file target="lib\Win32\Release" src="DirectXMesh\Bin\Windows10\Win32\Release\*.pdb" />
+        <file target="lib\Win32\Release" src="DirectXMesh\Bin\Windows10_2017\Win32\Release\*.lib" />
+        <file target="lib\Win32\Release" src="DirectXMesh\Bin\Windows10_2017\Win32\Release\*.pdb" />
 
-        <file target="lib\x64\Debug" src="DirectXMesh\Bin\Windows10\x64\Debug\*.lib" />
-        <file target="lib\x64\Debug" src="DirectXMesh\Bin\Windows10\x64\Debug\*.pdb" />
+        <file target="lib\x64\Debug" src="DirectXMesh\Bin\Windows10_2017\x64\Debug\*.lib" />
+        <file target="lib\x64\Debug" src="DirectXMesh\Bin\Windows10_2017\x64\Debug\*.pdb" />
 
-        <file target="lib\x64\Release" src="DirectXMesh\Bin\Windows10\x64\Release\*.lib" />
-        <file target="lib\x64\Release" src="DirectXMesh\Bin\Windows10\x64\Release\*.pdb" />
+        <file target="lib\x64\Release" src="DirectXMesh\Bin\Windows10_2017\x64\Release\*.lib" />
+        <file target="lib\x64\Release" src="DirectXMesh\Bin\Windows10_2017\x64\Release\*.pdb" />
 
         <file src=".nuget/directxmesh_uwp.targets" target="build\native" />
       
