@@ -165,7 +165,7 @@ public:
                     else
                     {
                         // OBJ format uses 1-based arrays
-                        vertexIndex = iPosition - 1;
+                        vertexIndex = uint32_t(iPosition - 1);
                     }
 
                     if (vertexIndex >= positions.size())
@@ -196,7 +196,7 @@ public:
                             else
                             {
                                 // OBJ format uses 1-based arrays
-                                coordIndex = iTexCoord - 1;
+                                coordIndex = uint32_t(iTexCoord - 1);
                             }
 
                             if (coordIndex >= texCoords.size())
@@ -226,7 +226,7 @@ public:
                             else
                             {
                                 // OBJ format uses 1-based arrays
-                                normIndex = iNormal - 1;
+                                normIndex = uint32_t(iNormal - 1);
                             }
 
                             if (normIndex >= normals.size())
@@ -477,7 +477,7 @@ public:
                 // Shininess
                 int nShininess;
                 InFile >> nShininess;
-                curMaterial->nShininess = nShininess;
+                curMaterial->nShininess = uint32_t(nShininess);
             }
             else if (0 == wcscmp(strCommand.c_str(), L"illum"))
             {
