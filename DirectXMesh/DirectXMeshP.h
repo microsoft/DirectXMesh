@@ -96,7 +96,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "directxmesh.h"
+#include "DirectXMesh.h"
 
 #include "scoped.h"
 

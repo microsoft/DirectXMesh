@@ -24,7 +24,7 @@
 #define NOHELP
 #pragma warning(pop)
 
-#include <windows.h>
+#include <Windows.h>
 
 #include <algorithm>
 #include <fstream>
@@ -34,8 +34,8 @@
 
 #include <stdint.h>
 
-#include <directxmath.h>
-#include <directxcollision.h>
+#include <DirectXMath.h>
+#include <DirectXCollision.h>
 
 template<class index_t>
 class WaveFrontReader
@@ -160,7 +160,7 @@ public:
                     else if (iPosition < 0)
                     {
                         // Negative values are relative indices
-                        vertexIndex = uint32_t(positions.size() + iPosition);
+                        vertexIndex = uint32_t(ptrdiff_t(positions.size()) + iPosition);
                     }
                     else
                     {
@@ -191,7 +191,7 @@ public:
                             else if (iTexCoord < 0)
                             {
                                 // Negative values are relative indices
-                                coordIndex = uint32_t(texCoords.size() + iTexCoord);
+                                coordIndex = uint32_t(ptrdiff_t(texCoords.size()) + iTexCoord);
                             }
                             else
                             {
@@ -221,7 +221,7 @@ public:
                             else if (iNormal < 0)
                             {
                                 // Negative values are relative indices
-                                normIndex = uint32_t(normals.size() + iNormal);
+                                normIndex = uint32_t(ptrdiff_t(normals.size()) + iNormal);
                             }
                             else
                             {

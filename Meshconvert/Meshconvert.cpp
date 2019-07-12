@@ -15,7 +15,6 @@
 #define NOMINMAX
 #define NODRAWTEXT
 #define NOGDI
-#define NOBITMAP
 #define NOMCX
 #define NOSERVICE
 #define NOHELP
@@ -124,7 +123,9 @@ namespace
 
     typedef std::unique_ptr<void, find_closer> ScopedFindHandle;
 
+#ifdef __PREFAST__
 #pragma prefast(disable : 26018, "Only used with static internal arrays")
+#endif
 
     DWORD LookupByName(const wchar_t *pName, const SValue *pArray)
     {
@@ -137,20 +138,6 @@ namespace
         }
 
         return 0;
-    }
-
-
-    const wchar_t* LookupByValue(DWORD pValue, const SValue *pArray)
-    {
-        while (pArray->pName)
-        {
-            if (pValue == pArray->dwValue)
-                return pArray->pName;
-
-            pArray++;
-        }
-
-        return L"";
     }
 
 
@@ -280,7 +267,9 @@ extern HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inM
 //--------------------------------------------------------------------------------------
 // Entry-point
 //--------------------------------------------------------------------------------------
+#ifdef __PREFAST__
 #pragma prefast(disable : 28198, "Command-line tool, frees all memory on exit")
+#endif
 
 int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 {
@@ -547,8 +536,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             return 1;
         }
 
-        assert(inMesh->GetPositionBuffer() != 0);
-        assert(inMesh->GetIndexBuffer() != 0);
+        assert(inMesh->GetPositionBuffer() != nullptr);
+        assert(inMesh->GetIndexBuffer() != nullptr);
 
         wprintf(L"\n%zu vertices, %zu faces", nVerts, nFaces);
 
@@ -680,7 +669,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         // Perform attribute and vertex-cache optimization
         if (dwOptions & (1 << OPT_OPTIMIZE))
         {
-            assert(inMesh->GetAdjacencyBuffer() != 0);
+            assert(inMesh->GetAdjacencyBuffer() != nullptr);
 
             float acmr, atvr;
             ComputeVertexCacheMissRate(inMesh->GetIndexBuffer(), nFaces, nVerts, OPTFACES_V_DEFAULT, acmr, atvr);
