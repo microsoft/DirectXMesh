@@ -3,7 +3,7 @@ DIRECTX MESH LIBRARY (DirectXMesh)
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 
-June 30, 2019
+August 21, 2019
 
 This package contains DirectXMesh, a shared source library for performing various geometry
 content processing operations including generating normals and tangent frames, triangle
@@ -78,6 +78,10 @@ RELEASE NOTES
 ---------------
 RELEASE HISTORY
 ---------------
+
+August 21, 2019
+    Added meshconvert to CMake project
+    Code cleanup
 
 June 30, 2019
     Clang/LLVM warning cleanup

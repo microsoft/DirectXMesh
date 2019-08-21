@@ -10,7 +10,7 @@
         <description>This version is for Windows desktop applications using Visual Studio 2015 Update 3, Visual Studio 2017, or Visual Studio 2019 and supports Windows 10 including both DirectX 11 and DirectX 12.
 
 DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, and vertex cache optimization.</description>
-        <releaseNotes>Matches the June 30, 2019 release on GitHub.</releaseNotes>
+        <releaseNotes>Matches the August 21, 2019 release on GitHub.</releaseNotes>
         <projectUrl>http://go.microsoft.com/fwlink/?LinkID=324981</projectUrl>
         <iconUrl>https://github.com/Microsoft/DirectXMesh/wiki/X_jpg.jpg</iconUrl>
         <license type="expression">MIT</license>
