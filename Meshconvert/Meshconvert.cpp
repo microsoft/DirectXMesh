@@ -399,46 +399,46 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_FILELIST:
+            {
+                std::wifstream inFile(pValue);
+                if (!inFile)
                 {
-                    std::wifstream inFile(pValue);
+                    wprintf(L"Error opening -flist file %ls\n", pValue);
+                    return 1;
+                }
+                wchar_t fname[1024] = {};
+                for (;;)
+                {
+                    inFile >> fname;
                     if (!inFile)
+                        break;
+
+                    if (*fname == L'#')
                     {
-                        wprintf(L"Error opening -flist file %ls\n", pValue);
+                        // Comment
+                    }
+                    else if (*fname == L'-')
+                    {
+                        wprintf(L"Command-line arguments not supported in -flist file\n");
                         return 1;
                     }
-                    wchar_t fname[1024] = {};
-                    for (;;)
+                    else if (wcspbrk(fname, L"?*") != nullptr)
                     {
-                        inFile >> fname;
-                        if (!inFile)
-                            break;
-
-                        if (*fname == L'#')
-                        {
-                            // Comment
-                        }
-                        else if (*fname == L'-')
-                        {
-                            wprintf(L"Command-line arguments not supported in -flist file\n");
-                            return 1;
-                        }
-                        else if (wcspbrk(fname, L"?*") != nullptr)
-                        {
-                            wprintf(L"Wildcards not supported in -flist file\n");
-                            return 1;
-                        }
-                        else
-                        {
-                            SConversion conv;
-                            wcscpy_s(conv.szSrc, MAX_PATH, fname);
-                            conversion.push_back(conv);
-                        }
-
-                        inFile.ignore(1000, '\n');
+                        wprintf(L"Wildcards not supported in -flist file\n");
+                        return 1;
                     }
-                    inFile.close();
+                    else
+                    {
+                        SConversion conv;
+                        wcscpy_s(conv.szSrc, MAX_PATH, fname);
+                        conversion.push_back(conv);
+                    }
+
+                    inFile.ignore(1000, '\n');
                 }
-                break;
+                inFile.close();
+            }
+            break;
             }
         }
         else if (wcspbrk(pArg, L"?*") != nullptr)
@@ -523,7 +523,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         if (FAILED(hr))
         {
-            wprintf(L" FAILED (%08X)\n", hr);
+            wprintf(L" FAILED (%08X)\n", static_cast<unsigned int>(hr));
             return 1;
         }
 
@@ -546,7 +546,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->InvertUTexCoord();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed inverting u texcoord (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed inverting u texcoord (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
         }
@@ -556,7 +556,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->InvertVTexCoord();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed inverting v texcoord (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed inverting v texcoord (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
         }
@@ -566,7 +566,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ReverseHandedness();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed reversing handedness (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed reversing handedness (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
         }
@@ -580,7 +580,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->GenerateAdjacency(epsilon);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed generating adjacency (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed generating adjacency (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
 
@@ -597,7 +597,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->Clean();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed mesh clean (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed mesh clean (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
             else
@@ -644,7 +644,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ComputeNormals(flags);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed computing normals (flags:%1X, %08X)\n", flags, hr);
+                wprintf(L"\nERROR: Failed computing normals (flags:%1X, %08X)\n", flags, static_cast<unsigned int>(hr));
                 return 1;
             }
         }
@@ -661,7 +661,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ComputeTangentFrame((dwOptions & (1 << OPT_CTF)) ? true : false);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed computing tangent frame (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed computing tangent frame (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
         }
@@ -679,7 +679,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->Optimize((dwOptions & (1 << OPT_OPTIMIZE_LRU)) ? true : false);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed vertex-cache optimization (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed vertex-cache optimization (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
         }
@@ -689,7 +689,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ReverseWinding();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed reversing winding (%08X)\n", hr);
+                wprintf(L"\nERROR: Failed reversing winding (%08X)\n", static_cast<unsigned int>(hr));
                 return 1;
             }
         }
