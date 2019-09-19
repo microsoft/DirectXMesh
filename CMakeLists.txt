@@ -39,6 +39,9 @@ add_library (directxmesh STATIC
     DirectXMesh/DirectXMeshWeldVertices.cpp
 )
 
+source_group(DirectXMesh REGULAR_EXPRESSION DirectXMesh/*.*)
+source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
+
 target_include_directories( directxmesh PUBLIC DirectXMesh )
 
 target_compile_options( directxmesh PRIVATE /fp:fast )
