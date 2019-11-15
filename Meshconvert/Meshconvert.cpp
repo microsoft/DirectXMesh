@@ -590,7 +590,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             if (!msgs.empty())
             {
                 wprintf(L"\nWARNING: \n");
-                wprintf(msgs.c_str());
+                wprintf(L"%ls", msgs.c_str());
             }
 
             // Clean (also handles attribute reuse split if needed)
@@ -644,7 +644,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ComputeNormals(flags);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed computing normals (flags:%1X, %08X)\n", flags, static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed computing normals (flags:%lX, %08X)\n", flags, static_cast<unsigned int>(hr));
                 return 1;
             }
         }
@@ -798,7 +798,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
         if (FAILED(hr))
         {
-            wprintf(L"\nERROR: Failed write (%08X):-> '%ls'\n", hr, outputPath);
+            wprintf(L"\nERROR: Failed write (%08X):-> '%ls'\n", static_cast<unsigned int>(hr), outputPath);
             return 1;
         }
 
