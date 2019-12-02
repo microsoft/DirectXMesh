@@ -41,15 +41,17 @@ source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
 target_include_directories(${PROJECT_NAME} PUBLIC DirectXMesh)
 
-# Use max Warning Level 
-string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+if(MSVC)
+    # Use max Warning Level 
+    string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+    string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 
-# Not using typeid or dynamic_cast, so disable RTTI to save binary size
-string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+    # Not using typeid or dynamic_cast, so disable RTTI to save binary size
+    string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+    string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+endif()
 
 add_executable(meshconvert
     meshconvert/meshconvert.cpp
@@ -61,12 +63,14 @@ target_include_directories(meshconvert PUBLIC MeshConvert Utilities)
 target_link_libraries(meshconvert ${PROJECT_NAME})
 source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
 
-target_compile_options(${PROJECT_NAME} PRIVATE /fp:fast)
-target_compile_options(meshconvert PRIVATE /fp:fast)
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /fp:fast)
+    target_compile_options(meshconvert PRIVATE /fp:fast)
 
-if(${CMAKE_SIZEOF_VOID_P} EQUAL "4")
-    target_compile_options(${PROJECT_NAME} PRIVATE /arch:SSE2)
-    target_compile_options(meshconvert PRIVATE /arch:SSE2)
+    if(${CMAKE_SIZEOF_VOID_P} EQUAL "4")
+        target_compile_options(${PROJECT_NAME} PRIVATE /arch:SSE2)
+        target_compile_options(meshconvert PRIVATE /arch:SSE2)
+    endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
