@@ -54,11 +54,11 @@ if(MSVC)
 endif()
 
 add_executable(meshconvert
-    meshconvert/meshconvert.cpp
-    meshconvert/MeshOBJ.cpp
-    meshconvert/Mesh.h
-    meshconvert/Mesh.cpp
-    meshconvert/SDKMesh.h)
+    Meshconvert/Meshconvert.cpp
+    Meshconvert/MeshOBJ.cpp
+    Meshconvert/Mesh.h
+    Meshconvert/Mesh.cpp
+    Meshconvert/SDKMesh.h)
 target_include_directories(meshconvert PUBLIC MeshConvert Utilities)
 target_link_libraries(meshconvert ${PROJECT_NAME})
 source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
