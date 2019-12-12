@@ -88,5 +88,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(meshconvert PRIVATE ${WarningsEXE})
 endif()
 
-# Windows 10 is used here to build the DirectX 12 code paths as well as 11
-add_compile_definitions(_UNICODE UNICODE _WIN32_WINNT=0x0A00)
+if(WIN32)
+    # Windows 10 is used here to build the DirectX 12 code paths as well as 11
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0A00)
+    target_compile_definitions(meshconvert PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0A00)
+endif()
