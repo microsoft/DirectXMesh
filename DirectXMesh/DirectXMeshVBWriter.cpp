@@ -44,7 +44,7 @@ namespace
     static_assert(c_MaxStride == D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES, "D3D11 mismatch");
 #endif
 
-#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
     static_assert(sizeof(InputElementDesc) == sizeof(D3D12_INPUT_ELEMENT_DESC), "D3D12 mismatch");
     static_assert(static_cast<int>(PER_VERTEX_DATA) == static_cast<int>(D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA), "D3D12 mismatch");
     static_assert(static_cast<int>(PER_INSTANCE_DATA) == static_cast<int>(D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA), "D3D12 mismatch");
@@ -67,7 +67,7 @@ public:
     HRESULT AddStream(_Out_writes_bytes_(stride*nVerts) void* vb, size_t nVerts, size_t inputSlot, size_t stride);
     HRESULT Write(_In_reads_(count) const XMVECTOR* buffer, _In_z_ const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const;
 
-    void Release()
+    void Release() noexcept
     {
         mInputDesc.clear();
         mSemantics.clear();
@@ -136,7 +136,7 @@ HRESULT VBWriter::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
 
     uint32_t offsets[c_MaxSlot] = {};
 
-#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
     {
         if (nDecl > D3D12_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT)
             return E_INVALIDARG;
@@ -677,7 +677,7 @@ HRESULT VBWriter::Initialize(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDec
 }
 #endif
 
-#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
 HRESULT VBWriter::Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl)
 {
     return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl.pInputElementDescs), vbDecl.NumElements);
@@ -776,7 +776,7 @@ HRESULT VBWriter::Write(const XMFLOAT4* buffer, const char* semanticName, unsign
 
 
 //-------------------------------------------------------------------------------------
-void VBWriter::Release()
+void VBWriter::Release() noexcept
 {
     pImpl->Release();
 }
@@ -791,7 +791,7 @@ const D3D11_INPUT_ELEMENT_DESC* VBWriter::GetElement11(const char* semanticName,
 }
 #endif
 
-#if defined(__d3d12_h__) || defined(__d3d12_x_h__)
+#if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
 _Use_decl_annotations_
 const D3D12_INPUT_ELEMENT_DESC* VBWriter::GetElement12(const char* semanticName, unsigned int semanticIndex) const
 {
