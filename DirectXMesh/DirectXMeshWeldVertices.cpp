@@ -145,8 +145,10 @@ namespace
 
 _Use_decl_annotations_
 HRESULT DirectX::WeldVertices(
-    uint16_t* indices, size_t nFaces,
-    size_t nVerts, const uint32_t* pointRep,
+    uint16_t* indices,
+    size_t nFaces,
+    size_t nVerts,
+    const uint32_t* pointRep,
     uint32_t* vertexRemap,
     std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest)
 {

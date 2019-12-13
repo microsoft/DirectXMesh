@@ -141,7 +141,7 @@ namespace DirectX
             CCW
         };
 
-        orbit_iterator(_In_reads_(nFaces * 3) const uint32_t* adjacency, _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces) :
+        orbit_iterator(_In_reads_(nFaces * 3) const uint32_t* adjacency, _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces) noexcept :
             m_face(UNUSED32),
             m_pointIndex(UNUSED32),
             m_currentFace(UNUSED32),
@@ -153,7 +153,7 @@ namespace DirectX
             m_clockWise(false),
             m_stopOnBoundary(false) {}
 
-        void initialize(uint32_t face, uint32_t point, WalkType wtype)
+        void initialize(uint32_t face, uint32_t point, WalkType wtype) noexcept
         {
             m_face = m_currentFace = face;
             m_pointIndex = point;
@@ -172,7 +172,7 @@ namespace DirectX
             m_currentEdge = m_nextEdge;
         }
 
-        uint32_t find(uint32_t face, uint32_t point)
+        uint32_t find(uint32_t face, uint32_t point) noexcept
         {
             assert(face < m_nFaces);
             _Analysis_assume_(face < m_nFaces);
@@ -188,7 +188,7 @@ namespace DirectX
             }
         }
 
-        uint32_t nextFace()
+        uint32_t nextFace() noexcept
         {
             assert(!done());
 
@@ -261,7 +261,7 @@ namespace DirectX
             return ret;
         }
 
-        bool moveToCCW()
+        bool moveToCCW() noexcept
         {
             m_currentFace = m_face;
 
@@ -316,8 +316,8 @@ namespace DirectX
             return ret;
         }
 
-        bool done() const { return (m_currentFace == UNUSED32); }
-        uint32_t getpoint() const { return m_clockWise ? m_currentEdge : ((m_currentEdge + 1) % 3); }
+        bool done() const noexcept { return (m_currentFace == UNUSED32); }
+        uint32_t getpoint() const noexcept { return m_clockWise ? m_currentEdge : ((m_currentEdge + 1) % 3); }
 
     private:
         uint32_t        m_face;
@@ -337,7 +337,7 @@ namespace DirectX
 
     //-------------------------------------------------------------------------------------
     template<class index_t>
-    inline uint32_t find_edge(_In_reads_(3) const index_t* indices, index_t search)
+    inline uint32_t find_edge(_In_reads_(3) const index_t* indices, index_t search) noexcept
     {
         assert(indices != nullptr);
 

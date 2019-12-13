@@ -64,7 +64,7 @@ public:
         mTempSize(0) {}
 
     HRESULT Initialize(_In_reads_(nDecl) const InputElementDesc* vbDecl, size_t nDecl);
-    HRESULT AddStream(_In_reads_bytes_(stride*nVerts) const void* vb, size_t nVerts, size_t inputSlot, size_t stride);
+    HRESULT AddStream(_In_reads_bytes_(stride*nVerts) const void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept;
     HRESULT Read(_Out_writes_(count) XMVECTOR* buffer, _In_z_ const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const;
 
     void Release() noexcept
@@ -95,7 +95,7 @@ public:
         return &mInputDesc[it->second];
     }
 
-    XMVECTOR* GetTemporaryBuffer(size_t count) const
+    XMVECTOR* GetTemporaryBuffer(size_t count) const noexcept
     {
         if (!mTempBuffer || (mTempSize < count))
         {
@@ -193,7 +193,7 @@ HRESULT VBReader::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBReader::Impl::AddStream(const void* vb, size_t nVerts, size_t inputSlot, size_t stride)
+HRESULT VBReader::Impl::AddStream(const void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
 {
     if (!vb || !nVerts)
         return E_INVALIDARG;
@@ -689,7 +689,7 @@ HRESULT VBReader::Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl)
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT VBReader::AddStream(const void* vb, size_t nVerts, size_t inputSlot, size_t stride)
+HRESULT VBReader::AddStream(const void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
 {
     return pImpl->AddStream(vb, nVerts, inputSlot, stride);
 }
