@@ -9,6 +9,9 @@ cmake_minimum_required (VERSION 3.11)
 
 project (DirectXMesh LANGUAGES CXX)
 
+# Includes the support for DX 12 input layouts
+option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -17,7 +20,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/CMake")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/CMake")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/CMake")
 
-add_library (${PROJECT_NAME} STATIC
+set(LIBRARY_SOURCES
     DirectXMesh/DirectXMesh.h
     DirectXMesh/DirectXMeshP.h
     DirectXMesh/scoped.h
@@ -34,8 +37,9 @@ add_library (${PROJECT_NAME} STATIC
     DirectXMesh/DirectXMeshValidate.cpp
     DirectXMesh/DirectXMeshVBReader.cpp
     DirectXMesh/DirectXMeshVBWriter.cpp
-    DirectXMesh/DirectXMeshWeldVertices.cpp
-)
+    DirectXMesh/DirectXMeshWeldVertices.cpp)
+
+add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
 
 source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
@@ -90,6 +94,12 @@ endif()
 
 if(WIN32)
     # Windows 10 is used here to build the DirectX 12 code paths as well as 11
-    target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0A00)
-    target_compile_definitions(meshconvert PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0A00)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE)
+    target_compile_definitions(meshconvert PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0601)
+
+    if(BUILD_DX12 MATCHES ON)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0A00)
+    else()
+        target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0601)
+    endif()
 endif()
