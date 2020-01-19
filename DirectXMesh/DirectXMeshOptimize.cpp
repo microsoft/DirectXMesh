@@ -104,7 +104,7 @@ HRESULT DirectX::AttributeSort(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
-    typedef std::pair<uint32_t, uint32_t> intpair_t;
+    using intpair_t = std::pair<uint32_t, uint32_t>;
 
     std::vector<intpair_t> list;
     list.reserve(nFaces);

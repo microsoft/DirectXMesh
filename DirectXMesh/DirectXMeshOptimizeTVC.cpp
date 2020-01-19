@@ -436,7 +436,7 @@ namespace
 
 
     //---------------------------------------------------------------------------------
-    typedef std::pair<uint32_t, uint32_t> facecorner_t;
+    using facecorner_t = std::pair<uint32_t, uint32_t>;
 
     template<class index_t>
     inline facecorner_t counterclockwise_corner(facecorner_t corner, mesh_status<index_t>& status) noexcept

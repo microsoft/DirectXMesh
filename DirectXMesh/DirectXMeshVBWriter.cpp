@@ -116,7 +116,7 @@ public:
     }
 
 private:
-    typedef std::multimap<std::string, uint32_t> SemanticMap;
+    using SemanticMap = std::multimap<std::string, uint32_t>;
 
     std::vector<InputElementDesc>           mInputDesc;
     SemanticMap                             mSemantics;

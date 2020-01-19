@@ -212,7 +212,7 @@ namespace
         uint32_t uniqueVertexCount = 0;
         uint32_t unused = 0;
         {
-            typedef IndexSortCompareIndexed<uint32_t, IndexType> indexSorter;
+            using indexSorter = IndexSortCompareIndexed<uint32_t, IndexType>;
 
             std::unique_ptr<uint32_t[]> indexSorted(new (std::nothrow) uint32_t[indexCount]);
             if (!indexSorted)

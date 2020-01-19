@@ -41,8 +41,6 @@ template<class index_t>
 class WaveFrontReader
 {
 public:
-    typedef index_t index_t;
-
     struct Vertex
     {
         DirectX::XMFLOAT3 position;
@@ -653,7 +651,7 @@ public:
     DirectX::BoundingBox    bounds;
 
 private:
-    typedef std::unordered_multimap<uint32_t, uint32_t> VertexCache;
+    using VertexCache = std::unordered_multimap<uint32_t, uint32_t>;
 
     uint32_t AddVertex(uint32_t hash, const Vertex* pVertex, VertexCache& cache)
     {

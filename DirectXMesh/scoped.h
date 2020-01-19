@@ -16,13 +16,12 @@
 //---------------------------------------------------------------------------------
 struct aligned_deleter { void operator()(void* p) noexcept { _aligned_free(p); } };
 
-typedef std::unique_ptr<float[], aligned_deleter> ScopedAlignedArrayFloat;
+using ScopedAlignedArrayFloat = std::unique_ptr<float[], aligned_deleter>;
 
-typedef std::unique_ptr<DirectX::XMVECTOR[], aligned_deleter> ScopedAlignedArrayXMVECTOR;
-
+using ScopedAlignedArrayXMVECTOR = std::unique_ptr<DirectX::XMVECTOR[], aligned_deleter>;
 //---------------------------------------------------------------------------------
 struct handle_closer { void operator()(HANDLE h) noexcept { assert(h != INVALID_HANDLE_VALUE); if (h) CloseHandle(h); } };
 
-typedef std::unique_ptr<void, handle_closer> ScopedHandle;
+using ScopedHandle = std::unique_ptr<void, handle_closer>;
 
 inline HANDLE safe_handle(HANDLE h) noexcept { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
