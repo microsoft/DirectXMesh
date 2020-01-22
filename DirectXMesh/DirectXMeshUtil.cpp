@@ -459,7 +459,10 @@ namespace
 
         size_t misses = 0;
 
-        std::unique_ptr<uint32_t[]> fifo(new uint32_t[cacheSize]);
+        std::unique_ptr<uint32_t[]> fifo(new (std::nothrow) uint32_t[cacheSize]);
+        if (!fifo)
+            return;
+
         size_t tail = 0;
 
         memset(fifo.get(), 0xff, sizeof(uint32_t) * cacheSize);

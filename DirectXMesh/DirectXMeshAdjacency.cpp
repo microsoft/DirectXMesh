@@ -242,7 +242,9 @@ namespace
         }
         else
         {
-            std::unique_ptr<uint32_t[]> xorder(new uint32_t[nVerts]);
+            std::unique_ptr<uint32_t[]> xorder(new (std::nothrow) uint32_t[nVerts]);
+            if (!xorder)
+                return E_OUTOFMEMORY;
 
             // order in descending order
             MakeXHeap(xorder.get(), positions, nVerts);
