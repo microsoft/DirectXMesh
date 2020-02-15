@@ -6,6 +6,10 @@ Release available for download on [GitHub](https://github.com/microsoft/DirectXM
 
 ## Release History
 
+### February 14, 2020
+* meshconvert: now supports exporting to WaveFront Object (OBJ) files
+* Retired VS 2015 projects
+
 ### December 17, 2019
 * Added ARM64 platform to VS 2019 Win32 desktop Win10 project
 * CMake project
