@@ -21,7 +21,7 @@ inline bool __cdecl IsValidVB(DXGI_FORMAT fmt) noexcept
 }
 
 _Use_decl_annotations_
-inline bool __cdecl IsValidIB(DXGI_FORMAT fmt) noexcept
+constexpr inline bool __cdecl IsValidIB(DXGI_FORMAT fmt) noexcept
 {
     return (fmt == DXGI_FORMAT_R32_UINT || fmt == DXGI_FORMAT_R16_UINT) != 0;
 }

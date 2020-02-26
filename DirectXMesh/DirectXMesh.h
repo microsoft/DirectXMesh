@@ -36,7 +36,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // DXGI Format Utilities
     bool __cdecl IsValidVB(_In_ DXGI_FORMAT fmt) noexcept;
-    bool __cdecl IsValidIB(_In_ DXGI_FORMAT fmt) noexcept;
+    constexpr bool __cdecl IsValidIB(_In_ DXGI_FORMAT fmt) noexcept;
     size_t __cdecl BytesPerElement(_In_ DXGI_FORMAT fmt) noexcept;
 
 
