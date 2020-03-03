@@ -27,12 +27,11 @@
 #include <Windows.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
-
-#include <stdint.h>
 
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
