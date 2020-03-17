@@ -38,7 +38,7 @@ namespace
         if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
             return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
-        static const float EPSILON = 0.0001f;
+        static constexpr float EPSILON = 0.0001f;
         static const XMVECTORF32 s_flips = { { { 1.f, -1.f, -1.f, 1.f } } };
 
         ScopedAlignedArrayXMVECTOR temp(static_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * nVerts * 2, 16)));

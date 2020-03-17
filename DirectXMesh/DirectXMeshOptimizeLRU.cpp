@@ -24,8 +24,8 @@ namespace
     // directly from the original publication.
     float ComputeVertexCacheScore(uint32_t cachePosition, uint32_t vertexCacheSize) noexcept
     {
-        const float FindVertexScore_CacheDecayPower = 1.5f;
-        const float FindVertexScore_LastTriScore = 0.75f;
+        constexpr float FindVertexScore_CacheDecayPower = 1.5f;
+        constexpr float FindVertexScore_LastTriScore = 0.75f;
 
         float score = 0.0f;
         if (cachePosition >= vertexCacheSize)
@@ -58,8 +58,8 @@ namespace
 
     float ComputeVertexValenceScore(uint32_t numActiveFaces) noexcept
     {
-        const float FindVertexScore_ValenceBoostScale = 2.0f;
-        const float FindVertexScore_ValenceBoostPower = 0.5f;
+        constexpr float FindVertexScore_ValenceBoostScale = 2.0f;
+        constexpr float FindVertexScore_ValenceBoostPower = 0.5f;
 
         float score = 0.f;
 

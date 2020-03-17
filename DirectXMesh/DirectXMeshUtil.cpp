@@ -443,7 +443,7 @@ namespace
     template<class index_t>
     void ComputeVertexCacheMissRateImpl(
         _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize,
-        float& acmr, float& atvr)
+        float& acmr, float& atvr) noexcept
     {
         acmr = -1.f;
         atvr = -1.f;

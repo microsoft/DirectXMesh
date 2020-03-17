@@ -15,7 +15,7 @@ using namespace DirectX;
 
 namespace
 {
-    const size_t c_MaxStride = 2048;
+    constexpr size_t c_MaxStride = 2048;
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     static_assert(c_MaxStride == D3D11_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES, "D3D11 mismatch");

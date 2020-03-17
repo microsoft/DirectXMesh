@@ -129,7 +129,7 @@ namespace
         _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts,
         float epsilon,
-        _Out_writes_(nVerts) uint32_t* pointRep)
+        _Out_writes_(nVerts) uint32_t* pointRep) noexcept
     {
         std::unique_ptr<uint32_t[]> temp(new (std::nothrow) uint32_t[nVerts + nFaces * 3]);
         if (!temp)
@@ -336,7 +336,7 @@ namespace
         _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts,
         _In_reads_(nVerts) const uint32_t* pointRep,
-        _Out_writes_(nFaces * 3) uint32_t* adjacency)
+        _Out_writes_(nFaces * 3) uint32_t* adjacency) noexcept
     {
         size_t hashSize = nVerts / 3;
 

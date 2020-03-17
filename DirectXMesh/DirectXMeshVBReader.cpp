@@ -16,8 +16,8 @@ using namespace DirectX::PackedVector;
 
 namespace
 {
-    const size_t c_MaxSlot = 32;
-    const size_t c_MaxStride = 2048;
+    constexpr size_t c_MaxSlot = 32;
+    constexpr size_t c_MaxStride = 2048;
 
     enum INPUT_CLASSIFICATION
     {

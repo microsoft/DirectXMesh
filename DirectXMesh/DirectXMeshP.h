@@ -109,7 +109,7 @@
 namespace DirectX
 {
     //---------------------------------------------------------------------------------
-    const uint32_t UNUSED32 = uint32_t(-1);
+    constexpr uint32_t UNUSED32 = uint32_t(-1);
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
     static_assert(D3D11_16BIT_INDEX_STRIP_CUT_VALUE == uint16_t(-1), "Mismatch with Direct3D11");
