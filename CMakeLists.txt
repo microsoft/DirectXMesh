@@ -5,7 +5,7 @@
 #
 # http://go.microsoft.com/fwlink/?LinkID=324981
 
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.16)
 
 project (DirectXMesh LANGUAGES CXX)
 
@@ -44,6 +44,8 @@ add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
 source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
 target_include_directories(${PROJECT_NAME} PUBLIC DirectXMesh)
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE DirectXMesh/DirectXMeshP.h)
 
 if(MSVC)
     # Use max Warning Level 
