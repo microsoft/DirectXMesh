@@ -6,6 +6,10 @@ Release available for download on [GitHub](https://github.com/microsoft/DirectXM
 
 ## Release History
 
+### April 3, 2020
+* Code review (constexpr / noexcept usage)
+* CMake updated for PCH usage with 3.16 or later
+
 ### February 14, 2020
 * meshconvert: now supports exporting to WaveFront Object (OBJ) files
 * Retired VS 2015 projects
