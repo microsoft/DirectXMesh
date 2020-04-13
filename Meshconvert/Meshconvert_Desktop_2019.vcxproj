@@ -138,6 +138,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;windowscodecs.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -169,6 +170,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;windowscodecs.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -199,6 +201,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;windowscodecs.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -231,6 +234,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;windowscodecs.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -263,6 +267,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;windowscodecs.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -295,6 +300,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ole32.lib;oleaut32.lib;windowscodecs.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
