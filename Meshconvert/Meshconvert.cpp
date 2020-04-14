@@ -46,6 +46,7 @@ enum OPTIONS
     OPT_TOPOLOGICAL_ADJ,
     OPT_GEOMETRIC_ADJ,
     OPT_OUTPUTFILE,
+    OPT_TOLOWER,
     OPT_SDKMESH,
     OPT_SDKMESH_V2,
     OPT_CMO,
@@ -95,6 +96,7 @@ const SValue g_pOptions[] =
     { L"ta",        OPT_TOPOLOGICAL_ADJ },
     { L"ga",        OPT_GEOMETRIC_ADJ },
     { L"o",         OPT_OUTPUTFILE },
+    { L"l",         OPT_TOLOWER },
     { L"sdkmesh",   OPT_SDKMESH },
     { L"sdkmesh2",  OPT_SDKMESH_V2 },
     { L"cmo",       OPT_CMO },
@@ -257,6 +259,7 @@ namespace
         wprintf(L"   -flipv              inverts the v texcoords\n");
         wprintf(L"   -flipz              flips the handedness of the positions/normals\n");
         wprintf(L"   -o <filename>       output filename\n");
+        wprintf(L"   -l                  force output filename to lower case\n");
         wprintf(L"   -y                  overwrite existing output file (if any)\n");
         wprintf(L"   -nologo             suppress copyright message\n");
         wprintf(L"   -flist <filename>   use text file with a list of input files (one per line)\n");
@@ -749,6 +752,11 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             wcscpy_s(outFilename, fname);
 
             _wmakepath_s(outputPath, nullptr, nullptr, outFilename, outputExt);
+        }
+
+        if (dwOptions & (1 << OPT_TOLOWER))
+        {
+            (void)_wcslwr_s(outputPath);
         }
 
         if (~dwOptions & (1 << OPT_OVERWRITE))
