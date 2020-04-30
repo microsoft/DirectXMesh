@@ -47,8 +47,8 @@ namespace
             else
             {
                 // Points for being high in the cache.
-                const float scaler = 1.0f / (vertexCacheSize - 3);
-                score = 1.0f - (cachePosition - 3) * scaler;
+                const float scaler = 1.0f / float(vertexCacheSize - 3u);
+                score = 1.0f - float(cachePosition - 3u) * scaler;
                 score = powf(score, FindVertexScore_CacheDecayPower);
             }
         }
