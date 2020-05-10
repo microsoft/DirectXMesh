@@ -6,6 +6,10 @@ Release available for download on [GitHub](https://github.com/microsoft/DirectXM
 
 ## Release History
 
+### May 10, 2020
+* Minor code review
+* meshconvert: Updated with ``-l`` switch for case-sensitive file systems
+
 ### April 3, 2020
 * Code review (constexpr / noexcept usage)
 * CMake updated for PCH usage with 3.16 or later
