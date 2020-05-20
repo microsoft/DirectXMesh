@@ -92,6 +92,11 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(${PROJECT_NAME} PRIVATE /permissive- /JMC- /Zc:__cplusplus)
     target_compile_options(meshconvert PRIVATE /permissive- /JMC- /Zc:__cplusplus)
 
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.26)
+        target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor /wd5105)
+        target_compile_options(meshconvert PRIVATE /Zc:preprocessor /wd5105)
+    endif()
+
     set(WarningsEXE "/wd4061" "/wd4365" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045")
     target_compile_options(meshconvert PRIVATE ${WarningsEXE})
 endif()
