@@ -251,12 +251,12 @@ namespace DirectX
     HRESULT __cdecl ComputeNormals(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
-        _In_ DWORD flags,
+        _In_ uint32_t flags,
         _Out_writes_(nVerts) XMFLOAT3* normals) noexcept;
     HRESULT __cdecl ComputeNormals(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
-        _In_ DWORD flags,
+        _In_ uint32_t flags,
         _Out_writes_(nVerts) XMFLOAT3* normals) noexcept;
         // Computes vertex normals
 
@@ -328,11 +328,11 @@ namespace DirectX
     HRESULT __cdecl Validate(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
-        _In_ DWORD flags, _In_opt_ std::wstring* msgs = nullptr);
+        _In_ uint32_t flags, _In_opt_ std::wstring* msgs = nullptr);
     HRESULT __cdecl Validate(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
-        _In_ DWORD flags, _In_opt_ std::wstring* msgs = nullptr);
+        _In_ uint32_t flags, _In_opt_ std::wstring* msgs = nullptr);
         // Checks the mesh for common problems, return 'S_OK' if no problems were found
 
     HRESULT __cdecl Clean(
@@ -605,14 +605,14 @@ namespace DirectX
         _In_reads_(nVertIndices) const uint16_t* uniqueVertexIndices, _In_ size_t nVertIndices,
         _In_reads_(nPrimIndices) const MeshletTriangle* primitiveIndices, _In_ size_t nPrimIndices,
         _Out_writes_(nMeshlets) CullData* cullData,
-        _In_ MESHLET_FLAGS flags = MESHLET_DEFAULT) noexcept;
+        _In_ uint32_t flags = MESHLET_DEFAULT) noexcept;
     HRESULT __cdecl ComputeCullData(
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_(nMeshlets) const Meshlet* meshlets, _In_ size_t nMeshlets,
         _In_reads_(nVertIndices) const uint32_t* uniqueVertexIndices, _In_ size_t nVertIndices,
         _In_reads_(nPrimIndices) const MeshletTriangle* primitiveIndices, _In_ size_t nPrimIndices,
         _Out_writes_(nMeshlets) CullData* cullData,
-        _In_ MESHLET_FLAGS flags = MESHLET_DEFAULT) noexcept;
+        _In_ uint32_t flags = MESHLET_DEFAULT) noexcept;
         // Computes culling data for each input meshlet
 
 #include "DirectXMesh.inl"
