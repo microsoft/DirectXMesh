@@ -456,6 +456,7 @@
   </ItemDefinitionGroup>
   <ItemGroup />
   <ItemGroup>
+    <ClCompile Include="DirectXMeshletGenerator.cpp" />
     <ClCompile Include="DirectXMeshWeldVertices.cpp" />
     <CLInclude Include="DirectXMesh.h" />
     <CLInclude Include="DirectXMeshP.h" />

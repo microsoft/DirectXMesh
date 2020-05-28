@@ -62,6 +62,9 @@
     <ClCompile Include="DirectXMeshWeldVertices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DirectXMeshletGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="DirectXMeshP.h">

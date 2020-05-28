@@ -26,6 +26,7 @@
     <ClCompile Include="DirectXMeshAdjacency.cpp" />
     <ClCompile Include="DirectXMeshClean.cpp" />
     <ClCompile Include="DirectXMeshGSAdjacency.cpp" />
+    <ClCompile Include="DirectXMeshletGenerator.cpp" />
     <ClCompile Include="DirectXMeshNormals.cpp" />
     <ClCompile Include="DirectXMeshOptimize.cpp" />
     <ClCompile Include="DirectXMeshOptimizeLRU.cpp" />

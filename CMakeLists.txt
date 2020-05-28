@@ -27,6 +27,7 @@ set(LIBRARY_SOURCES
     DirectXMesh/DirectXMeshAdjacency.cpp
     DirectXMesh/DirectXMeshClean.cpp
     DirectXMesh/DirectXMeshGSAdjacency.cpp
+    DirectXMesh/DirectXMeshletGenerator.cpp
     DirectXMesh/DirectXMeshNormals.cpp
     DirectXMesh/DirectXMeshOptimize.cpp
     DirectXMesh/DirectXMeshOptimizeLRU.cpp

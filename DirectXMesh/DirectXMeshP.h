@@ -87,15 +87,16 @@
 #define _XM_NO_XMVECTOR_OVERLOADS_
 
 #include <DirectXMath.h>
-#include <DirectXPackedVector.h>
 
 #include <assert.h>
 #include <malloc.h>
 
+#include <array>
 #include <algorithm>
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "DirectXMesh.h"
 
