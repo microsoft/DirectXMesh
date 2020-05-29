@@ -620,14 +620,10 @@ namespace DirectX
 #pragma clang diagnostic ignored "-Wdeprecated-dynamic-exception-spec"
 #endif
 
-    DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS);
-    DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS);
-    DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS);
+#include "DirectXMesh.inl"
 
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-
-#include "DirectXMesh.inl"
 
 } // namespace
