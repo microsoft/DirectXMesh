@@ -639,7 +639,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         if ((dwOptions & (1 << OPT_NORMALS))
             || ((dwOptions & ((1 << OPT_TANGENTS) | (1 << OPT_CTF))) && !inMesh->GetNormalBuffer()))
         {
-            DWORD flags = CNORM_DEFAULT;
+            CNORM_FLAGS flags = CNORM_DEFAULT;
 
             if (dwOptions & (1 << OPT_WEIGHT_BY_EQUAL))
             {

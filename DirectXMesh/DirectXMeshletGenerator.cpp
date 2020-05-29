@@ -569,7 +569,7 @@ namespace
         _In_reads_(nPrimIndices) const MeshletTriangle* primitiveIndices,
         size_t nPrimIndices,
         _Out_writes_(nMeshlets) CullData* cullData,
-        uint32_t flags)
+        MESHLET_FLAGS flags)
     {
         // Input validation
         if (!positions || !meshlets || !uniqueVertexIndices || !primitiveIndices || !cullData)
@@ -843,7 +843,7 @@ HRESULT DirectX::ComputeCullData(
     const MeshletTriangle* primitiveIndices,
     size_t nPrimIndices,
     CullData* cullData,
-    uint32_t flags) noexcept
+    MESHLET_FLAGS flags) noexcept
 {
     return ComputeCullDataInternal<uint16_t>(
         positions, nVerts,
@@ -864,7 +864,7 @@ HRESULT DirectX::ComputeCullData(
     const MeshletTriangle* primitiveIndices,
     size_t nPrimIndices,
     CullData* cullData,
-    uint32_t flags) noexcept
+    MESHLET_FLAGS flags) noexcept
 {
     return ComputeCullDataInternal<uint32_t>(
         positions, nVerts,

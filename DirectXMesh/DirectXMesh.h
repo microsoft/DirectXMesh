@@ -233,7 +233,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Normals, Tangents, and Bi-Tangents Computation
 
-    enum CNORM_FLAGS : uint32_t
+    enum CNORM_FLAGS : unsigned long
     {
         CNORM_DEFAULT                   = 0x0,
             // Default is to compute normals using weight-by-angle
@@ -248,15 +248,17 @@ namespace DirectX
             // Vertices are clock-wise (defaults to CCW)
     };
 
+    DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS);
+
     HRESULT __cdecl ComputeNormals(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
-        _In_ uint32_t flags,
+        _In_ CNORM_FLAGS flags,
         _Out_writes_(nVerts) XMFLOAT3* normals) noexcept;
     HRESULT __cdecl ComputeNormals(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
-        _In_ uint32_t flags,
+        _In_ CNORM_FLAGS flags,
         _Out_writes_(nVerts) XMFLOAT3* normals) noexcept;
         // Computes vertex normals
 
@@ -305,7 +307,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh clean-up and validation
 
-    enum VALIDATE_FLAGS : uint32_t
+    enum VALIDATE_FLAGS : unsigned long
     {
         VALIDATE_DEFAULT                = 0x0,
 
@@ -325,14 +327,16 @@ namespace DirectX
             // Checks that neighbors are symmetric (requires adjacency)
     };
 
+    DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS);
+
     HRESULT __cdecl Validate(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
-        _In_ uint32_t flags, _In_opt_ std::wstring* msgs = nullptr);
+        _In_ VALIDATE_FLAGS flags, _In_opt_ std::wstring* msgs = nullptr);
     HRESULT __cdecl Validate(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
-        _In_ uint32_t flags, _In_opt_ std::wstring* msgs = nullptr);
+        _In_ VALIDATE_FLAGS flags, _In_opt_ std::wstring* msgs = nullptr);
         // Checks the mesh for common problems, return 'S_OK' if no problems were found
 
     HRESULT __cdecl Clean(
@@ -529,13 +533,15 @@ namespace DirectX
     constexpr size_t MESHLET_MINIMUM_SIZE = 32u;
     constexpr size_t MESHLET_MAXIMUM_SIZE = 256u;
 
-    enum MESHLET_FLAGS : uint32_t
+    enum MESHLET_FLAGS : unsigned long
     {
         MESHLET_DEFAULT = 0x0,
 
         MESHLET_WIND_CW = 0x1,
             // Vertices are clock-wise (defaults to CCW)
     };
+
+    DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS);
 
     struct Meshlet
     {
@@ -605,14 +611,14 @@ namespace DirectX
         _In_reads_(nVertIndices) const uint16_t* uniqueVertexIndices, _In_ size_t nVertIndices,
         _In_reads_(nPrimIndices) const MeshletTriangle* primitiveIndices, _In_ size_t nPrimIndices,
         _Out_writes_(nMeshlets) CullData* cullData,
-        _In_ uint32_t flags = MESHLET_DEFAULT) noexcept;
+        _In_ MESHLET_FLAGS flags = MESHLET_DEFAULT) noexcept;
     HRESULT __cdecl ComputeCullData(
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_(nMeshlets) const Meshlet* meshlets, _In_ size_t nMeshlets,
         _In_reads_(nVertIndices) const uint32_t* uniqueVertexIndices, _In_ size_t nVertIndices,
         _In_reads_(nPrimIndices) const MeshletTriangle* primitiveIndices, _In_ size_t nPrimIndices,
         _Out_writes_(nMeshlets) CullData* cullData,
-        _In_ uint32_t flags = MESHLET_DEFAULT) noexcept;
+        _In_ MESHLET_FLAGS flags = MESHLET_DEFAULT) noexcept;
         // Computes culling data for each input meshlet
 
 #include "DirectXMesh.inl"

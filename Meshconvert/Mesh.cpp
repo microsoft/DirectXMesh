@@ -368,7 +368,7 @@ HRESULT Mesh::SetVertexData(_Inout_ DirectX::VBReader& reader, _In_ size_t nVert
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::Validate(DWORD flags, std::wstring* msgs) const
+HRESULT Mesh::Validate(DirectX::VALIDATE_FLAGS flags, std::wstring* msgs) const
 {
     if (!mnFaces || !mIndices || !mnVerts)
         return E_UNEXPECTED;
@@ -547,7 +547,7 @@ HRESULT Mesh::GenerateAdjacency(_In_ float epsilon)
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::ComputeNormals(_In_ DWORD flags)
+HRESULT Mesh::ComputeNormals(_In_ DirectX::CNORM_FLAGS flags)
 {
     if (!mnFaces || !mIndices || !mnVerts || !mPositions)
         return E_UNEXPECTED;
