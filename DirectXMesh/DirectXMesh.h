@@ -31,7 +31,6 @@
 
 #define DIRECTX_MESH_VERSION 150
 
-
 namespace DirectX
 {
     //---------------------------------------------------------------------------------
@@ -248,8 +247,6 @@ namespace DirectX
             // Vertices are clock-wise (defaults to CCW)
     };
 
-    DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS);
-
     HRESULT __cdecl ComputeNormals(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
@@ -326,8 +323,6 @@ namespace DirectX
         VALIDATE_ASYMMETRIC_ADJ         = 0x10,
             // Checks that neighbors are symmetric (requires adjacency)
     };
-
-    DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS);
 
     HRESULT __cdecl Validate(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
@@ -541,8 +536,6 @@ namespace DirectX
             // Vertices are clock-wise (defaults to CCW)
     };
 
-    DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS);
-
     struct Meshlet
     {
         uint32_t VertCount;
@@ -620,6 +613,20 @@ namespace DirectX
         _Out_writes_(nMeshlets) CullData* cullData,
         _In_ MESHLET_FLAGS flags = MESHLET_DEFAULT) noexcept;
         // Computes culling data for each input meshlet
+
+    //---------------------------------------------------------------------------------
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-dynamic-exception-spec"
+#endif
+
+    DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS);
+    DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS);
+    DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS);
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include "DirectXMesh.inl"
 
