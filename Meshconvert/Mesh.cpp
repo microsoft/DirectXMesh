@@ -62,7 +62,7 @@ namespace
 
         if (length > 0)
         {
-            DWORD bytes = static_cast<DWORD>(sizeof(wchar_t) * length);
+            auto bytes = static_cast<DWORD>(sizeof(wchar_t) * length);
 
             if (!WriteFile(hFile, value, bytes, &bytesWritten, nullptr))
                 return HRESULT_FROM_WIN32(GetLastError());
@@ -1070,7 +1070,7 @@ HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) const
     if (FAILED(hr))
         return hr;
 
-    DWORD vertSize = static_cast<DWORD>(sizeof(vertex_t) * header.numVertices);
+    auto vertSize = static_cast<DWORD>(sizeof(vertex_t) * header.numVertices);
 
     DWORD bytesWritten;
     if (!WriteFile(hFile.get(), vb.get(), vertSize, &bytesWritten, nullptr))
@@ -1079,7 +1079,7 @@ HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) const
     if (bytesWritten != vertSize)
         return E_FAIL;
 
-    DWORD indexSize = static_cast<DWORD>(sizeof(uint16_t) * header.numIndices);
+    auto indexSize = static_cast<DWORD>(sizeof(uint16_t) * header.numIndices);
 
     if (!WriteFile(hFile.get(), ib.get(), indexSize, &bytesWritten, nullptr))
         return HRESULT_FROM_WIN32(GetLastError());
@@ -1152,7 +1152,7 @@ HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, std::unique_ptr<Mesh>& re
     if (!vb || !ib)
         return E_OUTOFMEMORY;
 
-    DWORD vertSize = static_cast<DWORD>(sizeof(vertex_t) * header.numVertices);
+    auto vertSize = static_cast<DWORD>(sizeof(vertex_t) * header.numVertices);
 
     if (!ReadFile(hFile.get(), vb.get(), vertSize, &bytesRead, nullptr))
     {
@@ -1162,7 +1162,7 @@ HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, std::unique_ptr<Mesh>& re
     if (bytesRead != vertSize)
         return E_FAIL;
 
-    DWORD indexSize = static_cast<DWORD>(sizeof(uint16_t) * header.numIndices);
+    auto indexSize = static_cast<DWORD>(sizeof(uint16_t) * header.numIndices);
 
     if (!ReadFile(hFile.get(), ib.get(), indexSize, &bytesRead, nullptr))
     {
@@ -1648,7 +1648,7 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
     if (FAILED(hr))
         return hr;
 
-    DWORD indexSize = static_cast<DWORD>(sizeof(uint16_t) * nIndices);
+    auto indexSize = static_cast<DWORD>(sizeof(uint16_t) * nIndices);
 
     DWORD bytesWritten;
     if (!WriteFile(hFile.get(), ib.get(), indexSize, &bytesWritten, nullptr))
@@ -1668,7 +1668,7 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
     if (FAILED(hr))
         return hr;
 
-    DWORD vertSize = static_cast<DWORD>(sizeof(Vertex) * mnVerts);
+    auto vertSize = static_cast<DWORD>(sizeof(Vertex) * mnVerts);
 
     if (!WriteFile(hFile.get(), vb.get(), vertSize, &bytesWritten, nullptr))
         return HRESULT_FROM_WIN32(GetLastError());
@@ -1689,7 +1689,7 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
         if (FAILED(hr))
             return hr;
 
-        DWORD skinVertSize = static_cast<DWORD>(sizeof(SkinningVertex) * mnVerts);
+        auto skinVertSize = static_cast<DWORD>(sizeof(SkinningVertex) * mnVerts);
 
         if (!WriteFile(hFile.get(), vbSkin.get(), skinVertSize, &bytesWritten, nullptr))
             return HRESULT_FROM_WIN32(GetLastError());
@@ -2256,7 +2256,7 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
         return hr;
 
     // Write subsets
-    DWORD bytesToWrite = static_cast<DWORD>(sizeof(SDKMESH_SUBSET) * submeshes.size());
+    auto bytesToWrite = static_cast<DWORD>(sizeof(SDKMESH_SUBSET) * submeshes.size());
     DWORD bytesWritten;
     if (!WriteFile(hFile.get(), submeshes.data(), bytesToWrite, &bytesWritten, nullptr))
         return HRESULT_FROM_WIN32(GetLastError());
