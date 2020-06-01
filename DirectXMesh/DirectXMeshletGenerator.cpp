@@ -14,6 +14,8 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
+static_assert(sizeof(MeshletTriangle) == sizeof(uint32_t), "MeshletTriangle packing is incorrect");
+
 namespace
 {
     //---------------------------------------------------------------------------------
@@ -453,7 +455,7 @@ namespace
         size_t nSubsets,
         _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
         std::vector<Meshlet>& meshlets,
-        std::vector<uint8_t>& uniqueVertexIndices,
+        std::vector<uint8_t>& uniqueVertexIB,
         std::vector<MeshletTriangle>& primitiveIndices,
         _Out_writes_(nSubsets) std::pair<size_t, size_t>* meshletSubsets,
         size_t maxVerts,
@@ -509,7 +511,7 @@ namespace
             meshletSubsets[i] = std::make_pair(meshlets.size(), newMeshlets.size());
 
             // Determine final unique vertex index and primitive index counts & offsets.
-            size_t startVertCount = uniqueVertexIndices.size() / sizeof(T);
+            size_t startVertCount = uniqueVertexIB.size() / sizeof(T);
             size_t startPrimCount = primitiveIndices.size();
 
             size_t uniqueVertexIndexCount = startVertCount;
@@ -535,11 +537,11 @@ namespace
             }
 
             // Allocate space for the new data.
-            uniqueVertexIndices.resize(uniqueVertexIndexCount * sizeof(T));
+            uniqueVertexIB.resize(uniqueVertexIndexCount * sizeof(T));
             primitiveIndices.resize(primitiveIndexCount);
 
             // Copy data from the freshly built meshlets into the output buffers.
-            auto vertDest = reinterpret_cast<T*>(uniqueVertexIndices.data()) + startVertCount;
+            auto vertDest = reinterpret_cast<T*>(uniqueVertexIB.data()) + startVertCount;
             auto primDest = reinterpret_cast<uint32_t*>(primitiveIndices.data()) + startPrimCount;
 
             for (auto& m : newMeshlets)
@@ -734,7 +736,7 @@ HRESULT DirectX::ComputeMeshlets(
     size_t nVerts,
     const uint32_t* adjacency,
     std::vector<Meshlet>& meshlets,
-    std::vector<uint8_t>& uniqueVertexIndices,
+    std::vector<uint8_t>& uniqueVertexIB,
     std::vector<MeshletTriangle>& primitiveIndices,
     size_t maxVerts,
     size_t maxPrims)
@@ -748,7 +750,7 @@ HRESULT DirectX::ComputeMeshlets(
         &s, 1u,
         adjacency,
         meshlets,
-        uniqueVertexIndices, primitiveIndices,
+        uniqueVertexIB, primitiveIndices,
         &subset,
         maxVerts, maxPrims);
 }
@@ -761,7 +763,7 @@ HRESULT DirectX::ComputeMeshlets(
     size_t nVerts,
     const uint32_t* adjacency,
     std::vector<Meshlet>& meshlets,
-    std::vector<uint8_t>& uniqueVertexIndices,
+    std::vector<uint8_t>& uniqueVertexIB,
     std::vector<MeshletTriangle>& primitiveIndices,
     size_t maxVerts,
     size_t maxPrims)
@@ -775,7 +777,7 @@ HRESULT DirectX::ComputeMeshlets(
         &s, 1u,
         adjacency,
         meshlets,
-        uniqueVertexIndices, primitiveIndices,
+        uniqueVertexIB, primitiveIndices,
         &subset,
         maxVerts, maxPrims);
 }
@@ -790,7 +792,7 @@ HRESULT DirectX::ComputeMeshlets(
     size_t nSubsets,
     const uint32_t* adjacency,
     std::vector<Meshlet>& meshlets,
-    std::vector<uint8_t>& uniqueVertexIndices,
+    std::vector<uint8_t>& uniqueVertexIB,
     std::vector<MeshletTriangle>& primitiveIndices,
     std::pair<size_t, size_t>* meshletSubsets,
     size_t maxVerts,
@@ -802,7 +804,7 @@ HRESULT DirectX::ComputeMeshlets(
         subsets, nSubsets,
         adjacency,
         meshlets,
-        uniqueVertexIndices, primitiveIndices, meshletSubsets,
+        uniqueVertexIB, primitiveIndices, meshletSubsets,
         maxVerts, maxPrims);
 }
 
@@ -816,7 +818,7 @@ HRESULT DirectX::ComputeMeshlets(
     size_t nSubsets,
     const uint32_t* adjacency,
     std::vector<Meshlet>& meshlets,
-    std::vector<uint8_t>& uniqueVertexIndices,
+    std::vector<uint8_t>& uniqueVertexIB,
     std::vector<MeshletTriangle>& primitiveIndices,
     std::pair<size_t, size_t>* meshletSubsets,
     size_t maxVerts,
@@ -828,7 +830,7 @@ HRESULT DirectX::ComputeMeshlets(
         subsets, nSubsets,
         adjacency,
         meshlets,
-        uniqueVertexIndices,
+        uniqueVertexIB,
         primitiveIndices,
         meshletSubsets,
         maxVerts, maxPrims);
