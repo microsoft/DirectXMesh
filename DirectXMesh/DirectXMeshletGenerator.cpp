@@ -23,7 +23,7 @@ namespace
     class StaticVector
     {
     public:
-        StaticVector()
+        StaticVector() noexcept
             : m_data{}, m_size(0)
         { }
         ~StaticVector() = default;
@@ -168,7 +168,7 @@ namespace
         size_t maxVerts,
         size_t maxPrims,
         _In_reads_(3) const T* tri,
-        InlineMeshlet<T>& meshlet) noexcept
+        InlineMeshlet<T>& meshlet)
     {
         // Are we already full of vertices?
         if (meshlet.UniqueVertexIndices.size() == maxVerts)
@@ -238,7 +238,7 @@ namespace
         size_t nVerts,
         const std::pair<size_t, size_t>& subset,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
-        std::vector<InlineMeshlet<T>>& meshlets) noexcept
+        std::vector<InlineMeshlet<T>>& meshlets)
     {
         if (!indices || !positions || !adjacency)
             return E_INVALIDARG;
@@ -457,7 +457,7 @@ namespace
         std::vector<MeshletTriangle>& primitiveIndices,
         _Out_writes_(nSubsets) std::pair<size_t, size_t>* meshletSubsets,
         size_t maxVerts,
-        size_t maxPrims) noexcept
+        size_t maxPrims)
     {
         if (!indices || !positions || !subsets || !meshletSubsets)
             return E_INVALIDARG;
@@ -476,7 +476,9 @@ namespace
         std::unique_ptr<uint32_t[]> generatedAdj;
         if (!adjacency)
         {
-            generatedAdj.reset(new uint32_t[nFaces * 3]);
+            generatedAdj.reset(new (std::nothrow) uint32_t[nFaces * 3]);
+            if (!generatedAdj)
+                return E_OUTOFMEMORY;
 
             HRESULT hr = GenerateAdjacencyAndPointReps(indices, nFaces, positions, nVerts, 0.0f, nullptr, generatedAdj.get());
             if (FAILED(hr))
@@ -569,7 +571,7 @@ namespace
         _In_reads_(nPrimIndices) const MeshletTriangle* primitiveIndices,
         size_t nPrimIndices,
         _Out_writes_(nMeshlets) CullData* cullData,
-        MESHLET_FLAGS flags)
+        MESHLET_FLAGS flags) noexcept
     {
         // Input validation
         if (!positions || !meshlets || !uniqueVertexIndices || !primitiveIndices || !cullData)
@@ -735,7 +737,7 @@ HRESULT DirectX::ComputeMeshlets(
     std::vector<uint8_t>& uniqueVertexIndices,
     std::vector<MeshletTriangle>& primitiveIndices,
     size_t maxVerts,
-    size_t maxPrims) noexcept
+    size_t maxPrims)
 {
     std::pair<size_t, size_t> s = { 0, nFaces };
     std::pair<size_t, size_t> subset;
@@ -762,7 +764,7 @@ HRESULT DirectX::ComputeMeshlets(
     std::vector<uint8_t>& uniqueVertexIndices,
     std::vector<MeshletTriangle>& primitiveIndices,
     size_t maxVerts,
-    size_t maxPrims) noexcept
+    size_t maxPrims)
 {
     std::pair<size_t, size_t> s = { 0, nFaces };
     std::pair<size_t, size_t> subset;
@@ -792,7 +794,7 @@ HRESULT DirectX::ComputeMeshlets(
     std::vector<MeshletTriangle>& primitiveIndices,
     std::pair<size_t, size_t>* meshletSubsets,
     size_t maxVerts,
-    size_t maxPrims) noexcept
+    size_t maxPrims)
 {
     return ComputeMeshletsInternal<uint16_t>(
         indices, nFaces,
@@ -818,7 +820,7 @@ HRESULT DirectX::ComputeMeshlets(
     std::vector<MeshletTriangle>& primitiveIndices,
     std::pair<size_t, size_t>* meshletSubsets,
     size_t maxVerts,
-    size_t maxPrims) noexcept
+    size_t maxPrims)
 {
     return ComputeMeshletsInternal<uint32_t>(
         indices, nFaces,

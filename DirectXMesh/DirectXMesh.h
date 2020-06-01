@@ -565,7 +565,7 @@ namespace DirectX
         _Inout_ std::vector<Meshlet>& meshlets,
         _Inout_ std::vector<uint8_t>& uniqueVertexIndices,
         _Inout_ std::vector<MeshletTriangle>& primitiveIndices,
-        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS) noexcept;
+        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
     HRESULT __cdecl ComputeMeshlets(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
@@ -573,7 +573,7 @@ namespace DirectX
         _Inout_ std::vector<Meshlet>& meshlets,
         _Inout_ std::vector<uint8_t>& uniqueVertexIndices,
         _Inout_ std::vector<MeshletTriangle>& primitiveIndices,
-        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS) noexcept;
+        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
         // Generates meshlets for a single subset mesh
 
     HRESULT __cdecl ComputeMeshlets(
@@ -585,7 +585,7 @@ namespace DirectX
         _Inout_ std::vector<uint8_t>& uniqueVertexIndices,
         _Inout_ std::vector<MeshletTriangle>& primitiveIndices,
         _Out_writes_(nSubsets) std::pair<size_t, size_t>* meshletSubsets,
-        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS) noexcept;
+        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
     HRESULT __cdecl ComputeMeshlets(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
@@ -595,7 +595,7 @@ namespace DirectX
         _Inout_ std::vector<uint8_t>& uniqueVertexIndices,
         _Inout_ std::vector<MeshletTriangle>& primitiveIndices,
         _Out_writes_(nSubsets) std::pair<size_t, size_t>* meshletSubsets,
-        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS) noexcept;
+        _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
         // Generates meshlets for a mesh with several face subsets
 
     HRESULT __cdecl ComputeCullData(
