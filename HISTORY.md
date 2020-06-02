@@ -2,16 +2,23 @@
 
 http://go.microsoft.com/fwlink/?LinkID=324981
 
-Release available for download on [GitHub](https://github.com/microsoft/DirectXMesh/releases)
+Releases available for download on [GitHub](https://github.com/microsoft/DirectXMesh/releases)
 
 ## Release History
+
+### June 1, 2020
+* New functions **ComputeMeshlets** and **ComputeCullData** for use with Direct3D 12 Mesh Shaders
+* Converted to typed enum bitmask flags (see release notes for details on this potential *breaking change*)
+  + **ComputeNormals**, **Validate**
+* Minor fix for degenerate cases in point-reps generation
+* CMake project updates
 
 ### May 10, 2020
 * Minor code review
 * meshconvert: Updated with ``-l`` switch for case-sensitive file systems
 
 ### April 3, 2020
-* Code review (constexpr / noexcept usage)
+* Code review (``constexpr`` / ``noexcept`` usage)
 * CMake updated for PCH usage with 3.16 or later
 
 ### February 14, 2020
@@ -73,10 +80,10 @@ Release available for download on [GitHub](https://github.com/microsoft/DirectXM
 * Code and project cleanup
 
 ### February 7, 2018
-* New functions: ``WeldVertices``, ``CompactVB``
-* Added new optional parameter to ``OptimizeVertices``
+* New functions: **WeldVertices**, **CompactVB**, **OptimizeFacesLRU**
+* Added new optional parameter to **OptimizeVertices**
 * Fixed bug in remap functions which were applying vertex remaps backwards
-  + ``FinalizeIB``, ``FinalizeVB``, and ``FinalizeVBAndPointReps``
+  + **FinalizeIB**, **FinalizeVB**, and **FinalizeVBAndPointReps**
 * meshconvert: added ``-oplru`` switch
 * WaveFrontReader utility header made more robust
 * Minor code cleanup
@@ -103,11 +110,11 @@ Release available for download on [GitHub](https://github.com/microsoft/DirectXM
 
 ### April 7, 2017
 * VS 2017 updated for Windows Creators Update SDK (15063)
-* VBReader/VBWriter ``GetElement`` adapter for ``GetElement11``
+* VBReader/VBWriter **GetElement** adapter for ``GetElement11``
 
 ### January 31, 2017
-* DirectX 12 support for VBReader, VBWriter, IsValid, and ComputeInputLayout
-* *breaking change*: VBReader/VBWriter method ``GetElement`` method now named ``GetElement11`` for DirectX 11
+* DirectX 12 support for **VBReader**, **VBWriter**, **IsValid**, and **ComputeInputLayout**
+* *breaking change*: VBReader/VBWriter method **GetElement** method now named ``GetElement11`` for DirectX 11
 
 ### October 27, 2016
 * x2bias optional parameter for VB reader/writer
@@ -150,7 +157,7 @@ Release available for download on [GitHub](https://github.com/microsoft/DirectXM
 
 ### March 27, 2015
 * Added projects for Windows apps Technical Preview
-* Fixed attributes usage for ``OptimizeFacesEx``
+* Fixed attributes usage for **OptimizeFacesEx**
 * meshconvert: fix when importing from .vbo
 * Minor code cleanup
 
@@ -161,8 +168,8 @@ Release available for download on [GitHub](https://github.com/microsoft/DirectXM
 
 ### October 28, 2014
 * meshconvert command-line sample
-* Added VBReader/VBWriter::GetElement method
-* Added more ``ComputeTangentFrame`` overloads
+* Added **VBReader/VBWriter::GetElement** method
+* Added more **ComputeTangentFrame** overloads
 * Explicit calling-convention annotation for public headers
 * Windows phone 8.1 platform support
 * Minor code and project cleanup
