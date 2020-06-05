@@ -12,6 +12,8 @@ project (DirectXMesh LANGUAGES CXX)
 # Includes the support for DX 12 input layouts
 option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
 
+option(ENABLE_CODE_ANALYSIS "Use Static Code Analysis on build" OFF)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -93,6 +95,11 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(${PROJECT_NAME} PRIVATE /permissive- /JMC- /Zc:__cplusplus)
     target_compile_options(meshconvert PRIVATE /permissive- /JMC- /Zc:__cplusplus)
 
+   if(ENABLE_CODE_ANALYSIS)
+      target_compile_options(${PROJECT_NAME} PRIVATE /analyze)
+      target_compile_options(meshconvert PRIVATE /analyze)
+   endif()
+
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.26)
         target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor /wd5105)
         target_compile_options(meshconvert PRIVATE /Zc:preprocessor /wd5105)
@@ -107,7 +114,7 @@ if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE)
     target_compile_definitions(meshconvert PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0601)
 
-    if(BUILD_DX12 MATCHES ON)
+    if(BUILD_DX12)
         target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0A00)
     else()
         target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0601)
