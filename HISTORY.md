@@ -6,6 +6,9 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### July 2, 2020
+* Minor warning fixes for VS 2019 (16.7)
+
 ### June 1, 2020
 * New functions **ComputeMeshlets** and **ComputeCullData** for use with Direct3D 12 Mesh Shaders
 * Converted to typed enum bitmask flags (see release notes for details on this potential *breaking change*)
