@@ -173,11 +173,11 @@ namespace
         InlineMeshlet<T>& meshlet)
     {
         // Are we already full of vertices?
-        if (meshlet.UniqueVertexIndices.size() == maxVerts)
+        if (meshlet.UniqueVertexIndices.size() >= maxVerts)
             return false;
 
         // Are we full, or can we store an additional primitive?
-        if (meshlet.PrimitiveIndices.size() == maxPrims)
+        if (meshlet.PrimitiveIndices.size() >= maxPrims)
             return false;
 
         uint32_t indices[3] = { uint32_t(-1), uint32_t(-1), uint32_t(-1) };
@@ -210,7 +210,8 @@ namespace
         }
 
         // Add the new primitive 
-        meshlet.PrimitiveIndices.emplace_back(MeshletTriangle{ indices[0], indices[1], indices[2] });
+        MeshletTriangle mtri = { indices[0], indices[1], indices[2] };
+        meshlet.PrimitiveIndices.emplace_back(mtri);
 
         return true;
     }
@@ -224,7 +225,7 @@ namespace
         assert(meshlet.UniqueVertexIndices.size() <= maxVerts);
         assert(meshlet.PrimitiveIndices.size() <= maxPrims);
 
-        return meshlet.UniqueVertexIndices.size() == maxVerts || meshlet.PrimitiveIndices.size() == maxPrims;
+        return meshlet.UniqueVertexIndices.size() >= maxVerts || meshlet.PrimitiveIndices.size() >= maxPrims;
     }
 
     //---------------------------------------------------------------------------------
