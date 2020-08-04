@@ -894,7 +894,8 @@ HRESULT Mesh::GetVertexBuffer(_Inout_ DirectX::VBWriter& writer) const
         auto e = writer.GetElement11("NORMAL", 0);
         if (e)
         {
-            hr = writer.Write(mNormals.get(), "NORMAL", 0, mnVerts);
+            bool x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
+            hr = writer.Write(mNormals.get(), "NORMAL", 0, mnVerts, x2bias);
             if (FAILED(hr))
                 return hr;
         }
@@ -905,7 +906,8 @@ HRESULT Mesh::GetVertexBuffer(_Inout_ DirectX::VBWriter& writer) const
         auto e = writer.GetElement11("TANGENT", 0);
         if (e)
         {
-            hr = writer.Write(mTangents.get(), "TANGENT", 0, mnVerts);
+            bool x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
+            hr = writer.Write(mTangents.get(), "TANGENT", 0, mnVerts, x2bias);
             if (FAILED(hr))
                 return hr;
         }
@@ -916,7 +918,8 @@ HRESULT Mesh::GetVertexBuffer(_Inout_ DirectX::VBWriter& writer) const
         auto e = writer.GetElement11("BINORMAL", 0);
         if (e)
         {
-            hr = writer.Write(mBiTangents.get(), "BINORMAL", 0, mnVerts);
+            bool x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
+            hr = writer.Write(mBiTangents.get(), "BINORMAL", 0, mnVerts, x2bias);
             if (FAILED(hr))
                 return hr;
         }
@@ -1744,7 +1747,15 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
 //======================================================================================
 
 _Use_decl_annotations_
-HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, const Material* materials, bool force32bit, bool version2) const
+
+_Use_decl_annotations_
+HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
+    size_t nMaterials, const Material* materials,
+    bool force32bit,
+    bool version2,
+    DXGI_FORMAT normalFormat,
+    DXGI_FORMAT uvFormat,
+    DXGI_FORMAT colorFormat) const
 {
     using namespace DXUT;
 
@@ -1788,6 +1799,65 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
 
     static_assert((_countof(s_elements) + 1) == _countof(s_decls), "InputLayouts and Vertex Decls disagree");
 
+    uint8_t normalType;
+    size_t normalStride;
+    switch (normalFormat)
+    {
+    case DXGI_FORMAT_R16G16B16A16_FLOAT:
+        normalType = D3DDECLTYPE_FLOAT16_4; normalStride = sizeof(PackedVector::XMHALF4);
+        break;
+
+    case DXGI_FORMAT_R11G11B10_FLOAT: // Biased in GetVertexBuffer
+        normalType = D3DDECLTYPE_DXGI_R11G11B10_FLOAT; normalStride = sizeof(UINT);
+        break;
+
+    default:
+        normalFormat = DXGI_FORMAT_R32G32B32_FLOAT; normalType = D3DDECLTYPE_FLOAT3; normalStride = sizeof(XMFLOAT3);
+        break;
+    }
+
+    uint8_t uvType;
+    size_t uvStride;
+    switch (uvFormat)
+    {
+    case DXGI_FORMAT_R16G16_FLOAT:
+        uvType = D3DDECLTYPE_FLOAT16_2; uvStride = sizeof(PackedVector::XMHALF2);
+        break;
+
+    default:
+        uvFormat = DXGI_FORMAT_R32G32_FLOAT; uvType = D3DDECLTYPE_FLOAT2; uvStride = sizeof(XMFLOAT2);
+        break;
+    }
+
+    uint8_t colorType;
+    size_t colorStride;
+    switch (colorFormat)
+    {
+    case DXGI_FORMAT_R32G32B32A32_FLOAT:
+        colorType = D3DDECLTYPE_FLOAT4; colorStride = sizeof(XMFLOAT4);
+        break;
+
+    case DXGI_FORMAT_R16G16B16A16_FLOAT:
+        colorType = D3DDECLTYPE_FLOAT16_4; colorStride = sizeof(PackedVector::XMHALF4);
+        break;
+
+    case DXGI_FORMAT_R11G11B10_FLOAT:
+        colorType = D3DDECLTYPE_DXGI_R11G11B10_FLOAT; colorStride = sizeof(UINT);
+        break;
+
+    case DXGI_FORMAT_R10G10B10A2_UNORM:
+        colorType = D3DDECLTYPE_DXGI_R10G10B10A2_UNORM; colorStride = sizeof(UINT);
+        break;
+
+    case DXGI_FORMAT_R8G8B8A8_UNORM:
+        colorType = D3DDECLTYPE_UBYTE4N; colorStride = sizeof(UINT);
+        break;
+
+    default:
+        colorFormat = DXGI_FORMAT_B8G8R8A8_UNORM; colorType = D3DDECLTYPE_D3DCOLOR; colorStride = sizeof(UINT);
+        break;
+    }
+
     SDKMESH_VERTEX_BUFFER_HEADER vbHeader = {};
     vbHeader.NumVertices = mnVerts;
     vbHeader.Decl[0] = s_decls[0];
@@ -1818,46 +1888,56 @@ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName, size_t nMaterials, cons
     if (mNormals)
     {
         vbHeader.Decl[nDecl] = s_decls[1];
+        vbHeader.Decl[nDecl].Type = normalType;
         vbHeader.Decl[nDecl].Offset = static_cast<WORD>(stride);
         inputLayout[nDecl] = s_elements[1];
+        inputLayout[nDecl].Format = normalFormat;
         ++nDecl;
-        stride += sizeof(XMFLOAT3);
+        stride += normalStride;
     }
 
     if (mColors)
     {
         vbHeader.Decl[nDecl] = s_decls[2];
+        vbHeader.Decl[nDecl].Type = colorType;
         vbHeader.Decl[nDecl].Offset = static_cast<WORD>(stride);
         inputLayout[nDecl] = s_elements[2];
+        inputLayout[nDecl].Format = colorFormat;
         ++nDecl;
-        stride += sizeof(UINT);
+        stride += colorStride;
     }
 
     if (mTexCoords)
     {
         vbHeader.Decl[nDecl] = s_decls[5];
+        vbHeader.Decl[nDecl].Type = uvType;
         vbHeader.Decl[nDecl].Offset = static_cast<WORD>(stride);
         inputLayout[nDecl] = s_elements[5];
+        inputLayout[nDecl].Format = uvFormat;
         ++nDecl;
-        stride += sizeof(XMFLOAT2);
+        stride += uvStride;
     }
 
     if (mTangents)
     {
         vbHeader.Decl[nDecl] = s_decls[3];
+        vbHeader.Decl[nDecl].Type = normalType;
         vbHeader.Decl[nDecl].Offset = static_cast<WORD>(stride);
         inputLayout[nDecl] = s_elements[3];
+        inputLayout[nDecl].Format = normalFormat;
         ++nDecl;
-        stride += sizeof(XMFLOAT3);
+        stride += normalStride;
     }
 
     if (mBiTangents)
     {
         vbHeader.Decl[nDecl] = s_decls[4];
+        vbHeader.Decl[nDecl].Type = normalType;
         vbHeader.Decl[nDecl].Offset = static_cast<WORD>(stride);
         inputLayout[nDecl] = s_elements[4];
+        inputLayout[nDecl].Format = normalFormat;
         ++nDecl;
-        stride += sizeof(XMFLOAT3);
+        stride += normalStride;
     }
 
     assert(nDecl < MAX_VERTEX_ELEMENTS);
