@@ -60,6 +60,9 @@ enum OPTIONS
     OPT_FLIPU,
     OPT_FLIPV,
     OPT_FLIPZ,
+    OPT_VERT_NORMAL_FORMAT,
+    OPT_VERT_UV_FORMAT,
+    OPT_VERT_COLOR_FORMAT,
     OPT_NOLOGO,
     OPT_FILELIST,
     OPT_MAX
@@ -110,8 +113,37 @@ const SValue g_pOptions[] =
     { L"flipu",     OPT_FLIPU },
     { L"flipv",     OPT_FLIPV },
     { L"flipz",     OPT_FLIPZ },
+    { L"fn",        OPT_VERT_NORMAL_FORMAT },
+    { L"fuv",       OPT_VERT_UV_FORMAT },
+    { L"fc",        OPT_VERT_COLOR_FORMAT },
     { L"nologo",    OPT_NOLOGO },
     { L"flist",     OPT_FILELIST },
+    { nullptr,      0 }
+};
+
+const SValue g_vertexNormalFormats[] =
+{
+    { L"float3",    DXGI_FORMAT_R32G32B32_FLOAT },
+    { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
+    { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
+    { nullptr,      0 }
+};
+
+const SValue g_vertexUVFormats[] =
+{
+    { L"float2",    DXGI_FORMAT_R32G32_FLOAT },
+    { L"float16_2", DXGI_FORMAT_R16G16_FLOAT },
+    { nullptr,      0 }
+};
+
+const SValue g_vertexColorFormats[] =
+{
+    { L"bgra",      DXGI_FORMAT_B8G8R8A8_UNORM },
+    { L"rgba",      DXGI_FORMAT_R8G8B8A8_UNORM },
+    { L"float4",    DXGI_FORMAT_R32G32B32A32_FLOAT },
+    { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
+    { L"rgba_10",   DXGI_FORMAT_R10G10B10A2_UNORM },
+    { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
     { nullptr,      0 }
 };
 
@@ -219,6 +251,25 @@ namespace
         }
     }
 
+    void PrintList(size_t cch, const SValue *pValue)
+    {
+        while (pValue->pName)
+        {
+            size_t cchName = wcslen(pValue->pName);
+
+            if (cch + cchName + 2 >= 80)
+            {
+                wprintf(L"\n      ");
+                cch = 6;
+            }
+
+            wprintf(L"%ls ", pValue->pName);
+            cch += cchName + 2;
+            pValue++;
+        }
+
+        wprintf(L"\n");
+    }
 
     void PrintLogo()
     {
@@ -249,7 +300,6 @@ namespace
         wprintf(L"   -t                  generate tangents\n");
         wprintf(L"   -tb                 generate tangents & bi-tangents\n");
         wprintf(L"   -cw                 faces are clockwise (defaults to counter-clockwise)\n");
-        wprintf(L"   -ib32               use 32-bit index buffer (SDKMESH only)\n");
         wprintf(L"   -op | -oplru        vertex cache optimize the mesh (implies -c)\n");
         wprintf(L"   -c                  mesh cleaning including vertex dups for atttribute sets\n");
         wprintf(L"   -ta | -ga           generate topological vs. geometric adjancecy (def: ta)\n");
@@ -263,8 +313,20 @@ namespace
         wprintf(L"   -y                  overwrite existing output file (if any)\n");
         wprintf(L"   -nologo             suppress copyright message\n");
         wprintf(L"   -flist <filename>   use text file with a list of input files (one per line)\n");
+        wprintf(L"\n       (sdkmesh/sdkmesh2 only)\n");
+        wprintf(L"   -ib32               use 32-bit index buffer\n");
+        wprintf(L"   -fn <normal-format> format to use for writing normals/tangents/normals\n");
+        wprintf(L"   -fuv <uv-format>    format to use for texture coordinates\n");
+        wprintf(L"   -fc <color-format>  format to use for writing colors\n");
 
-        wprintf(L"\n");
+        wprintf(L"\n   <normal-format>: ");
+        PrintList(13, g_vertexNormalFormats);
+
+        wprintf(L"\n   <uv-format>: ");
+        PrintList(13, g_vertexUVFormats);
+
+        wprintf(L"\n   <color-format>: ");
+        PrintList(13, g_vertexColorFormats);
     }
 }
 
@@ -284,6 +346,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
     // Process command line
     DWORD dwOptions = 0;
+    DXGI_FORMAT normalFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+    DXGI_FORMAT uvFormat = DXGI_FORMAT_R32G32_FLOAT;
+    DXGI_FORMAT colorFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     std::list<SConversion> conversion;
 
     for (int iArg = 1; iArg < argc; iArg++)
@@ -315,6 +380,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             switch (dwOption)
             {
             case OPT_OUTPUTFILE:
+            case OPT_VERT_NORMAL_FORMAT:
+            case OPT_VERT_UV_FORMAT:
+            case OPT_VERT_COLOR_FORMAT:
             case OPT_FILELIST:
                 if (!*pValue)
                 {
@@ -408,6 +476,39 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 if (dwOptions & ((1 << OPT_VBO) | (1 << OPT_SDKMESH) | (1 << OPT_CMO)))
                 {
                     wprintf(L"Can only use one of sdkmesh, cmo, vbo, or wf\n");
+                    return 1;
+                }
+                break;
+
+            case OPT_VERT_NORMAL_FORMAT:
+                normalFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexNormalFormats));
+                if (!normalFormat)
+                {
+                    wprintf(L"Invalid value specified with -fn (%ls)\n", pValue);
+                    wprintf(L"\n");
+                    PrintUsage();
+                    return 1;
+                }
+                break;
+
+            case OPT_VERT_UV_FORMAT:
+                uvFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexUVFormats));
+                if (!uvFormat)
+                {
+                    wprintf(L"Invalid value specified with -fuv (%ls)\n", pValue);
+                    wprintf(L"\n");
+                    PrintUsage();
+                    return 1;
+                }
+                break;
+
+            case OPT_VERT_COLOR_FORMAT:
+                colorFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexColorFormats));
+                if (!colorFormat)
+                {
+                    wprintf(L"Invalid value specified with -fc (%ls)\n", pValue);
+                    wprintf(L"\n");
+                    PrintUsage();
                     return 1;
                 }
                 break;
@@ -790,7 +891,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 outputPath,
                 inMaterial.size(), inMaterial.empty() ? nullptr : inMaterial.data(),
                 (dwOptions & (1 << OPT_FORCE_32BIT_IB)) ? true : false,
-                (dwOptions & (1 << OPT_SDKMESH_V2)) ? true : false);
+                (dwOptions & (1 << OPT_SDKMESH_V2)) ? true : false,
+                normalFormat,
+                uvFormat,
+                colorFormat);
         }
         else if (!_wcsicmp(outputExt, L".cmo"))
         {
