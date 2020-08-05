@@ -132,7 +132,7 @@ const SValue g_vertexNormalFormats[] =
 const SValue g_vertexUVFormats[] =
 {
     { L"float2",    DXGI_FORMAT_R32G32_FLOAT },
-    { L"float2_16", DXGI_FORMAT_R16G16_FLOAT },
+    { L"float16_2", DXGI_FORMAT_R16G16_FLOAT },
     { nullptr,      0 }
 };
 
