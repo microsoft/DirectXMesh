@@ -32,120 +32,131 @@
 
 using namespace DirectX;
 
-enum OPTIONS
+namespace
 {
-    OPT_RECURSIVE = 1,
-    OPT_NORMALS,
-    OPT_WEIGHT_BY_AREA,
-    OPT_WEIGHT_BY_EQUAL,
-    OPT_TANGENTS,
-    OPT_CTF,
-    OPT_OPTIMIZE,
-    OPT_OPTIMIZE_LRU,
-    OPT_CLEAN,
-    OPT_TOPOLOGICAL_ADJ,
-    OPT_GEOMETRIC_ADJ,
-    OPT_OUTPUTFILE,
-    OPT_TOLOWER,
-    OPT_SDKMESH,
-    OPT_SDKMESH_V2,
-    OPT_CMO,
-    OPT_VBO,
-    OPT_WAVEFRONT_OBJ,
-    OPT_CLOCKWISE,
-    OPT_FORCE_32BIT_IB,
-    OPT_OVERWRITE,
-    OPT_NODDS,
-    OPT_FLIP,
-    OPT_FLIPU,
-    OPT_FLIPV,
-    OPT_FLIPZ,
-    OPT_VERT_NORMAL_FORMAT,
-    OPT_VERT_UV_FORMAT,
-    OPT_VERT_COLOR_FORMAT,
-    OPT_NOLOGO,
-    OPT_FILELIST,
-    OPT_MAX
-};
+    enum OPTIONS
+    {
+        OPT_RECURSIVE = 1,
+        OPT_TOPOLOGICAL_ADJ,
+        OPT_GEOMETRIC_ADJ,
+        OPT_NORMALS,
+        OPT_WEIGHT_BY_AREA,
+        OPT_WEIGHT_BY_EQUAL,
+        OPT_TANGENTS,
+        OPT_CTF,
+        OPT_OPTIMIZE,
+        OPT_OPTIMIZE_LRU,
+        OPT_CLEAN,
+        OPT_OUTPUTFILE,
+        OPT_TOLOWER,
+        OPT_SDKMESH,
+        OPT_SDKMESH_V2,
+        OPT_CMO,
+        OPT_VBO,
+        OPT_WAVEFRONT_OBJ,
+        OPT_CLOCKWISE,
+        OPT_FORCE_32BIT_IB,
+        OPT_OVERWRITE,
+        OPT_NODDS,
+        OPT_FLIP,
+        OPT_FLIPU,
+        OPT_FLIPV,
+        OPT_FLIPZ,
+        OPT_VERT_NORMAL_FORMAT,
+        OPT_VERT_UV_FORMAT,
+        OPT_VERT_COLOR_FORMAT,
+        OPT_NOLOGO,
+        OPT_FILELIST,
+        OPT_MAX
+    };
 
-static_assert(OPT_MAX <= 32, "dwOptions is a DWORD bitfield");
+    static_assert(OPT_MAX <= 32, "dwOptions is a DWORD bitfield");
 
-struct SConversion
-{
-    wchar_t szSrc[MAX_PATH];
-};
+    struct SConversion
+    {
+        wchar_t szSrc[MAX_PATH];
+    };
 
-struct SValue
-{
-    LPCWSTR pName;
-    DWORD dwValue;
-};
+    struct SValue
+    {
+        LPCWSTR pName;
+        DWORD dwValue;
+    };
+
+    //////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+
+    const SValue g_pOptions[] =
+    {
+        { L"r",         OPT_RECURSIVE },
+        { L"ta",        OPT_TOPOLOGICAL_ADJ },
+        { L"ga",        OPT_GEOMETRIC_ADJ },
+        { L"n",         OPT_NORMALS },
+        { L"na",        OPT_WEIGHT_BY_AREA },
+        { L"ne",        OPT_WEIGHT_BY_EQUAL },
+        { L"t",         OPT_TANGENTS },
+        { L"tb",        OPT_CTF },
+        { L"op",        OPT_OPTIMIZE },
+        { L"oplru",     OPT_OPTIMIZE_LRU },
+        { L"c",         OPT_CLEAN },
+        { L"o",         OPT_OUTPUTFILE },
+        { L"l",         OPT_TOLOWER },
+        { L"sdkmesh",   OPT_SDKMESH },
+        { L"sdkmesh2",  OPT_SDKMESH_V2 },
+        { L"cmo",       OPT_CMO },
+        { L"vbo",       OPT_VBO },
+        { L"wf",        OPT_WAVEFRONT_OBJ },
+        { L"cw",        OPT_CLOCKWISE },
+        { L"ib32",      OPT_FORCE_32BIT_IB },
+        { L"y",         OPT_OVERWRITE },
+        { L"nodds",     OPT_NODDS },
+        { L"flip",      OPT_FLIP },
+        { L"flipu",     OPT_FLIPU },
+        { L"flipv",     OPT_FLIPV },
+        { L"flipz",     OPT_FLIPZ },
+        { L"fn",        OPT_VERT_NORMAL_FORMAT },
+        { L"fuv",       OPT_VERT_UV_FORMAT },
+        { L"fc",        OPT_VERT_COLOR_FORMAT },
+        { L"nologo",    OPT_NOLOGO },
+        { L"flist",     OPT_FILELIST },
+        { nullptr,      0 }
+    };
+
+    const SValue g_vertexNormalFormats[] =
+    {
+        { L"float3",    DXGI_FORMAT_R32G32B32_FLOAT },
+        { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
+        { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
+        { nullptr,      0 }
+    };
+
+    const SValue g_vertexUVFormats[] =
+    {
+        { L"float2",    DXGI_FORMAT_R32G32_FLOAT },
+        { L"float16_2", DXGI_FORMAT_R16G16_FLOAT },
+        { nullptr,      0 }
+    };
+
+    const SValue g_vertexColorFormats[] =
+    {
+        { L"bgra",      DXGI_FORMAT_B8G8R8A8_UNORM },
+        { L"rgba",      DXGI_FORMAT_R8G8B8A8_UNORM },
+        { L"float4",    DXGI_FORMAT_R32G32B32A32_FLOAT },
+        { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
+        { L"rgba_10",   DXGI_FORMAT_R10G10B10A2_UNORM },
+        { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
+        { nullptr,      0 }
+    };
+}
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-const SValue g_pOptions[] =
-{
-    { L"r",         OPT_RECURSIVE },
-    { L"n",         OPT_NORMALS },
-    { L"na",        OPT_WEIGHT_BY_AREA },
-    { L"ne",        OPT_WEIGHT_BY_EQUAL },
-    { L"t",         OPT_TANGENTS },
-    { L"tb",        OPT_CTF },
-    { L"op",        OPT_OPTIMIZE },
-    { L"oplru",     OPT_OPTIMIZE_LRU },
-    { L"c",         OPT_CLEAN },
-    { L"ta",        OPT_TOPOLOGICAL_ADJ },
-    { L"ga",        OPT_GEOMETRIC_ADJ },
-    { L"o",         OPT_OUTPUTFILE },
-    { L"l",         OPT_TOLOWER },
-    { L"sdkmesh",   OPT_SDKMESH },
-    { L"sdkmesh2",  OPT_SDKMESH_V2 },
-    { L"cmo",       OPT_CMO },
-    { L"vbo",       OPT_VBO },
-    { L"wf",        OPT_WAVEFRONT_OBJ },
-    { L"cw",        OPT_CLOCKWISE },
-    { L"ib32",      OPT_FORCE_32BIT_IB },
-    { L"y",         OPT_OVERWRITE },
-    { L"nodds",     OPT_NODDS },
-    { L"flip",      OPT_FLIP },
-    { L"flipu",     OPT_FLIPU },
-    { L"flipv",     OPT_FLIPV },
-    { L"flipz",     OPT_FLIPZ },
-    { L"fn",        OPT_VERT_NORMAL_FORMAT },
-    { L"fuv",       OPT_VERT_UV_FORMAT },
-    { L"fc",        OPT_VERT_COLOR_FORMAT },
-    { L"nologo",    OPT_NOLOGO },
-    { L"flist",     OPT_FILELIST },
-    { nullptr,      0 }
-};
-
-const SValue g_vertexNormalFormats[] =
-{
-    { L"float3",    DXGI_FORMAT_R32G32B32_FLOAT },
-    { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
-    { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
-    { nullptr,      0 }
-};
-
-const SValue g_vertexUVFormats[] =
-{
-    { L"float2",    DXGI_FORMAT_R32G32_FLOAT },
-    { L"float16_2", DXGI_FORMAT_R16G16_FLOAT },
-    { nullptr,      0 }
-};
-
-const SValue g_vertexColorFormats[] =
-{
-    { L"bgra",      DXGI_FORMAT_B8G8R8A8_UNORM },
-    { L"rgba",      DXGI_FORMAT_R8G8B8A8_UNORM },
-    { L"float4",    DXGI_FORMAT_R32G32B32A32_FLOAT },
-    { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
-    { L"rgba_10",   DXGI_FORMAT_R10G10B10A2_UNORM },
-    { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
-    { nullptr,      0 }
-};
+HRESULT LoadFromOBJ(const wchar_t* szFilename,
+    std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial,
+    bool ccw, bool dds);
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -153,9 +164,9 @@ const SValue g_vertexColorFormats[] =
 
 namespace
 {
-    inline HANDLE safe_handle(HANDLE h) { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
+    inline HANDLE safe_handle(HANDLE h) noexcept { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
 
-    struct find_closer { void operator()(HANDLE h) { assert(h != INVALID_HANDLE_VALUE); if (h) FindClose(h); } };
+    struct find_closer { void operator()(HANDLE h) noexcept { assert(h != INVALID_HANDLE_VALUE); if (h) FindClose(h); } };
 
     using ScopedFindHandle = std::unique_ptr<void, find_closer>;
 
@@ -163,7 +174,7 @@ namespace
 #pragma prefast(disable : 26018, "Only used with static internal arrays")
 #endif
 
-    DWORD LookupByName(const wchar_t *pName, const SValue *pArray)
+    DWORD LookupByName(const wchar_t* pName, const SValue* pArray)
     {
         while (pArray->pName)
         {
@@ -251,7 +262,7 @@ namespace
         }
     }
 
-    void PrintList(size_t cch, const SValue *pValue)
+    void PrintList(size_t cch, const SValue* pValue)
     {
         while (pValue->pName)
         {
@@ -330,8 +341,6 @@ namespace
     }
 }
 
-extern HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial, bool ccw, bool dds);
-
 //--------------------------------------------------------------------------------------
 // Entry-point
 //--------------------------------------------------------------------------------------
@@ -342,13 +351,14 @@ extern HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inM
 int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 {
     // Parameters and defaults
+    DXGI_FORMAT normalFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+    DXGI_FORMAT uvFormat = DXGI_FORMAT_R32G32_FLOAT;
+    DXGI_FORMAT colorFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+
     wchar_t szOutputFile[MAX_PATH] = {};
 
     // Process command line
     DWORD dwOptions = 0;
-    DXGI_FORMAT normalFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-    DXGI_FORMAT uvFormat = DXGI_FORMAT_R32G32_FLOAT;
-    DXGI_FORMAT colorFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     std::list<SConversion> conversion;
 
     for (int iArg = 1; iArg < argc; iArg++)
@@ -514,46 +524,46 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_FILELIST:
-            {
-                std::wifstream inFile(pValue);
-                if (!inFile)
                 {
-                    wprintf(L"Error opening -flist file %ls\n", pValue);
-                    return 1;
-                }
-                wchar_t fname[1024] = {};
-                for (;;)
-                {
-                    inFile >> fname;
+                    std::wifstream inFile(pValue);
                     if (!inFile)
-                        break;
-
-                    if (*fname == L'#')
                     {
-                        // Comment
-                    }
-                    else if (*fname == L'-')
-                    {
-                        wprintf(L"Command-line arguments not supported in -flist file\n");
+                        wprintf(L"Error opening -flist file %ls\n", pValue);
                         return 1;
                     }
-                    else if (wcspbrk(fname, L"?*") != nullptr)
+                    wchar_t fname[1024] = {};
+                    for (;;)
                     {
-                        wprintf(L"Wildcards not supported in -flist file\n");
-                        return 1;
-                    }
-                    else
-                    {
-                        SConversion conv;
-                        wcscpy_s(conv.szSrc, MAX_PATH, fname);
-                        conversion.push_back(conv);
-                    }
+                        inFile >> fname;
+                        if (!inFile)
+                            break;
 
-                    inFile.ignore(1000, '\n');
+                        if (*fname == L'#')
+                        {
+                            // Comment
+                        }
+                        else if (*fname == L'-')
+                        {
+                            wprintf(L"Command-line arguments not supported in -flist file\n");
+                            return 1;
+                        }
+                        else if (wcspbrk(fname, L"?*") != nullptr)
+                        {
+                            wprintf(L"Wildcards not supported in -flist file\n");
+                            return 1;
+                        }
+                        else
+                        {
+                            SConversion conv;
+                            wcscpy_s(conv.szSrc, MAX_PATH, fname);
+                            conversion.push_back(conv);
+                        }
+
+                        inFile.ignore(1000, '\n');
+                    }
+                    inFile.close();
                 }
-                inFile.close();
-            }
-            break;
+                break;
             }
         }
         else if (wcspbrk(pArg, L"?*") != nullptr)
@@ -819,7 +829,6 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             wprintf(L" [ACMR %f, ATVR %f] ", acmr, atvr);
         }
-
 
         wchar_t outputPath[MAX_PATH] = {};
         wchar_t outputExt[_MAX_EXT] = {};

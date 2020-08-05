@@ -31,11 +31,11 @@ using namespace DirectX;
 
 namespace
 {
-    struct handle_closer { void operator()(HANDLE h) { if (h) CloseHandle(h); } };
+    struct handle_closer { void operator()(HANDLE h) noexcept { if (h) CloseHandle(h); } };
 
     using ScopedHandle = std::unique_ptr<void, handle_closer>;
 
-    inline HANDLE safe_handle(HANDLE h) { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
+    inline HANDLE safe_handle(HANDLE h) noexcept { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
 
     template<typename T> inline HRESULT write_file(HANDLE hFile, const T& value)
     {
@@ -121,7 +121,7 @@ Mesh& Mesh::operator= (Mesh&& moveFrom) noexcept
 
 
 //--------------------------------------------------------------------------------------
-void Mesh::Clear()
+void Mesh::Clear() noexcept
 {
     mnFaces = mnVerts = 0;
 
@@ -144,7 +144,7 @@ void Mesh::Clear()
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::SetIndexData(size_t nFaces, const uint16_t* indices, uint32_t* attributes)
+HRESULT Mesh::SetIndexData(size_t nFaces, const uint16_t* indices, uint32_t* attributes) noexcept
 {
     if (!nFaces || !indices)
         return E_INVALIDARG;
@@ -191,7 +191,7 @@ HRESULT Mesh::SetIndexData(size_t nFaces, const uint16_t* indices, uint32_t* att
 }
 
 _Use_decl_annotations_
-HRESULT Mesh::SetIndexData(size_t nFaces, const uint32_t* indices, uint32_t* attributes)
+HRESULT Mesh::SetIndexData(size_t nFaces, const uint32_t* indices, uint32_t* attributes) noexcept
 {
     if (!nFaces || !indices)
         return E_INVALIDARG;
@@ -228,7 +228,7 @@ HRESULT Mesh::SetIndexData(size_t nFaces, const uint32_t* indices, uint32_t* att
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::SetVertexData(_Inout_ DirectX::VBReader& reader, _In_ size_t nVerts)
+HRESULT Mesh::SetVertexData(_Inout_ DirectX::VBReader& reader, _In_ size_t nVerts) noexcept
 {
     if (!nVerts)
         return E_INVALIDARG;
@@ -368,7 +368,7 @@ HRESULT Mesh::SetVertexData(_Inout_ DirectX::VBReader& reader, _In_ size_t nVert
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::Validate(DirectX::VALIDATE_FLAGS flags, std::wstring* msgs) const
+HRESULT Mesh::Validate(DirectX::VALIDATE_FLAGS flags, std::wstring* msgs) const noexcept
 {
     if (!mnFaces || !mIndices || !mnVerts)
         return E_UNEXPECTED;
@@ -378,7 +378,7 @@ HRESULT Mesh::Validate(DirectX::VALIDATE_FLAGS flags, std::wstring* msgs) const
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::Clean()
+HRESULT Mesh::Clean() noexcept
 {
     if (!mnFaces || !mIndices || !mnVerts || !mPositions)
         return E_UNEXPECTED;
@@ -530,7 +530,7 @@ HRESULT Mesh::Clean()
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::GenerateAdjacency(_In_ float epsilon)
+HRESULT Mesh::GenerateAdjacency(_In_ float epsilon) noexcept
 {
     if (!mnFaces || !mIndices || !mnVerts || !mPositions)
         return E_UNEXPECTED;
@@ -547,7 +547,7 @@ HRESULT Mesh::GenerateAdjacency(_In_ float epsilon)
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::ComputeNormals(_In_ DirectX::CNORM_FLAGS flags)
+HRESULT Mesh::ComputeNormals(_In_ DirectX::CNORM_FLAGS flags) noexcept
 {
     if (!mnFaces || !mIndices || !mnVerts || !mPositions)
         return E_UNEXPECTED;
@@ -561,7 +561,7 @@ HRESULT Mesh::ComputeNormals(_In_ DirectX::CNORM_FLAGS flags)
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::ComputeTangentFrame(_In_ bool bitangents)
+HRESULT Mesh::ComputeTangentFrame(_In_ bool bitangents) noexcept
 {
     if (!mnFaces || !mIndices || !mnVerts || !mPositions || !mNormals || !mTexCoords)
         return E_UNEXPECTED;
@@ -603,7 +603,7 @@ HRESULT Mesh::ComputeTangentFrame(_In_ bool bitangents)
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::Optimize(bool lru)
+HRESULT Mesh::Optimize(bool lru) noexcept
 {
     if (!mnFaces || !mIndices || !mnVerts || !mPositions)
         return E_UNEXPECTED;
@@ -742,7 +742,7 @@ HRESULT Mesh::Optimize(bool lru)
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::ReverseWinding()
+HRESULT Mesh::ReverseWinding() noexcept
 {
     if (!mIndices || !mnFaces)
         return E_UNEXPECTED;
@@ -759,7 +759,7 @@ HRESULT Mesh::ReverseWinding()
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::InvertUTexCoord()
+HRESULT Mesh::InvertUTexCoord() noexcept
 {
     if (!mTexCoords)
         return E_UNEXPECTED;
@@ -775,7 +775,7 @@ HRESULT Mesh::InvertUTexCoord()
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::InvertVTexCoord()
+HRESULT Mesh::InvertVTexCoord() noexcept
 {
     if (!mTexCoords)
         return E_UNEXPECTED;
@@ -791,7 +791,7 @@ HRESULT Mesh::InvertVTexCoord()
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::ReverseHandedness()
+HRESULT Mesh::ReverseHandedness() noexcept
 {
     if (!mPositions)
         return E_UNEXPECTED;
@@ -816,7 +816,7 @@ HRESULT Mesh::ReverseHandedness()
 
 
 //--------------------------------------------------------------------------------------
-bool Mesh::Is16BitIndexBuffer() const
+bool Mesh::Is16BitIndexBuffer() const noexcept
 {
     if (!mIndices || !mnFaces)
         return false;
@@ -840,7 +840,7 @@ bool Mesh::Is16BitIndexBuffer() const
 
 
 //--------------------------------------------------------------------------------------
-std::unique_ptr<uint16_t[]> Mesh::GetIndexBuffer16() const
+std::unique_ptr<uint16_t[]> Mesh::GetIndexBuffer16() const noexcept
 {
     std::unique_ptr<uint16_t[]> ib;
 
@@ -880,7 +880,7 @@ std::unique_ptr<uint16_t[]> Mesh::GetIndexBuffer16() const
 
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::GetVertexBuffer(_Inout_ DirectX::VBWriter& writer) const
+HRESULT Mesh::GetVertexBuffer(_Inout_ DirectX::VBWriter& writer) const noexcept
 {
     if (!mnVerts || !mPositions)
         return E_UNEXPECTED;
@@ -1004,7 +1004,7 @@ namespace VBO
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) const
+HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) const noexcept
 {
     using namespace VBO;
 
@@ -1096,7 +1096,7 @@ HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) const
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, std::unique_ptr<Mesh>& result)
+HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, std::unique_ptr<Mesh>& result) noexcept
 {
     using namespace VBO;
 
@@ -1374,7 +1374,7 @@ static_assert(sizeof(VSD3DStarter::Keyframe) == 72, "CMO Mesh structure size inc
 
 //--------------------------------------------------------------------------------------
 _Use_decl_annotations_
-HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const
+HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const noexcept
 {
     using namespace VSD3DStarter;
 
@@ -1747,15 +1747,13 @@ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Ma
 //======================================================================================
 
 _Use_decl_annotations_
-
-_Use_decl_annotations_
 HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
     size_t nMaterials, const Material* materials,
     bool force32bit,
     bool version2,
     DXGI_FORMAT normalFormat,
     DXGI_FORMAT uvFormat,
-    DXGI_FORMAT colorFormat) const
+    DXGI_FORMAT colorFormat) const noexcept
 {
     using namespace DXUT;
 
