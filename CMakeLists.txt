@@ -88,7 +88,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(WarningsLib "-Wpedantic" "-Wextra")
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsLib})
 
-    set(WarningsEXE ${WarningsLib} "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-double-promotion" "-Wno-exit-time-destructors" "-Wno-missing-prototypes")
+    set(WarningsEXE ${WarningsLib} "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-switch" "-Wno-switch-enum" "-Wno-double-promotion" "-Wno-exit-time-destructors" "-Wno-missing-prototypes")
     target_compile_options(meshconvert PRIVATE ${WarningsEXE})
 endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
