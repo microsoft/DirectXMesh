@@ -71,7 +71,7 @@ add_executable(meshconvert
     Meshconvert/Mesh.cpp
     Meshconvert/SDKMesh.h)
 target_include_directories(meshconvert PUBLIC MeshConvert Utilities)
-target_link_libraries(meshconvert ${PROJECT_NAME})
+target_link_libraries(meshconvert ${PROJECT_NAME} version.lib)
 source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
 
 if(MSVC)
