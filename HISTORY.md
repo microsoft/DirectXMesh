@@ -6,6 +6,11 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### August 15, 2020
+* Added GDK projects
+* Code review and project updates
+* meshconvert: Added ``-fn``, ``-fuc``, and ``-fc`` switches to control vertex format
+
 ### July 2, 2020
 * Minor warning fixes for VS 2019 (16.7)
 
