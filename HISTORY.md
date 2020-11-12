@@ -6,6 +6,9 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+###November 11, 2020
+* Code review and project updates
+
 ### August 15, 2020
 * Added GDK projects
 * Code review and project updates
