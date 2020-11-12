@@ -93,6 +93,7 @@ namespace
 
                 while (iulJ < iulLim)
                 {
+                    _Analysis_assume_(iulJ < nVerts);
                     uint32_t ulJ = index[iulJ];
 
                     if (iulJ + 1 < iulLim)
