@@ -72,6 +72,18 @@ if(MSVC)
     string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 endif()
 
+#--- Utilities
+set(UTILS_HEADERS
+    Utilities/WaveFrontReader.h)
+
+add_library(Utilities INTERFACE)
+
+source_group(Utilities REGULAR_EXPRESSION Utilities/*.*)
+
+target_include_directories(Utilities INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Utilities>
+  $<INSTALL_INTERFACE:utils>)
+
 #--- Package
 include(CMakePackageConfigHelpers)
 
@@ -84,7 +96,15 @@ install(TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}-targets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  RUNTIME DESTINATION bin
+  COMPONENT library)
+
+install(TARGETS Utilities
+  EXPORT Utilities-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  COMPONENT utils)
 
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/.nuget/${PROJECT_NAME}-config.cmake.in
   ${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake
@@ -95,8 +115,16 @@ install(EXPORT ${PROJECT_NAME}-targets
   NAMESPACE Microsoft::
   DESTINATION cmake/)
 
+install(EXPORT Utilities-targets
+  FILE Utilities-targets.cmake
+  NAMESPACE Microsoft::DirectXMesh::
+  DESTINATION cmake/)
+
 install(FILES ${LIBRARY_HEADERS}
   DESTINATION include)
+
+install(FILES ${UTILS_HEADERS}
+  DESTINATION utils)
 
 install(
   FILES
