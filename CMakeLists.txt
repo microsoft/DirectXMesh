@@ -92,6 +92,7 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/.nuget/${PROJECT_NAME}
 
 install(EXPORT ${PROJECT_NAME}-targets
   FILE ${PROJECT_NAME}-targets.cmake
+  NAMESPACE Microsoft::
   DESTINATION cmake/)
 
 install(FILES ${LIBRARY_HEADERS}
