@@ -1,13 +1,15 @@
-﻿# DirectXMesh geometry Library
-#
-# Copyright (c) Microsoft Corporation. All rights reserved.
+﻿# Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-#
-# http://go.microsoft.com/fwlink/?LinkID=324981
 
 cmake_minimum_required (VERSION 3.11)
 
-project (DirectXMesh LANGUAGES CXX)
+set(DIRECTXMESH_VERSION 1.6.0)
+
+project(DirectXMesh
+  VERSION ${DIRECTXMESH_VERSION}
+  DESCRIPTION "DirectXMesh geometry Library"
+  HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkID=324981"
+  LANGUAGES CXX)
 
 # Includes the support for DX 12 input layouts
 option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
@@ -22,8 +24,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/CMake")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/CMake")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/CMake")
 
-set(LIBRARY_SOURCES
+#--- Library
+set(LIBRARY_HEADERS
     DirectXMesh/DirectXMesh.h
+    DirectXMesh/DirectXMesh.inl)
+
+set(LIBRARY_SOURCES
     DirectXMesh/DirectXMeshP.h
     DirectXMesh/scoped.h
     DirectXMesh/DirectXMeshAdjacency.cpp
@@ -42,11 +48,13 @@ set(LIBRARY_SOURCES
     DirectXMesh/DirectXMeshVBWriter.cpp
     DirectXMesh/DirectXMeshWeldVertices.cpp)
 
-add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
 
 source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
-target_include_directories(${PROJECT_NAME} PUBLIC DirectXMesh)
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/DirectXMesh>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16")
     target_precompile_headers(${PROJECT_NAME} PRIVATE DirectXMesh/DirectXMeshP.h)
@@ -64,6 +72,38 @@ if(MSVC)
     string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 endif()
 
+#--- Package
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+  ${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}-config-version.cmake
+  VERSION ${DIRECTXMESH_VERSION}
+  COMPATIBILITY AnyNewerVersion)
+
+install(TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}-targets
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/.nuget/${PROJECT_NAME}-config.cmake.in
+  ${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake
+  INSTALL_DESTINATION cmake/})
+
+install(EXPORT ${PROJECT_NAME}-targets
+  FILE ${PROJECT_NAME}-targets.cmake
+  DESTINATION cmake/)
+
+install(FILES ${LIBRARY_HEADERS}
+  DESTINATION include/${PROJECT_NAME})
+
+install(
+  FILES
+    ${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake
+    ${PROJECT_BINARY_DIR}/cmake/${PROJECT_NAME}-config-version.cmake
+  DESTINATION cmake/)
+
+#--- Command-line tool
 add_executable(meshconvert
     Meshconvert/Meshconvert.cpp
     Meshconvert/MeshOBJ.cpp
