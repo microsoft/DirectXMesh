@@ -54,7 +54,7 @@ source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/DirectXMesh>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+  $<INSTALL_INTERFACE:include>)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16")
     target_precompile_headers(${PROJECT_NAME} PRIVATE DirectXMesh/DirectXMeshP.h)
@@ -95,7 +95,7 @@ install(EXPORT ${PROJECT_NAME}-targets
   DESTINATION cmake/)
 
 install(FILES ${LIBRARY_HEADERS}
-  DESTINATION include/${PROJECT_NAME})
+  DESTINATION include)
 
 install(
   FILES
