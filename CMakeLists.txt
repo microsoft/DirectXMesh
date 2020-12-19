@@ -11,6 +11,8 @@ project(DirectXMesh
   HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkID=324981"
   LANGUAGES CXX)
 
+option(BUILD_TOOLS "Build meshconvert" ON)
+
 # Includes the support for DX 12 input layouts
 option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
 
@@ -133,23 +135,28 @@ install(
   DESTINATION cmake/)
 
 #--- Command-line tool
-add_executable(meshconvert
+if(BUILD_TOOLS)
+  add_executable(meshconvert
     Meshconvert/Meshconvert.cpp
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
     Meshconvert/SDKMesh.h)
-target_include_directories(meshconvert PUBLIC MeshConvert Utilities)
-target_link_libraries(meshconvert ${PROJECT_NAME} version.lib)
-source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
-
+  target_include_directories(meshconvert PUBLIC MeshConvert Utilities)
+  target_link_libraries(meshconvert ${PROJECT_NAME} version.lib)
+  source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
+endif()
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /fp:fast)
-    target_compile_options(meshconvert PRIVATE /fp:fast)
+    if(BUILD_TOOLS)
+      target_compile_options(meshconvert PRIVATE /fp:fast)
+    endif()
 
     if(${CMAKE_SIZEOF_VOID_P} EQUAL "4")
         target_compile_options(${PROJECT_NAME} PRIVATE /arch:SSE2)
-        target_compile_options(meshconvert PRIVATE /arch:SSE2)
+        if(BUILD_TOOLS)
+          target_compile_options(meshconvert PRIVATE /arch:SSE2)
+        endif()
     endif()
 endif()
 
@@ -157,31 +164,43 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(WarningsLib "-Wpedantic" "-Wextra")
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsLib})
 
-    set(WarningsEXE ${WarningsLib} "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-switch" "-Wno-switch-enum" "-Wno-double-promotion" "-Wno-exit-time-destructors" "-Wno-missing-prototypes")
-    target_compile_options(meshconvert PRIVATE ${WarningsEXE})
+    if(BUILD_TOOLS)
+      set(WarningsEXE ${WarningsLib} "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-switch" "-Wno-switch-enum" "-Wno-double-promotion" "-Wno-exit-time-destructors" "-Wno-missing-prototypes")
+      target_compile_options(meshconvert PRIVATE ${WarningsEXE})
+    endif()
 endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options(${PROJECT_NAME} PRIVATE /permissive- /JMC- /Zc:__cplusplus)
-    target_compile_options(meshconvert PRIVATE /permissive- /JMC- /Zc:__cplusplus)
+    if(BUILD_TOOLS)
+      target_compile_options(meshconvert PRIVATE /permissive- /JMC- /Zc:__cplusplus)
+    endif()
 
    if(ENABLE_CODE_ANALYSIS)
       target_compile_options(${PROJECT_NAME} PRIVATE /analyze)
-      target_compile_options(meshconvert PRIVATE /analyze)
+      if(BUILD_TOOLS)
+        target_compile_options(meshconvert PRIVATE /analyze)
+      endif()
    endif()
 
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.26)
         target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor /wd5105)
-        target_compile_options(meshconvert PRIVATE /Zc:preprocessor /wd5105)
+        if(BUILD_TOOLS)
+          target_compile_options(meshconvert PRIVATE /Zc:preprocessor /wd5105)
+        endif()
     endif()
 
-    set(WarningsEXE "/wd4061" "/wd4365" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045" "/wd5219")
-    target_compile_options(meshconvert PRIVATE ${WarningsEXE})
+    if(BUILD_TOOLS)
+      set(WarningsEXE "/wd4061" "/wd4365" "/wd4668" "/wd4710" "/wd4820" "/wd5039" "/wd5045" "/wd5219")
+      target_compile_options(meshconvert PRIVATE ${WarningsEXE})
+    endif()
 endif()
 
 if(WIN32)
     # Windows 10 is used here to build the DirectX 12 code paths as well as 11
     target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE)
-    target_compile_definitions(meshconvert PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0601)
+    if(BUILD_TOOLS)
+      target_compile_definitions(meshconvert PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0601)
+    endif()
 
     if(BUILD_DX12)
         target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0A00)
@@ -190,4 +209,7 @@ if(WIN32)
     endif()
 endif()
 
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT meshconvert)
+if(BUILD_TOOLS)
+  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT meshconvert)
+endif()
+
