@@ -63,7 +63,7 @@ if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16")
 endif()
 
 if(MSVC)
-    # Use max Warning Level 
+    # Use max Warning Level
     string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
     string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
     string(REPLACE "/W3 " "/Wall " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
@@ -214,4 +214,3 @@ endif()
 if(BUILD_TOOLS)
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT meshconvert)
 endif()
-
