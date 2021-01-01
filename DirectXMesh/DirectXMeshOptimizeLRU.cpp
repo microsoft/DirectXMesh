@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshOptimizeLRU.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Mesh optimization
 //
 // Forsyth "Linear-Speed Vertex Cache Optimisation"
@@ -508,7 +508,7 @@ HRESULT DirectX::OptimizeFacesLRU(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
@@ -529,7 +529,7 @@ HRESULT DirectX::OptimizeFacesLRU(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
@@ -553,7 +553,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
@@ -570,7 +570,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
             return E_UNEXPECTED;
 
         if ((uint64_t(it->first) + uint64_t(it->second)) >= UINT32_MAX)
-            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+            return HRESULT_E_ARITHMETIC_OVERFLOW;
 
         uint32_t faceMax = uint32_t(it->first + it->second);
 
@@ -602,7 +602,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 
@@ -619,7 +619,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
             return E_UNEXPECTED;
 
         if ((uint64_t(it->first) + uint64_t(it->second)) >= UINT32_MAX)
-            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+            return HRESULT_E_ARITHMETIC_OVERFLOW;
 
         uint32_t faceMax = uint32_t(it->first + it->second);
 

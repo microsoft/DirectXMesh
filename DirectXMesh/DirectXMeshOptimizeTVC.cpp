@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshOptimizeTVC.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Mesh optimization
 //
 // Hoppe "Optimization of mesh locality for transparent vertex caching"
@@ -56,7 +56,7 @@ namespace
             for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
             {
                 if ((uint64_t(it->first) + uint64_t(it->second)) >= UINT32_MAX)
-                    return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+                    return HRESULT_E_ARITHMETIC_OVERFLOW;
 
                 if (it->second > mMaxSubset)
                 {
@@ -174,7 +174,7 @@ namespace
                 return E_POINTER;
 
             if ((uint64_t(faceOffset) + uint64_t(faceCount)) >= UINT32_MAX)
-                return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+                return HRESULT_E_ARITHMETIC_OVERFLOW;
 
             uint32_t faceMax = uint32_t(faceOffset + faceCount);
 
@@ -781,7 +781,7 @@ HRESULT DirectX::OptimizeFaces(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {
@@ -809,7 +809,7 @@ HRESULT DirectX::OptimizeFaces(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {
@@ -840,7 +840,7 @@ HRESULT DirectX::OptimizeFacesEx(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {
@@ -869,7 +869,7 @@ HRESULT DirectX::OptimizeFacesEx(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {

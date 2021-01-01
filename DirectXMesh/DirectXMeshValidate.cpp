@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshValidate.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Mesh validation
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -371,7 +371,7 @@ HRESULT DirectX::Validate(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     if (msgs)
         msgs->clear();
@@ -408,7 +408,7 @@ HRESULT DirectX::Validate(
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-        return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+        return HRESULT_E_ARITHMETIC_OVERFLOW;
 
     if (msgs)
         msgs->clear();

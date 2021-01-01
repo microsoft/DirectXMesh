@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshClean.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Mesh clean-up
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -27,7 +27,7 @@ namespace
             return E_INVALIDARG;
 
         if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
-            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+            return HRESULT_E_ARITHMETIC_OVERFLOW;
 
         dupVerts.clear();
         size_t curNewVert = nVerts;
@@ -390,7 +390,7 @@ namespace
         }
 
         if ((uint64_t(nVerts) + uint64_t(dupVerts.size())) >= index_t(-1))
-            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+            return HRESULT_E_ARITHMETIC_OVERFLOW;
 
         if (!dupVerts.empty())
         {

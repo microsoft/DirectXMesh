@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshVBReader.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Vertex Buffer Reader
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
@@ -164,7 +164,7 @@ HRESULT VBReader::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
         {
             // Does not currently support instance data layouts
             Release();
-            return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+            return HRESULT_E_NOT_SUPPORTED;
         }
 
         mInputDesc.push_back(vbDecl[j]);
