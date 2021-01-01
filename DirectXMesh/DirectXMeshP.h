@@ -57,6 +57,7 @@
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #endif
 
+#ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
@@ -88,10 +89,7 @@
 #else
 #include <d3d11_1.h>
 #endif
-
-#define _XM_NO_XMVECTOR_OVERLOADS_
-
-#include "DirectXMesh.h"
+#endif
 
 #include <array>
 #include <algorithm>
@@ -104,9 +102,15 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#define _XM_NO_XMVECTOR_OVERLOADS_
+
+#include "DirectXMesh.h"
+
 #include <malloc.h>
 
+#ifdef WIN32 // TEMP
 #include "scoped.h"
+#endif
 
 #ifndef XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM
 #define XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM DXGI_FORMAT(189)

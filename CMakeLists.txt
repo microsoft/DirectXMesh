@@ -74,6 +74,12 @@ if(MSVC)
     string(REPLACE "/GR " "/GR- " CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 endif()
 
+if (NOT WIN32)
+    find_package(directx-headers CONFIG REQUIRED)
+    find_package(directxmath CONFIG REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectX-Headers Microsoft::DirectXMath)
+endif()
+
 #--- Utilities
 set(UTILS_HEADERS
     Utilities/WaveFrontReader.h)

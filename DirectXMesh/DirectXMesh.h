@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#ifdef WIN32
 #if !defined(__d3d11_h__) && !defined(__d3d11_x_h__) && !defined(__d3d12_h__) && !defined(__d3d12_x_h__) && !defined(__XBOX_D3D12_X__)
 #ifdef _GAMING_XBOX_SCARLETT
 #include <d3d12_xs.h>
@@ -29,6 +30,10 @@
 #else
 #include <d3d11_1.h>
 #endif
+#endif
+#else
+#include <directx/dxgiformat.h>
+#include <wsl/winadapter.h>
 #endif
 
 #include <DirectXMath.h>
