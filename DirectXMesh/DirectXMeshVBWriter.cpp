@@ -107,9 +107,11 @@ public:
                     mTempSize = mVerts[j];
             }
 
-            mTempBuffer.reset(static_cast<XMVECTOR*>(_aligned_malloc(sizeof(XMVECTOR) * mTempSize, 16)));
-            if (!mTempBuffer)
+            auto temp = make_AlignedArrayXMVECTOR(mTempSize);
+            if (!temp)
                 mTempSize = 0;
+
+            mTempBuffer.swap(temp);
         }
 
         return mTempBuffer.get();
