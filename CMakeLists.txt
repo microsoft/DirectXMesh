@@ -13,12 +13,12 @@ project(DirectXMesh
 
 option(BUILD_TOOLS "Build meshconvert" ON)
 
-# Includes the support for DX 12 input layouts
+# Includes the support for DirectX 12 input layouts
 option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
 
 option(ENABLE_CODE_ANALYSIS "Use Static Code Analysis on build" OFF)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -130,8 +130,7 @@ install(FILES ${LIBRARY_HEADERS}
 install(FILES ${UTILS_HEADERS}
   DESTINATION utils)
 
-install(
-  FILES
+install(FILES
     ${PROJECT_BINARY_DIR}/cmake/${PACKAGE_NAME}-config.cmake
     ${PROJECT_BINARY_DIR}/cmake/${PACKAGE_NAME}-config-version.cmake
   DESTINATION cmake/)
