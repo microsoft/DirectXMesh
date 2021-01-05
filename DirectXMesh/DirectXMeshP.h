@@ -89,6 +89,10 @@
 #else
 #include <d3d11_1.h>
 #endif
+#else // !WIN32
+#include <wsl/winadapter.h>
+#include <wsl/wrladapter.h>
+#include <directx/d3d12.h>
 #endif
 
 #include <array>
@@ -120,6 +124,13 @@
 // HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)
 #define HRESULT_E_NOT_SUPPORTED static_cast<HRESULT>(0x80070032L)
 
+// HRESULT_FROM_WIN32(ERROR_INVALID_NAME)
+#define HRESULT_E_INVALID_NAME static_cast<HRESULT>(0x8007007BL)
+
+// E_BOUNDS
+#ifndef E_BOUNDS
+#define E_BOUNDS static_cast<HRESULT>(0x8000000BL)
+#endif
 
 namespace DirectX
 {

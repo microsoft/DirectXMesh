@@ -78,9 +78,13 @@ namespace
     float s_vertexCacheScores[kMaxVertexCacheSize + 1][kMaxVertexCacheSize];
     float s_vertexValenceScores[kMaxPrecomputedVertexValenceScores];
 
+#ifdef WIN32
     static INIT_ONCE s_initOnce = INIT_ONCE_STATIC_INIT;
 
     BOOL WINAPI ComputeVertexScores(PINIT_ONCE, PVOID, PVOID*) noexcept
+#else
+    bool ComputeVertexScores() noexcept
+#endif
     {
         for (uint32_t cacheSize = 0; cacheSize <= kMaxVertexCacheSize; ++cacheSize)
         {
@@ -95,11 +99,19 @@ namespace
             s_vertexValenceScores[valence] = ComputeVertexValenceScore(valence);
         }
 
+#ifdef WIN32
         return TRUE;
+#else
+        return true;
+#endif
     }
 
     float FindVertexScore(uint32_t numActiveFaces, uint32_t cachePosition, uint32_t vertexCacheSize) noexcept
     {
+  #ifndef WIN32
+        static bool s_vertexScoresComputed = ComputeVertexScores();
+  #endif
+
         if (numActiveFaces == 0)
         {
             // No tri needs this vertex!
@@ -510,7 +522,9 @@ HRESULT DirectX::OptimizeFacesLRU(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
+#ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#endif
 
     return OptimizeFacesImpl<uint16_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
 }
@@ -531,7 +545,9 @@ HRESULT DirectX::OptimizeFacesLRU(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
+#ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#endif
 
     return OptimizeFacesImpl<uint32_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
 }
@@ -555,7 +571,9 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
+#ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#endif
 
     auto subsets = ComputeSubsets(attributes, nFaces);
 
@@ -604,7 +622,9 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
+#ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#endif
 
     auto subsets = ComputeSubsets(attributes, nFaces);
 

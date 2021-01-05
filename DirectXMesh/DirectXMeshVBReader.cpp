@@ -14,6 +14,10 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
+#ifndef WIN32
+#define _stricmp strcasecmp
+#endif
+
 namespace
 {
     constexpr size_t c_MaxSlot = 32;
@@ -291,7 +295,7 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
     }
 
     if (it == range.second)
-        return HRESULT_FROM_WIN32(ERROR_INVALID_NAME);
+        return HRESULT_E_INVALID_NAME;
 
     uint32_t inputSlot = mInputDesc[it->second].InputSlot;
 
