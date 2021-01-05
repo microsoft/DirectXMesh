@@ -108,9 +108,7 @@
 
 #include <malloc.h>
 
-#ifdef WIN32 // TEMP
 #include "scoped.h"
-#endif
 
 #ifndef XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM
 #define XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM DXGI_FORMAT(189)
