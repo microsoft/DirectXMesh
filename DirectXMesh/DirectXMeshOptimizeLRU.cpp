@@ -83,7 +83,9 @@ namespace
 
     BOOL WINAPI ComputeVertexScores(PINIT_ONCE, PVOID, PVOID*) noexcept
 #else
-    bool ComputeVertexScores() noexcept
+    std::once_flag s_initOnce;
+
+    void ComputeVertexScores() noexcept
 #endif
     {
         for (uint32_t cacheSize = 0; cacheSize <= kMaxVertexCacheSize; ++cacheSize)
@@ -101,17 +103,11 @@ namespace
 
 #ifdef WIN32
         return TRUE;
-#else
-        return true;
 #endif
     }
 
     float FindVertexScore(uint32_t numActiveFaces, uint32_t cachePosition, uint32_t vertexCacheSize) noexcept
     {
-  #ifndef WIN32
-        static bool s_vertexScoresComputed = ComputeVertexScores();
-  #endif
-
         if (numActiveFaces == 0)
         {
             // No tri needs this vertex!
@@ -524,6 +520,8 @@ HRESULT DirectX::OptimizeFacesLRU(
 
 #ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#else
+    std::call_once(s_initOnce, ComputeVertexScores);
 #endif
 
     return OptimizeFacesImpl<uint16_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
@@ -547,6 +545,8 @@ HRESULT DirectX::OptimizeFacesLRU(
 
 #ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#else
+    std::call_once(s_initOnce, ComputeVertexScores);
 #endif
 
     return OptimizeFacesImpl<uint32_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
@@ -573,6 +573,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
 #ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#else
+    std::call_once(s_initOnce, ComputeVertexScores);
 #endif
 
     auto subsets = ComputeSubsets(attributes, nFaces);
@@ -624,6 +626,8 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
 #ifdef WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
+#else
+    std::call_once(s_initOnce, ComputeVertexScores);
 #endif
 
     auto subsets = ComputeSubsets(attributes, nFaces);

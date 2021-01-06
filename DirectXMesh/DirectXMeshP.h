@@ -106,6 +106,10 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#ifndef WIN32
+#include <mutex>
+#endif
+
 #define _XM_NO_XMVECTOR_OVERLOADS_
 
 #include "DirectXMesh.h"
