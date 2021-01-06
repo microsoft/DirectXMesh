@@ -57,7 +57,7 @@
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WINAPI_FAMILY)
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
