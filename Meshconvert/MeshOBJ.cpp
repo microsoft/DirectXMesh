@@ -25,6 +25,7 @@
 #include "WaveFrontReader.h"
 
 #include <iterator>
+#include <cwchar>
 
 using namespace DirectX;
 

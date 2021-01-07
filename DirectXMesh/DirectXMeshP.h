@@ -99,6 +99,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <cwchar>
 #include <map>
 #include <string>
 #include <unordered_map>
