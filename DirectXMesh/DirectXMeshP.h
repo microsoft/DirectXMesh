@@ -57,6 +57,7 @@
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #endif
 
+#if defined(WIN32) || defined(WINAPI_FAMILY)
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
@@ -88,10 +89,11 @@
 #else
 #include <d3d11_1.h>
 #endif
-
-#define _XM_NO_XMVECTOR_OVERLOADS_
-
-#include "DirectXMesh.h"
+#else // !WIN32
+#include <wsl/winadapter.h>
+#include <wsl/wrladapter.h>
+#include <directx/d3d12.h>
+#endif
 
 #include <array>
 #include <algorithm>
@@ -105,6 +107,14 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#ifndef WIN32
+#include <mutex>
+#endif
+
+#define _XM_NO_XMVECTOR_OVERLOADS_
+
+#include "DirectXMesh.h"
+
 #include <malloc.h>
 
 #include "scoped.h"
@@ -113,6 +123,19 @@
 #define XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM DXGI_FORMAT(189)
 #endif
 
+// HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW)
+#define HRESULT_E_ARITHMETIC_OVERFLOW static_cast<HRESULT>(0x80070216L)
+
+// HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)
+#define HRESULT_E_NOT_SUPPORTED static_cast<HRESULT>(0x80070032L)
+
+// HRESULT_FROM_WIN32(ERROR_INVALID_NAME)
+#define HRESULT_E_INVALID_NAME static_cast<HRESULT>(0x8007007BL)
+
+// E_BOUNDS
+#ifndef E_BOUNDS
+#define E_BOUNDS static_cast<HRESULT>(0x8000000BL)
+#endif
 
 namespace DirectX
 {
