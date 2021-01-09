@@ -13,6 +13,7 @@
 
 #pragma once
 
+#if defined(WIN32) || defined(_WIN32)
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
@@ -25,6 +26,14 @@
 #pragma warning(pop)
 
 #include <Windows.h>
+#else // !WIN32
+#include <wsl/winadapter.h>
+#include <wsl/wrladapter.h>
+
+#ifndef MAX_PATH
+#define MAX_PATH 4096
+#endif
+#endif
 
 #include <algorithm>
 #include <cstdint>
@@ -32,6 +41,10 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+
+#ifndef WIN32
+#include <filesystem>
+#endif
 
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
@@ -59,12 +72,16 @@ public:
 
         std::wifstream InFile(szFileName);
         if (!InFile)
-            return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+            return /* HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) */ static_cast<HRESULT>(0x80070002L);
 
+#ifdef WIN32
         wchar_t fname[_MAX_FNAME] = {};
         _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
-
         name = fname;
+#else
+        auto path = std::filesystem::path(szFileName);
+        name = path.filename().c_str();
+#endif
 
         std::vector<XMFLOAT3>   positions;
         std::vector<XMFLOAT3>   normals;
@@ -363,6 +380,7 @@ public:
         // If an associated material file was found, read that in as well.
         if (*strMaterialFilename)
         {
+#ifdef WIN32
             wchar_t ext[_MAX_EXT] = {};
             _wsplitpath_s(strMaterialFilename, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
 
@@ -375,6 +393,16 @@ public:
             HRESULT hr = LoadMTL(szPath);
             if (FAILED(hr))
                 return hr;
+#else
+            auto path = std::filesystem::path(szFileName);
+            auto mtlpath = std::filesystem::path(strMaterialFilename);
+            path.replace_filename(mtlpath.filename());
+            path.replace_extension(mtlpath.extension());
+
+            HRESULT hr = LoadMTL(path.c_str());
+            if (FAILED(hr))
+                return hr;
+#endif
         }
 
         return S_OK;
@@ -387,7 +415,7 @@ public:
         // Assumes MTL is in CWD along with OBJ
         std::wifstream InFile(szFileName);
         if (!InFile)
-            return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+            return /* HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) */ static_cast<HRESULT>(0x80070002L);
 
         auto curMaterial = materials.end();
 
@@ -545,10 +573,14 @@ public:
 
         Clear();
 
+#ifdef WIN32
         wchar_t fname[_MAX_FNAME] = {};
         _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
-
         name = fname;
+#else
+        auto path = std::filesystem::path(szFileName);
+        name = path.filename().c_str();
+#endif
 
         Material defmat;
         wcscpy_s(defmat.strName, L"default");
@@ -556,7 +588,7 @@ public:
 
         std::ifstream vboFile(szFileName, std::ifstream::in | std::ifstream::binary);
         if (!vboFile.is_open())
-            return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+            return /* HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) */ static_cast<HRESULT>(0x80070002L);
 
         hasNormals = hasTexcoords = true;
 
@@ -705,7 +737,11 @@ private:
 
         if (!path.empty())
         {
+#ifdef WIN32
             wcscpy_s(texture, maxChar, path.c_str());
+#else
+            wcscpy(texture, path.c_str());
+#endif
         }
     }
 };
