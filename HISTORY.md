@@ -6,7 +6,12 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
-###November 11, 2020
+#### January 9, 2021
+* Windows Subsystem for Linux support
+* Code review for improved conformance
+* CMake updated to support package install
+
+### November 11, 2020
 * Code review and project updates
 
 ### August 15, 2020
