@@ -24,8 +24,9 @@
 #include "Mesh.h"
 #include "WaveFrontReader.h"
 
-#include <iterator>
 #include <cwchar>
+#include <iterator>
+#include <new>
 
 using namespace DirectX;
 

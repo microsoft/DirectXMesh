@@ -103,6 +103,7 @@
 #include <cstring>
 #include <cwchar>
 #include <map>
+#include <new>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
