@@ -155,7 +155,7 @@ if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
   source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
 
   if (VCPKG_TOOLCHAIN)
-    target_link_libraries(meshconvert Microsoft::DirectX-Headers Microsoft::DirectXMath)
+    target_link_libraries(meshconvert Microsoft::DirectXMath)
   endif()
 endif()
 if(MSVC)
