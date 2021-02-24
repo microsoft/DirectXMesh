@@ -19,6 +19,7 @@
 *.nupkg
 .vs
 [Bb]in
+packages
 /ipch
 Debug
 Profile

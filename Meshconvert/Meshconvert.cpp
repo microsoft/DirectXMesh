@@ -167,6 +167,11 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename,
     std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial,
     bool ccw, bool dds);
 
+HRESULT LoadFromX(const wchar_t* szFilename,
+    std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial,
+    bool ccw, bool dds);
+
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -760,8 +765,14 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else if (_wcsicmp(ext, L".x") == 0)
         {
-            wprintf(L"\nERROR: Legacy Microsoft X files not supported\n");
-            return 1;
+            hr = LoadFromX(pConv->szSrc, inMesh, inMaterial,
+                (dwOptions & (1 << OPT_CLOCKWISE)) ? false : true,
+                (dwOptions & (1 << OPT_NODDS)) ? false : true);
+            if (hr == HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED) || hr == E_NOINTERFACE)
+            {
+                wprintf(L"\nERROR: D3DX9_43.DLL required to load legacy Microsoft X files\n");
+                return 1;
+            }
         }
         else if (_wcsicmp(ext, L".fbx") == 0)
         {
