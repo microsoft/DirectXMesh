@@ -6,7 +6,7 @@
 // Forsyth "Linear-Speed Vertex Cache Optimisation"
 // https://tomforsyth1000.github.io/papers/fast_vert_cache_opt.html
 //
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkID=324981
