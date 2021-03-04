@@ -8,6 +8,9 @@
     <Filter Include="Wavefront OBJ">
       <UniqueIdentifier>{a500efbf-87f7-4c3b-b7c4-a3505a25d342}</UniqueIdentifier>
     </Filter>
+    <Filter Include="XFile">
+      <UniqueIdentifier>{d24cdb33-8b04-4cfe-aba2-8f1e5233fa06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Meshconvert.cpp" />
@@ -15,6 +18,9 @@
     <CLInclude Include="Mesh.h" />
     <ClCompile Include="MeshOBJ.cpp">
       <Filter>Wavefront OBJ</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshX.cpp">
+      <Filter>XFile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -29,5 +35,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
