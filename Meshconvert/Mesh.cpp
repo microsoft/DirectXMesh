@@ -236,6 +236,52 @@ HRESULT Mesh::SetIndexData(size_t nFaces, const uint32_t* indices, const uint32_
 
 
 //--------------------------------------------------------------------------------------
+_Use_decl_annotations_
+HRESULT Mesh::SetVertexData(_In_ size_t nVerts,
+    const DirectX::XMFLOAT3* positions,
+    const DirectX::XMFLOAT3* normals,
+    const DirectX::XMFLOAT2* itexcoords) noexcept
+{
+    // Release vertex data
+    mnVerts = 0;
+    mPositions.reset();
+    mNormals.reset();
+    mTangents.reset();
+    mBiTangents.reset();
+    mTexCoords.reset();
+    mColors.reset();
+    mBlendIndices.reset();
+    mBlendWeights.reset();
+
+    std::unique_ptr<XMFLOAT3[]> pos(new (std::nothrow) XMFLOAT3[nVerts]);
+    if (!pos)
+        return E_OUTOFMEMORY;
+
+    memcpy(pos.get(), positions, sizeof(XMFLOAT3) * nVerts);
+
+    std::unique_ptr<XMFLOAT3[]> norms;
+    if (normals)
+    {
+        norms.reset(new (std::nothrow) XMFLOAT3[nVerts]);
+        memcpy(norms.get(), normals, sizeof(XMFLOAT3) * nVerts);
+    }
+
+    std::unique_ptr<XMFLOAT2[]> texcoord;
+    if (itexcoords)
+    {
+        texcoord.reset(new (std::nothrow) XMFLOAT2[nVerts]);
+        memcpy(texcoord.get(), itexcoords, sizeof(XMFLOAT2) * nVerts);
+    }
+
+    // Return values
+    mPositions.swap(pos);
+    mNormals.swap(norms);
+    mTexCoords.swap(texcoord);
+    mnVerts = nVerts;
+
+    return S_OK;
+}
+
 HRESULT Mesh::SetVertexData(const DirectX::VBReader& reader, _In_ size_t nVerts) noexcept
 {
     if (!nVerts)

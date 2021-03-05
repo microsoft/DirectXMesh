@@ -76,7 +76,7 @@ namespace
     class ScratchMesh
     {
     public:
-        ScratchMesh() {}
+        ScratchMesh() noexcept : m_texcoordsCount{} {}
         ~ScratchMesh() { Release(); }
 
         ScratchMesh(ScratchMesh&&) = default;
@@ -99,6 +99,8 @@ namespace
 
             for (size_t i = 0; i < MAX_TEXCOORD; ++i)
                 m_texcoords[i].clear();
+
+            memset(&m_texcoordsCount, 0, sizeof(m_texcoordsCount));
 
             m_materials.clear();
             m_vdups.clear();
@@ -185,6 +187,7 @@ namespace
                         continue;
 
                     m_texcoords[tc].push_back(mesh.m_texcoords[tc][ivert]);
+                    m_texcoordsCount[tc] = std::max(m_texcoordsCount[tc], mesh.m_texcoordsCount[tc]);
                 }
             }
 
@@ -313,12 +316,15 @@ namespace
             return S_OK;
         }
 
-        HRESULT SetTexCoords(_In_ size_t tset, _In_ size_t nverts, _In_count_(nverts) const XMFLOAT4* coords)
+        HRESULT SetTexCoords(_In_ size_t tset, _In_ size_t tcount, _In_ size_t nverts, _In_count_(nverts) const XMFLOAT4* coords)
         {
             if (m_positions.empty() || m_indices.empty())
                 return E_FAIL;
 
             if (tset >= MAX_TEXCOORD)
+                return E_INVALIDARG;
+
+            if (tcount < 1 || tcount > 4)
                 return E_INVALIDARG;
 
             size_t overts = m_positions.size() - m_vdups.size();
@@ -338,6 +344,8 @@ namespace
             {
                 m_texcoords[tset][i] = coords[i];
             }
+
+            m_texcoordsCount[tset] = static_cast<uint32_t>(tcount);
 
             // Set texture coordinates in any duplicated vertices
             for (auto it = m_vdups.cbegin(); it != m_vdups.cend(); ++it)
@@ -620,6 +628,50 @@ namespace
             return m_materials.size();
         }
 
+        HRESULT GetMesh(std::unique_ptr<Mesh>& mesh) const
+        {
+            if (!IsValid())
+                return E_FAIL;
+
+            mesh.reset(new (std::nothrow) Mesh);
+            if (!mesh)
+                return E_OUTOFMEMORY;
+
+            HRESULT hr = mesh->SetIndexData(m_indices.size() / 3, m_indices.data(),
+                m_attributes.empty() ? nullptr : m_attributes.data());
+            if (FAILED(hr))
+                return hr;
+
+            if (m_texcoords[0].empty() || m_texcoordsCount[0] != 2)
+            {
+                hr = mesh->SetVertexData(m_positions.size(), m_positions.data(),
+                    m_normals.empty() ? nullptr : m_normals.data(),
+                    nullptr);
+
+                // TODO - needs FVF or DeclData if m_texcoordsCount[0] != 2
+            }
+            else
+            {
+                std::unique_ptr<XMFLOAT2[]> temp(new (std::nothrow) XMFLOAT2[m_texcoords[0].size()]);
+                if (!temp)
+                    return E_OUTOFMEMORY;
+
+                for (size_t j = 0; j < m_texcoords[0].size(); ++j)
+                {
+                    temp[j].x = m_texcoords[0][j].x;
+                    temp[j].y = m_texcoords[0][j].y;
+                }
+
+                hr = mesh->SetVertexData(m_positions.size(), m_positions.data(),
+                    m_normals.empty() ? nullptr : m_normals.data(),
+                    temp.get());
+            }
+            if (FAILED(hr))
+                return hr;
+
+            return S_OK;
+        }
+
     private:
         using indices_t = std::vector<uint32_t>;
         using attributes_t = std::vector<uint32_t>;
@@ -646,6 +698,7 @@ namespace
         bones_t         m_bones;
         weights_t       m_weights;
         texcoords_t     m_texcoords[MAX_TEXCOORD];
+        uint32_t        m_texcoordsCount[MAX_TEXCOORD];
 
         materials_t     m_materials;
         vdups_t         m_vdups;
@@ -723,7 +776,7 @@ namespace
         auto verts = reinterpret_cast<const XMFLOAT3*>(pMeshData + sizeof(DWORD));
 
         uint64_t cb = uint64_t(nVerts) * 3 * sizeof(float) + sizeof(DWORD);
-        if (cb > UINT32_MAX)
+        if ((cb + sizeof(DWORD)) > UINT32_MAX)
             return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
         // Verify we have enough space for those verts plus the face count
@@ -827,7 +880,17 @@ namespace
 
             Lock<ID3DXFileData> unlockc(pChild.Get());
 
-            if (type == TID_D3DRMMeshVertexColors)
+            if (type == DXFILEOBJ_PMInfo)
+            {
+                // ProgressiveMesh data is not supported.
+                return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+            }
+            else if (type == DXFILEOBJ_PatchMesh9)
+            {
+                // PatchMesh data is not supported.
+                return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+            }
+            else if (type == TID_D3DRMMeshVertexColors)
             {
                 //--- Load vertex colors -----------------------------------------------
 #ifdef _DEBUG
@@ -840,7 +903,11 @@ namespace
                 pptr = reinterpret_cast<const DWORD*>(dataPtr);
                 size_t nColors = *pptr;
 
-                if (cbSize < (sizeof(DWORD) + (sizeof(DWORD) * uint64_t(nColors)) + (sizeof(float) * 4 * uint64_t(nColors))))
+                uint64_t cb2 = sizeof(DWORD) + (sizeof(DWORD) * uint64_t(nColors)) + (sizeof(float) * 4 * uint64_t(nColors));
+                if (cb2 > UINT32_MAX)
+                    return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+
+                if (cbSize < cb2)
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
                 ++pptr;
@@ -884,18 +951,22 @@ namespace
                 if (!nNormals)
                     return E_FAIL;
 
-                cb = sizeof(DWORD) + (uint64_t(nNormals) * sizeof(float) * 3);
+                uint64_t cb2 = sizeof(DWORD) + (uint64_t(nNormals) * sizeof(float) * 3);
+                if ((cb2 + sizeof(DWORD)) > UINT32_MAX)
+                    return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
-                if (cbSize < (cb + sizeof(DWORD)))
+                if (cbSize < (cb2 + sizeof(DWORD)))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
-                size_t nFaceNormals = *reinterpret_cast<const DWORD*>(dataPtr + cb);
+                size_t nFaceNormals = *reinterpret_cast<const DWORD*>(dataPtr + cb2);
                 if (nPolygons != nFaceNormals)
                     return E_FAIL;
 
-                cb += (uint64_t(nOrigIndices) * sizeof(DWORD));
+                cb2 += uint64_t(nOrigIndices) * sizeof(DWORD);
+                if (cb2 > UINT32_MAX)
+                    return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
-                if (cbSize < cb)
+                if (cbSize < cb2)
                     return E_FAIL;
 
                 normals.reset(new (std::nothrow) XMFLOAT3[nTris * 3]);
@@ -955,7 +1026,11 @@ namespace
 
                 ++pptr;
 
-                if (cbSize < (sizeof(DWORD) + (sizeof(float) * 2 * uint64_t(nVerts))))
+                uint64_t cb2 = (sizeof(DWORD) + (sizeof(float) * 2 * uint64_t(nVerts)));
+                if (cb2 > UINT32_MAX)
+                    return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
+
+                if (cbSize < cb2)
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
                 std::unique_ptr<XMFLOAT4[]> coords(new (std::nothrow) XMFLOAT4[nVerts]);
@@ -971,7 +1046,7 @@ namespace
                     pptr += 2;
                 }
 
-                hr = mesh.SetTexCoords(0, nVerts, coords.get());
+                hr = mesh.SetTexCoords(0, 2, nVerts, coords.get());
                 if (FAILED(hr))
                     return hr;
             }
@@ -986,7 +1061,7 @@ namespace
             }
             else if (type == DXFILEOBJ_FVFData)
            {
-                //--- Fixed-vertex-format ----------------------------------------------
+                //--- Additional vertex data using FVF ---------------------------------
                 if (cbSize < (sizeof(DWORD) * 2))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
@@ -1006,21 +1081,27 @@ namespace
                 OutputDebugStringA(buff);
 #endif
 
-                cb = sizeof(DWORD) * (ndw + 2);
+                uint64_t cb2 = sizeof(DWORD) * (uint64_t(ndw) + 2);
+                if (cb2 > UINT32_MAX)
+                    return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
-                if (cbSize < cb)
+                if (cbSize < cb2)
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                // TODO - Multiple and/or !float2 texcoords, weights, specular,
+                return E_NOTIMPL;
             }
             else if (type == DXFILEOBJ_DeclData)
             {
-                //--- Decl layout ------------------------------------------------------
+                //--- Additional vertex data via Decl ----------------------------------
 #ifdef _DEBUG
                 OutputDebugStringA("XFileMesh: found DeclData data in .X file\n");
 #endif
+                // TODO - Multiple and/or !float2 texcoords, tangents, binormals, specular, weights, etc.
+                return E_NOTIMPL;
             }
             else if (type == DXFILEOBJ_XSkinMeshHeader)
             {
-
                 // TODO - DXFILEOBJ_XSkinMeshHeader
 
 #ifdef _DEBUG
@@ -1030,7 +1111,6 @@ namespace
             else if (type == DXFILEOBJ_SkinWeights)
             {
                 // TODO - DXFILEOBJ_SkinWeights
-
 #ifdef _DEBUG
                 OutputDebugStringA("XFileMesh: found SkinWeights data in .X file\n");
 #endif
@@ -1223,7 +1303,5 @@ HRESULT LoadFromX(
     if (FAILED(hr))
         return hr;
 
-    // TODO - ScratchMesh to Mesh
-
-    return E_NOTIMPL;
+    return mesh.GetMesh(inMesh);
 }
