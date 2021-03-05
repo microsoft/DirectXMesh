@@ -2,9 +2,9 @@
 // File: MeshX.cpp
 //
 // Helper code for loading Mesh data from legacy .X files
-// (Uses legacy X File COM interface in D3DX9 DLL)
+// (Uses XFile COM interface in legacy D3DX9 DLL)
 //
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkID=324981
@@ -24,6 +24,7 @@
 #include "Mesh.h"
 
 #include <map>
+#include <new>
 
 #include <objbase.h>
 #include <d3d9.h>
@@ -39,6 +40,7 @@
 #undef DEFINE_GUID
 #include <initguid.h>
 #include <d3dx9xof.h>
+#include <d3dx9mesh.h>
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -48,18 +50,24 @@ namespace
     template<class T> class Lock
     {
     public:
-        explicit Lock(T* p = 0) : _pointer(p) {}
+        explicit Lock(T* p = 0) noexcept : _pointer(p) {}
+
+        Lock(const Lock&) = delete;
+        Lock& operator=(const Lock&) = delete;
+
+        Lock(Lock&&) = delete;
+        Lock& operator=(Lock&&) = delete;
+
         ~Lock()
         {
             if (_pointer)
+            {
                 _pointer->Unlock();
-            _pointer = nullptr;
+                _pointer = nullptr;
+            }
         }
 
     private:
-        Lock(const Lock&);
-        Lock& operator=(const Lock&);
-
         T* _pointer;
     };
 
@@ -213,7 +221,7 @@ namespace
                 if ((uint64_t(m_materials.size()) + uint64_t(mesh.m_materials.size())) > UINT32_MAX)
                     return E_FAIL;
 
-                uint32_t mbase = static_cast<uint32_t>(m_materials.size());
+                auto mbase = static_cast<uint32_t>(m_materials.size());
 
                 m_materials.reserve(m_materials.size() + mesh.m_materials.size());
 
@@ -646,10 +654,12 @@ namespace
     //-------------------------------------------------------------------------------------
     // Creates an X File reader object (using the legacy D3DX9 DLL if it can be found)
     //-------------------------------------------------------------------------------------
-    HRESULT SetupXFile(_Deref_out_ ID3DXFile** ppXFile)
+    HRESULT SetupXFile(_COM_Outptr_ ID3DXFile** ppXFile)
     {
         if (!ppXFile)
-            return E_POINTER;
+            return E_INVALIDARG;
+
+        *ppXFile = nullptr;
 
         HMODULE hMod = LoadLibraryW(D3DX9_DLL_W);
         if (!hMod)
@@ -657,40 +667,31 @@ namespace
 
         typedef HRESULT(STDAPICALLTYPE* fpDirectXFile)(_Deref_out_ ID3DXFile** lplpDirectXFile);
 
-        auto pfXFile = reinterpret_cast<fpDirectXFile>(GetProcAddress(hMod, "D3DXFileCreate"));
+        auto pfXFile = reinterpret_cast<fpDirectXFile>(static_cast<void*>(GetProcAddress(hMod, "D3DXFileCreate")));
         if (!pfXFile)
         {
             FreeLibrary(hMod);
             return E_NOINTERFACE;
         }
 
-        ID3DXFile* pXFile = nullptr;
+        ComPtr<ID3DXFile> pXFile;
         HRESULT hr = pfXFile(&pXFile);
         if (FAILED(hr))
             return hr;
 
-        hr = pXFile->RegisterTemplates((LPVOID)D3DRM_XTEMPLATES, D3DRM_XTEMPLATE_BYTES);
+        hr = pXFile->RegisterTemplates(reinterpret_cast<LPVOID>(D3DRM_XTEMPLATES), D3DRM_XTEMPLATE_BYTES);
         if (FAILED(hr))
-        {
-            pXFile->Release();
             return hr;
-        }
 
-        hr = pXFile->RegisterTemplates((LPVOID)XSKINEXP_TEMPLATES, sizeof(XSKINEXP_TEMPLATES) - 1);
+        hr = pXFile->RegisterTemplates(reinterpret_cast<LPCVOID>(XSKINEXP_TEMPLATES), sizeof(XSKINEXP_TEMPLATES) - 1);
         if (FAILED(hr))
-        {
-            pXFile->Release();
             return hr;
-        }
 
-        hr = pXFile->RegisterTemplates((LPVOID)XEXTENSIONS_TEMPLATES, sizeof(XEXTENSIONS_TEMPLATES) - 1);
+        hr = pXFile->RegisterTemplates(reinterpret_cast<LPCVOID>(XEXTENSIONS_TEMPLATES), sizeof(XEXTENSIONS_TEMPLATES) - 1);
         if (FAILED(hr))
-        {
-            pXFile->Release();
             return hr;
-        }
 
-        *ppXFile = pXFile;
+        *ppXFile = pXFile.Detach();
 
         return S_OK;
     }
@@ -721,7 +722,9 @@ namespace
 
         auto verts = reinterpret_cast<const XMFLOAT3*>(pMeshData + sizeof(DWORD));
 
-        size_t cb = (nVerts * 3 * sizeof(float)) + sizeof(DWORD);
+        uint64_t cb = uint64_t(nVerts) * 3 * sizeof(float) + sizeof(DWORD);
+        if (cb > UINT32_MAX)
+            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
         // Verify we have enough space for those verts plus the face count
         if (cbSize < (cb + sizeof(DWORD)))
@@ -733,7 +736,9 @@ namespace
 
         auto polys = reinterpret_cast<const DWORD*>(pMeshData + cb + sizeof(DWORD));
 
-        cb += (nPolygons * sizeof(DWORD)) + sizeof(DWORD);
+        cb += (uint64_t(nPolygons) * sizeof(DWORD)) + sizeof(DWORD);
+        if (cb > UINT32_MAX)
+            return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
 
         // Verify we have enough space for the polygons
         if (cbSize < cb)
@@ -759,14 +764,14 @@ namespace
 
         mesh.Reserve(nVerts, nTris);
 
-        //---------------------------------------------------------------- Process vertices
+        //--- Process vertices ---------------------------------------------------------
         const XMFLOAT3* vptr = verts;
         for (size_t ivert = 0; ivert < nVerts; ++ivert)
         {
             mesh.AddVertex(*vptr++);
         }
 
-        //---------------------------------------- Process faces, convertings polys to tris
+        //--- Process faces, convertings polys to tris ---------------------------------
         pptr = polys;
         size_t aTris = 0;
         for (size_t iface = 0; iface < nPolygons; ++iface)
@@ -805,8 +810,7 @@ namespace
         std::unique_ptr<XMFLOAT3[]> normals;
         for (size_t ichild = 0; ichild < nchildren; ++ichild)
         {
-            LPD3DXFILEDATA pChild = nullptr;
-
+            ComPtr<ID3DXFileData> pChild;
             hr = pCurrent->GetChild(ichild, &pChild);
             if (FAILED(hr))
                 return hr;
@@ -817,40 +821,40 @@ namespace
                 return hr;
 
             const uint8_t* dataPtr;
-            hr = pChild->Lock(&cbSize, (LPCVOID*)&dataPtr);
+            hr = pChild->Lock(&cbSize, reinterpret_cast<LPCVOID*>(&dataPtr));
             if (FAILED(hr))
                 return hr;
 
-            Lock<ID3DXFileData> unlockc(pChild);
+            Lock<ID3DXFileData> unlockc(pChild.Get());
 
             if (type == TID_D3DRMMeshVertexColors)
             {
-                //------------------------------------------------------ Load vertex colors
+                //--- Load vertex colors -----------------------------------------------
 #ifdef _DEBUG
-                OutputDebugStringA("DirectXMesh found vertex colors in .X file\n");
+                OutputDebugStringA("XFileMesh: found vertex colors in .X file\n");
 #endif
 
                 if (cbSize < sizeof(DWORD))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
                 pptr = reinterpret_cast<const DWORD*>(dataPtr);
-                DWORD nColors = *pptr;
+                size_t nColors = *pptr;
 
-                if (cbSize < (sizeof(DWORD) + (sizeof(DWORD) * nColors) + (sizeof(float) * 4 * nColors)))
+                if (cbSize < (sizeof(DWORD) + (sizeof(DWORD) * uint64_t(nColors)) + (sizeof(float) * 4 * uint64_t(nColors))))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
                 ++pptr;
 
-                auto colors = std::make_unique<XMFLOAT4[]>(nVerts);
+                std::unique_ptr<XMFLOAT4[]> colors(new (std::nothrow) XMFLOAT4[nVerts]);
                 if (!colors)
                     return E_OUTOFMEMORY;
 
-                for (DWORD i = 0; i < nVerts; ++i)
+                for (size_t i = 0; i < nVerts; ++i)
                 {
                     colors[i] = XMFLOAT4(0.f, 0.f, 0.f, 1.f);
                 }
 
-                for (DWORD i = 0; i < nColors; ++i)
+                for (size_t i = 0; i < nColors; ++i)
                 {
                     DWORD index = *pptr;
                     ++pptr;
@@ -869,9 +873,9 @@ namespace
             }
             else if (type == TID_D3DRMMeshNormals)
             {
-                //------------------------------------------------------------ Load normals
+                //--- Load normals -----------------------------------------------------
 #ifdef _DEBUG
-                OutputDebugStringA("DirectXMesh found normals in .X file\n");
+                OutputDebugStringA("XFileMesh: found normals in .X file\n");
 #endif
                 if (cbSize < sizeof(DWORD))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
@@ -880,7 +884,7 @@ namespace
                 if (!nNormals)
                     return E_FAIL;
 
-                cb = sizeof(DWORD) + (nNormals * sizeof(float) * 3);
+                cb = sizeof(DWORD) + (uint64_t(nNormals) * sizeof(float) * 3);
 
                 if (cbSize < (cb + sizeof(DWORD)))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
@@ -889,17 +893,17 @@ namespace
                 if (nPolygons != nFaceNormals)
                     return E_FAIL;
 
-                cb += (nOrigIndices * sizeof(DWORD));
+                cb += (uint64_t(nOrigIndices) * sizeof(DWORD));
 
                 if (cbSize < cb)
                     return E_FAIL;
 
-                normals.reset(new XMFLOAT3[nTris * 3]);
+                normals.reset(new (std::nothrow) XMFLOAT3[nTris * 3]);
                 if (!normals)
                     return E_OUTOFMEMORY;
 
                 auto n = reinterpret_cast<const XMFLOAT3*>(dataPtr + sizeof(DWORD));
-                auto nptr = reinterpret_cast<const DWORD*>(dataPtr + 2 * sizeof(DWORD) + nNormals * 3 * sizeof(float));
+                auto nptr = reinterpret_cast<const DWORD*>(dataPtr + 2 * sizeof(DWORD) + uint64_t(nNormals) * 3 * sizeof(float));
                 const DWORD* mptr = polys;
                 aTris = 0;
                 for (size_t iface = 0; iface < nPolygons; ++iface)
@@ -936,9 +940,9 @@ namespace
             }
             else if (type == TID_D3DRMMeshTextureCoords)
             {
-                //--------------------------------------- Load (simple) texture coordinates
+                //--- Load (simple) texture coordinates --------------------------------
 #ifdef _DEBUG
-                OutputDebugStringA("DirectXMesh found simple texture coords in .X file\n");
+                OutputDebugStringA("XFileMesh: found simple texture coords in .X file\n");
 #endif
 
                 if (cbSize < sizeof(DWORD))
@@ -951,10 +955,10 @@ namespace
 
                 ++pptr;
 
-                if (cbSize < (sizeof(DWORD) + (sizeof(float) * 2 * nVerts)))
+                if (cbSize < (sizeof(DWORD) + (sizeof(float) * 2 * uint64_t(nVerts))))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
-                auto coords = std::make_unique<XMFLOAT4[]>(nVerts);
+                std::unique_ptr<XMFLOAT4[]> coords(new (std::nothrow) XMFLOAT4[nVerts]);
                 if (!coords)
                     return E_OUTOFMEMORY;
 
@@ -973,15 +977,16 @@ namespace
             }
             else if (type == TID_D3DRMMeshMaterialList)
             {
-                //----------------------------------------------- Load materials/attributes
+                //--- Load materials/attributes ----------------------------------------
 #ifdef _DEBUG
-                OutputDebugStringA("DirectXMesh found materials list in .X file\n");
+                OutputDebugStringA("XFileMesh: found materials list in .X file\n");
 #endif
 
                 // TODO - load m_attributes and m_materials
             }
             else if (type == DXFILEOBJ_FVFData)
-            {
+           {
+                //--- Fixed-vertex-format ----------------------------------------------
                 if (cbSize < (sizeof(DWORD) * 2))
                     return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
@@ -997,7 +1002,7 @@ namespace
 
 #ifdef _DEBUG
                 char buff[128] = {};
-                sprintf_s(buff, "MeshX found FVF data in .X file: FVF %08X, bytes-per-vertex %zu\n", fvf, (ndw * sizeof(DWORD)) / nVerts);
+                sprintf_s(buff, "XFileMesh: found FVF data in .X file: FVF %08X, bytes-per-vertex %zu\n", fvf, (ndw * sizeof(DWORD)) / nVerts);
                 OutputDebugStringA(buff);
 #endif
 
@@ -1008,14 +1013,51 @@ namespace
             }
             else if (type == DXFILEOBJ_DeclData)
             {
+                //--- Decl layout ------------------------------------------------------
 #ifdef _DEBUG
-                OutputDebugStringA("DirectXMesh found DeclData data in .X file\n");
+                OutputDebugStringA("XFileMesh: found DeclData data in .X file\n");
 #endif
             }
+            else if (type == DXFILEOBJ_XSkinMeshHeader)
+            {
 
-            // TODO - DXFILEOBJ_XSkinMeshHeader, DXFILEOBJ_SkinWeights
+                // TODO - DXFILEOBJ_XSkinMeshHeader
 
-            pChild->Release();
+#ifdef _DEBUG
+                OutputDebugStringA("XFileMesh: found SkinMeshHeader data in .X file\n");
+#endif
+            }
+            else if (type == DXFILEOBJ_SkinWeights)
+            {
+                // TODO - DXFILEOBJ_SkinWeights
+
+#ifdef _DEBUG
+                OutputDebugStringA("XFileMesh: found SkinWeights data in .X file\n");
+#endif
+            }
+#ifdef _DEBUG
+            else if (type == DXFILEOBJ_VertexDuplicationIndices)
+            {
+                OutputDebugStringA("XFileMesh: found VertexDups data in .X file\n");
+            }
+            else if (type == DXFILEOBJ_FaceAdjacency)
+            {
+                OutputDebugStringA("XFileMesh: found FaceAdjacency data in .X file\n");
+            }
+            else if (type == DXFILEOBJ_VertexElement)
+            {
+                OutputDebugStringA("XFileMesh: found VertexElement data in .X file\n");
+            }
+            else
+            {
+                char buff[128] = {};
+                sprintf_s(buff, "XFileMesh: found unknown GUID (%08lX-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X) data in .X file\n",
+                    type.Data1, type.Data2, type.Data3,
+                    type.Data4[0], type.Data4[1], type.Data4[2], type.Data4[3],
+                    type.Data4[4], type.Data4[5], type.Data4[6], type.Data4[7]);
+                OutputDebugStringA(buff);
+            }
+#endif
 
             if (FAILED(hr))
                 return hr;
@@ -1097,25 +1139,37 @@ namespace
 
             for (size_t ichild = 0; ichild < nchildren; ++ichild)
             {
-                LPD3DXFILEDATA pChild = nullptr;
-
+                ComPtr<ID3DXFileData> pChild;
                 hr = pCurrent->GetChild(ichild, &pChild);
                 if (FAILED(hr))
                     return hr;
 
-                hr = LoadMeshesFromX(pChild, lmatrix, mesh);
-
-                pChild->Release();
+                hr = LoadMeshesFromX(pChild.Get(), lmatrix, mesh);
 
                 if (FAILED(hr))
                     return hr;
             }
         }
+#ifdef _DEBUG
+        else if (type == TID_D3DRMAnimationSet)
+        {
+            OutputDebugStringA("XFile: found AnimationSet data in.X file\n");
+        }
+        else
+        {
+            char buff[128] = {};
+            sprintf_s(buff, "XFile: found unknown GUID (%08lX-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X) data in .X file\n",
+                type.Data1, type.Data2, type.Data3,
+                type.Data4[0], type.Data4[1], type.Data4[2], type.Data4[3],
+                type.Data4[4], type.Data4[5], type.Data4[6], type.Data4[7]);
+            OutputDebugStringA(buff);
+        }
+#endif
 
         return S_OK;
     }
 
-    HRESULT LoadFromX(_In_ ID3DXFileEnumObject* pXFileEnum, _Inout_ ScratchMesh& mesh)
+    HRESULT LoadFromXFile(_In_ ID3DXFileEnumObject* pXFileEnum, _Inout_ ScratchMesh& mesh)
     {
         if (!pXFileEnum)
             return E_POINTER;
@@ -1127,18 +1181,14 @@ namespace
 
         for (size_t ichild = 0; ichild < nchildren; ++ichild)
         {
-            LPD3DXFILEDATA pChild = nullptr;
-
+            ComPtr<ID3DXFileData> pChild;
             hr = pXFileEnum->GetChild(ichild, &pChild);
             if (FAILED(hr))
                 return hr;
 
             XMMATRIX mat = XMMatrixIdentity();
 
-            hr = LoadMeshesFromX(pChild, mat, mesh);
-
-            pChild->Release();
-
+            hr = LoadMeshesFromX(pChild.Get(), mat, mesh);
             if (FAILED(hr))
                 return hr;
         }
@@ -1169,7 +1219,7 @@ HRESULT LoadFromX(
         return hr;
 
     ScratchMesh mesh;
-    hr = LoadFromX(xfileEnum.Get(), mesh);
+    hr = LoadFromXFile(xfileEnum.Get(), mesh);
     if (FAILED(hr))
         return hr;
 
