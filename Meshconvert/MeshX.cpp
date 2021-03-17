@@ -537,6 +537,11 @@ namespace
         }
 
         // Accessors
+        bool IsEmpty() const
+        {
+            return (m_indices.empty() || m_positions.empty()) != 0;
+        }
+
         bool IsValid() const
         {
             if (m_indices.empty() || m_positions.empty())
@@ -1013,7 +1018,7 @@ namespace
             {
                 //--- Load (simple) texture coordinates --------------------------------
 #ifdef _DEBUG
-                OutputDebugStringA("XFileMesh: found simple texture coords in .X file\n");
+                OutputDebugStringA("XFileMesh: found 1 coords in .X file\n");
 #endif
 
                 if (cbSize < sizeof(DWORD))
@@ -1143,6 +1148,10 @@ namespace
                 return hr;
         }
 
+#ifdef _DEBUG
+        OutputDebugStringA("XFileMesh: eof\n");
+#endif
+
         // Set face information last to ensure proper vertex duplication
         if (normals)
         {
@@ -1170,7 +1179,7 @@ namespace
 
         if (type == TID_D3DRMMesh)
         {
-            if (!mesh.IsValid())
+            if (mesh.IsEmpty())
             {
                 hr = ParseMesh(pCurrent, mesh);
                 if (FAILED(hr))
