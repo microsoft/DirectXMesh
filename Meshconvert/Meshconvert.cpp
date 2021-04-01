@@ -189,7 +189,6 @@ namespace
         return 0;
     }
 
-
     void SearchForFiles(const wchar_t* path, std::list<SConversion>& files, bool recursive)
     {
         // Process files
@@ -365,6 +364,36 @@ namespace
 
         wprintf(L"\n   <color-format>: ");
         PrintList(13, g_vertexColorFormats);
+    }
+
+    const wchar_t* GetErrorDesc(HRESULT hr)
+    {
+        static wchar_t desc[1024] = {};
+
+        LPWSTR errorText = nullptr;
+
+        DWORD result = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, nullptr,
+            static_cast<DWORD>(hr),
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&errorText), 0, nullptr);
+
+        *desc = 0;
+
+        if (result > 0 && errorText)
+        {
+            swprintf_s(desc, L": %ls", errorText);
+
+            size_t len = wcslen(desc);
+            if (len >= 2)
+            {
+                desc[len - 2] = 0;
+                desc[len - 1] = 0;
+            }
+
+            if (errorText)
+                LocalFree(errorText);
+        }
+
+        return desc;
     }
 }
 
@@ -675,7 +704,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         if (FAILED(hr))
         {
-            wprintf(L" FAILED (%08X)\n", static_cast<unsigned int>(hr));
+            wprintf(L" FAILED (%08X%ls)\n", static_cast<unsigned int>(hr), GetErrorDesc(hr));
             return 1;
         }
 
@@ -698,7 +727,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->InvertUTexCoord();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed inverting u texcoord (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed inverting u texcoord (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -708,7 +738,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->InvertVTexCoord();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed inverting v texcoord (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed inverting v texcoord (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -718,7 +749,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ReverseHandedness();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed reversing handedness (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed reversing handedness (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -732,7 +764,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->GenerateAdjacency(epsilon);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed generating adjacency (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed generating adjacency (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
 
@@ -749,7 +782,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->Clean();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed mesh clean (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed mesh clean (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
             else
@@ -796,7 +830,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ComputeNormals(flags);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed computing normals (flags:%lX, %08X)\n", flags, static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed computing normals (flags:%lX, %08X%ls)\n",
+                    flags, static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -813,7 +848,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ComputeTangentFrame((dwOptions & (1 << OPT_CTF)) ? true : false);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed computing tangent frame (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed computing tangent frame (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -831,7 +867,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->Optimize((dwOptions & (1 << OPT_OPTIMIZE_LRU)) ? true : false);
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed vertex-cache optimization (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed vertex-cache optimization (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -841,7 +878,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ReverseWinding();
             if (FAILED(hr))
             {
-                wprintf(L"\nERROR: Failed reversing winding (%08X)\n", static_cast<unsigned int>(hr));
+                wprintf(L"\nERROR: Failed reversing winding (%08X%ls)\n",
+                    static_cast<unsigned int>(hr), GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -965,7 +1003,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
         if (FAILED(hr))
         {
-            wprintf(L"\nERROR: Failed write (%08X):-> '%ls'\n", static_cast<unsigned int>(hr), outputPath);
+            wprintf(L"\nERROR: Failed write (%08X%ls):-> '%ls'\n",
+                static_cast<unsigned int>(hr), GetErrorDesc(hr), outputPath);
             return 1;
         }
 
