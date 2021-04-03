@@ -23,6 +23,7 @@
 
 #include "Mesh.h"
 
+#include <algorithm>
 #include <map>
 #include <new>
 
