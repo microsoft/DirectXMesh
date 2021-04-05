@@ -65,6 +65,9 @@
     <ClCompile Include="DirectXMeshletGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DirectXMeshConcat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CLInclude Include="DirectXMeshP.h">
