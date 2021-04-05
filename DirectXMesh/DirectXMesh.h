@@ -376,8 +376,8 @@ namespace DirectX
     HRESULT __cdecl ConcatenateMesh(
         _In_ size_t nFaces,
         _In_ size_t nVerts,
-        _Out_writes_(nFaces) uint32_t* faceRemap,
-        _Out_writes_(nVerts) uint32_t* vertexRemap,
+        _Out_writes_(nFaces) uint32_t* faceDestMap,
+        _Out_writes_(nVerts) uint32_t* vertexDestMap,
         _Inout_ size_t& totalFaces,
         _Inout_ size_t& totalVerts) noexcept;
         // Merge meshes together
