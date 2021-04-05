@@ -373,6 +373,15 @@ namespace DirectX
         _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest);
         // Welds vertices together based on a test function
 
+    HRESULT __cdecl ConcatenateMesh(
+        _In_ size_t nFaces,
+        _In_ size_t nVerts,
+        _Out_writes_(nFaces) uint32_t* faceRemap,
+        _Out_writes_(nVerts) uint32_t* vertexRemap,
+        _Inout_ size_t& totalFaces,
+        _Inout_ size_t& totalVerts) noexcept;
+        // Merge meshes together
+
     //---------------------------------------------------------------------------------
     // Mesh Optimization
 

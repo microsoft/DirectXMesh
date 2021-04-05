@@ -424,6 +424,7 @@
   <ItemGroup>
     <None Include="..\README.md" />
     <None Include="DirectXMesh.inl" />
+    <None Include="DirectXMeshConcat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectXMeshAdjacency.cpp" />

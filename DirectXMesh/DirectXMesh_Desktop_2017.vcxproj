@@ -311,6 +311,7 @@
   </ItemDefinitionGroup>
   <ItemGroup />
   <ItemGroup>
+    <ClCompile Include="DirectXMeshConcat.cpp" />
     <ClCompile Include="DirectXMeshletGenerator.cpp" />
     <ClCompile Include="DirectXMeshWeldVertices.cpp" />
     <CLInclude Include="DirectXMesh.h" />

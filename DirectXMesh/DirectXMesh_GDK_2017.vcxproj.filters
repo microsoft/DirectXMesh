@@ -28,6 +28,9 @@
     <None Include="..\README.md">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="DirectXMeshConcat.cpp">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectXMeshUtil.cpp">
