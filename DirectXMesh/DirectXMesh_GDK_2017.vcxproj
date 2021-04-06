@@ -419,16 +419,16 @@
   <ItemGroup>
     <ClInclude Include="DirectXMesh.h" />
     <ClInclude Include="DirectXMeshP.h" />
+    <ClInclude Include="DirectXMesh.inl" />
     <ClInclude Include="scoped.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
-    <None Include="DirectXMesh.inl" />
-    <None Include="DirectXMeshConcat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectXMeshAdjacency.cpp" />
     <ClCompile Include="DirectXMeshClean.cpp" />
+    <ClCompile Include="DirectXMeshConcat.cpp" />
     <ClCompile Include="DirectXMeshGSAdjacency.cpp" />
     <ClCompile Include="DirectXMeshletGenerator.cpp" />
     <ClCompile Include="DirectXMeshNormals.cpp" />

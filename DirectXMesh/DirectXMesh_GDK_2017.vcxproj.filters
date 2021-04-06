@@ -14,23 +14,18 @@
     <ClInclude Include="DirectXMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirectXMeshP.h">
+    <ClInclude Include="scoped.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="scoped.h">
+    <ClInclude Include="DirectXMesh.inl">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectXMeshP.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DirectXMesh.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="..\README.md">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="DirectXMeshConcat.cpp">
-      <Filter>Source Files</Filter>
-    </None>
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectXMeshUtil.cpp">
@@ -40,6 +35,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DirectXMeshClean.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectXMeshConcat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DirectXMeshGSAdjacency.cpp">
