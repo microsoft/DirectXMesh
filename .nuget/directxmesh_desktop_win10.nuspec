@@ -15,7 +15,7 @@ DirectXMesh, a shared source library for performing various geometry content pro
         <icon>images\icon.jpg</icon>
         <license type="expression">MIT</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <copyright>© Microsoft Corporation.</copyright>
+        <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
         <tags>DirectX  DirectXMesh  native nativepackage</tags>
     </metadata>
 
