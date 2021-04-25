@@ -36,7 +36,7 @@ using namespace DirectX;
 
 namespace
 {
-    enum OPTIONS
+    enum OPTIONS : uint32_t
     {
         OPT_RECURSIVE = 1,
         OPT_TOPOLOGICAL_ADJ,
@@ -72,7 +72,7 @@ namespace
         OPT_MAX
     };
 
-    static_assert(OPT_MAX <= 32, "dwOptions is a DWORD bitfield");
+    static_assert(OPT_MAX <= 32, "dwOptions is a unsigned int bitfield");
 
     struct SConversion
     {
@@ -81,8 +81,8 @@ namespace
 
     struct SValue
     {
-        LPCWSTR pName;
-        DWORD dwValue;
+        const wchar_t*  name;
+        uint32_t        value;
     };
 
     //////////////////////////////////////////////////////////////////////////////
@@ -176,12 +176,12 @@ namespace
 #pragma prefast(disable : 26018, "Only used with static internal arrays")
 #endif
 
-    DWORD LookupByName(const wchar_t* pName, const SValue* pArray)
+    uint32_t LookupByName(const wchar_t* pName, const SValue* pArray)
     {
-        while (pArray->pName)
+        while (pArray->name)
         {
-            if (!_wcsicmp(pName, pArray->pName))
-                return pArray->dwValue;
+            if (!_wcsicmp(pName, pArray->name))
+                return pArray->value;
 
             pArray++;
         }
@@ -265,9 +265,9 @@ namespace
 
     void PrintList(size_t cch, const SValue* pValue)
     {
-        while (pValue->pName)
+        while (pValue->name)
         {
-            size_t cchName = wcslen(pValue->pName);
+            size_t cchName = wcslen(pValue->name);
 
             if (cch + cchName + 2 >= 80)
             {
@@ -275,7 +275,7 @@ namespace
                 cch = 6;
             }
 
-            wprintf(L"%ls ", pValue->pName);
+            wprintf(L"%ls ", pValue->name);
             cch += cchName + 2;
             pValue++;
         }
@@ -414,7 +414,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     wchar_t szOutputFile[MAX_PATH] = {};
 
     // Process command line
-    DWORD dwOptions = 0;
+    uint32_t dwOptions = 0;
     std::list<SConversion> conversion;
 
     for (int iArg = 1; iArg < argc; iArg++)
@@ -431,7 +431,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             if (*pValue)
                 *pValue++ = 0;
 
-            DWORD dwOption = LookupByName(pArg, g_pOptions);
+            uint32_t dwOption = LookupByName(pArg, g_pOptions);
 
             if (!dwOption || (dwOptions & (1 << dwOption)))
             {
