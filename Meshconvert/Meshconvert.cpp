@@ -29,6 +29,7 @@
 #include <iterator>
 #include <memory>
 #include <list>
+#include <locale>
 
 #include "Mesh.h"
 
@@ -412,6 +413,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     DXGI_FORMAT colorFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 
     wchar_t szOutputFile[MAX_PATH] = {};
+
+    // Set locale for output since GetErrorDesc can get localized strings.
+    std::locale::global(std::locale(""));
 
     // Process command line
     uint32_t dwOptions = 0;
