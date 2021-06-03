@@ -15,7 +15,7 @@
 
 #include <cstdint>
 #include <iterator>
-
+#include <vector>
 
 namespace FVF
 {
@@ -129,8 +129,9 @@ namespace FVF
                 if (pDecl->Type >= std::size(g_declTypeSizes))
                     return 0;
 
-                if (currentSize < g_declTypeSizes[pDecl->Type] + pDecl->Offset)
-                    currentSize = g_declTypeSizes[pDecl->Type] + pDecl->Offset;
+                size_t slotSize = g_declTypeSizes[pDecl->Type];
+                if (currentSize < slotSize + pDecl->Offset)
+                    currentSize = slotSize + pDecl->Offset;
             }
 
             ++pDecl;
@@ -167,8 +168,9 @@ namespace FVF
                 if (pDecl->Type >= std::size(g_declTypeSizes))
                     return 0;
 
-                if (currentSize < g_declTypeSizes[pDecl->Type] + pDecl->Offset)
-                    currentSize = g_declTypeSizes[pDecl->Type] + pDecl->Offset;
+                size_t slotSize = g_declTypeSizes[pDecl->Type];
+                if (currentSize < slotSize + pDecl->Offset)
+                    currentSize = slotSize + pDecl->Offset;
             }
 
             ++pDecl;
@@ -189,6 +191,151 @@ namespace FVF
             ++length;
         }
         return length;
+    }
+
+    _Success_(return != false)
+    inline bool CreateDeclFromFVF(uint32_t fvfCode, std::vector<D3DVERTEXELEMENT9>& decl)
+    {
+        decl.clear();
+
+        if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
+            return false;
+
+        uint32_t nTexCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+        if (nTexCoords > 8)
+            return false;
+
+        size_t offset = 0;
+
+        switch (fvfCode & D3DFVF_POSITION_MASK)
+        {
+        case 0:
+            break;
+
+        case D3DFVF_XYZRHW:
+            decl.emplace_back(
+                D3DVERTEXELEMENT9{ 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITIONT, 0 }
+            );
+            offset = sizeof(float) * 4;
+            break;
+
+        case D3DFVF_XYZW:
+            decl.emplace_back(
+                D3DVERTEXELEMENT9{ 0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }
+            );
+            offset = sizeof(float) * 4;
+            break;
+
+        default:
+            decl.emplace_back(
+                D3DVERTEXELEMENT9{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }
+            );
+            offset = sizeof(float) * 3;
+            break;
+        }
+
+        size_t weights = 0;
+        switch (fvfCode & D3DFVF_POSITION_MASK)
+        {
+        case D3DFVF_XYZB1: weights = 1; break;
+        case D3DFVF_XYZB2: weights = 2; break;
+        case D3DFVF_XYZB3: weights = 3; break;
+        case D3DFVF_XYZB4: weights = 4; break;
+        case D3DFVF_XYZB5: weights = 5; break;
+        }
+
+        if (weights > 0)
+        {
+            if (fvfCode & (D3DFVF_LASTBETA_UBYTE4 | D3DFVF_LASTBETA_D3DCOLOR))
+            {
+                // subtract one to convert to D3DDECLTYPE_FLOAT* and another for where the indices were
+                if (weights > 1)
+                {
+                    decl.emplace_back(
+                        D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), static_cast<BYTE>(weights - 2),
+                            D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0 }
+                    );
+                    offset += sizeof(float) * (weights - 2);
+                }
+
+                decl.emplace_back(
+                    D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset),
+                        static_cast<BYTE>((fvfCode & D3DFVF_LASTBETA_UBYTE4) ? D3DDECLTYPE_UBYTE4 : D3DDECLTYPE_D3DCOLOR),
+                        D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES, 0 }
+                );
+                offset += sizeof(uint32_t);
+            }
+            else if (weights == 5)
+            {
+                decl.clear();
+                return false;
+            }
+            else
+            {
+                // subtract one to convert to D3DDECLTYPE_FLOAT*
+                decl.emplace_back(
+                    D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), static_cast<BYTE>(weights - 1),
+                        D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0 }
+                );
+                offset += sizeof(float) * (weights - 1);
+            }
+        }
+
+        if (fvfCode & D3DFVF_NORMAL)
+        {
+            decl.emplace_back(
+                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_FLOAT3,
+                    D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 }
+            );
+            offset += sizeof(float) * 3;
+        }
+
+        if (fvfCode & D3DFVF_PSIZE)
+        {
+            decl.emplace_back(
+                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_FLOAT1,
+                    D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_PSIZE, 0 }
+            );
+            offset += sizeof(float);
+        }
+
+        if (fvfCode & D3DFVF_DIFFUSE)
+        {
+            decl.emplace_back(
+                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_D3DCOLOR,
+                    D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 }
+            );
+            offset += sizeof(uint32_t);
+        }
+
+        if (fvfCode & D3DFVF_SPECULAR)
+        {
+            decl.emplace_back(
+                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_D3DCOLOR,
+                    D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1 }
+            );
+            offset += sizeof(uint32_t);
+        }
+
+        if (nTexCoords > 0)
+        {
+            for (uint32_t t = 0; t < nTexCoords; ++t)
+            {
+                size_t texCoordSize = g_declTypeSizes[(fvfCode >> (16 + t * 2)) & 0x3];
+
+                // D3DDECLTYPE_FLOAT1 = 0, D3DDECLTYPE_FLOAT4 = 3
+                decl.emplace_back(
+                    D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset),
+                        static_cast<BYTE>(texCoordSize / sizeof(float) - 1),
+                        D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 }
+                );
+                offset += texCoordSize;
+            }
+        }
+
+        decl.emplace_back(D3DVERTEXELEMENT9{ 0xFF, 0, D3DDECLTYPE_UNUSED, 0, 0, 0 });
+
+        return true;
     }
 
     inline uint32_t ComputeFVF(const D3DVERTEXELEMENT9* pDecl)
