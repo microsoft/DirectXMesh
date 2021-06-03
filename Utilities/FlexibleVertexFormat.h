@@ -47,6 +47,10 @@ namespace FVF
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
             return 0;
 
+        size_t numCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+        if (numCoords > 8)
+            return 0;
+
         size_t vertexSize = 0;
 
         switch (fvfCode & D3DFVF_POSITION_MASK)
@@ -80,7 +84,6 @@ namespace FVF
             vertexSize += sizeof(uint32_t);
 
         // Texture coordinates
-        size_t numCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
         uint32_t textureFormats = fvfCode >> 16u;
 
         if (textureFormats)
@@ -108,7 +111,7 @@ namespace FVF
 
     inline size_t ComputeVertexSize(const D3DVERTEXELEMENT9* pDecl, uint32_t stream)
     {
-        if (!pDecl)
+        if (!pDecl || stream >= 16u /*D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT*/)
             return 0;
 
         size_t currentSize = 0;
@@ -144,7 +147,7 @@ namespace FVF
     inline size_t ComputeVertexSize(
         _In_reads_(maxDeclLength) const D3DVERTEXELEMENT9* pDecl, size_t maxDeclLength, uint32_t stream)
     {
-        if (!pDecl)
+        if (!pDecl || stream >= 16u /*D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT*/)
             return 0;
 
         if (maxDeclLength > MAXD3DDECLLENGTH + 1)
@@ -181,10 +184,13 @@ namespace FVF
 
     inline size_t GetDeclLength(const D3DVERTEXELEMENT9* pDecl)
     {
+        if (!pDecl)
+            return 0;
+
         size_t length = 0;
         while (pDecl->Stream != 0xFF)
         {
-            if (length > MAXD3DDECLLENGTH)
+            if (length >= MAXD3DDECLLENGTH)
                 return 0;
 
             ++pDecl;
@@ -337,6 +343,24 @@ namespace FVF
 
         return true;
     }
+
+#ifdef __d3d11_h__
+    _Success_(return != false)
+        inline bool CreateInputLayoutFromFVF(uint32_t fvfCode, std::vector<D3D11_INPUT_ELEMENT_DESC>& decl)
+    {
+        // TODO -
+        return false;
+    }
+#endif
+
+#ifdef __d3d12_h__
+    _Success_(return != false)
+        inline bool CreateInputLayoutFromFVF(uint32_t fvfCode, std::vector<D3D12_INPUT_ELEMENT_DESC>& decl)
+    {
+        // TODO -
+        return false;
+    }
+#endif
 
     inline uint32_t ComputeFVF(const D3DVERTEXELEMENT9* pDecl)
     {
