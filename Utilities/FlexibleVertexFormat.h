@@ -42,14 +42,6 @@ namespace FVF
 
     static_assert(std::size(g_declTypeSizes) == D3DDECLTYPE_UNUSED, "Mismatch of array size");
 
-    constexpr size_t g_texCoordSizes[] =
-    {
-        2 * sizeof(float),
-        3 * sizeof(float),
-        4 * sizeof(float),
-        sizeof(float)
-    };
-
     inline size_t ComputeVertexSize(uint32_t fvfCode)
     {
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
@@ -210,6 +202,14 @@ namespace FVF
     _Success_(return != false)
     inline bool CreateDeclFromFVF(uint32_t fvfCode, std::vector<D3DVERTEXELEMENT9>& decl)
     {
+        static constexpr size_t s_texCoordSizes[] =
+        {
+            2 * sizeof(float),
+            3 * sizeof(float),
+            4 * sizeof(float),
+            sizeof(float)
+        };
+
         decl.clear();
 
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
@@ -269,7 +269,7 @@ namespace FVF
                         D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), static_cast<BYTE>(weights - 2),
                             D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0 }
                     );
-                    offset += sizeof(float) * (weights - 2);
+                    offset += sizeof(float) * (weights - 1);
                 }
 
                 decl.emplace_back(
@@ -281,6 +281,7 @@ namespace FVF
             }
             else if (weights == 5)
             {
+                // D3DFVF_XYZB5 is only supported when the 5th beta is D3DFVF_LASTBETA_UBYTE4/D3DCOLOR
                 decl.clear();
                 return false;
             }
@@ -335,7 +336,7 @@ namespace FVF
         {
             for (uint32_t t = 0; t < nTexCoords; ++t)
             {
-                size_t texCoordSize = g_texCoordSizes[(fvfCode >> (16 + t * 2)) & 0x3];
+                size_t texCoordSize = s_texCoordSizes[(fvfCode >> (16 + t * 2)) & 0x3];
 
                 // D3DDECLTYPE_FLOAT1 = 0, D3DDECLTYPE_FLOAT4 = 3
                 decl.emplace_back(
@@ -354,12 +355,146 @@ namespace FVF
 
 #ifdef __d3d11_h__
     _Success_(return != false)
-        inline bool CreateInputLayoutFromFVF(uint32_t fvfCode, std::vector<D3D11_INPUT_ELEMENT_DESC>& decl)
+        inline bool CreateInputLayoutFromFVF(uint32_t fvfCode, std::vector<D3D11_INPUT_ELEMENT_DESC>& il)
     {
-        // TODO -
-        return false;
+        static constexpr DXGI_FORMAT s_blendFormats[] =
+        {
+            DXGI_FORMAT_R32_FLOAT,
+            DXGI_FORMAT_R32G32_FLOAT,
+            DXGI_FORMAT_R32G32B32_FLOAT,
+            DXGI_FORMAT_R32G32B32A32_FLOAT,
+        };
+
+        static constexpr DXGI_FORMAT s_texCoordFormats[] =
+        {
+            DXGI_FORMAT_R32G32_FLOAT,
+            DXGI_FORMAT_R32G32B32_FLOAT,
+            DXGI_FORMAT_R32G32B32A32_FLOAT,
+            DXGI_FORMAT_R32_FLOAT
+        };
+
+        il.clear();
+
+        if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
+            return false;
+
+        uint32_t nTexCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+        if (nTexCoords > 8)
+            return false;
+
+        switch (fvfCode & D3DFVF_POSITION_MASK)
+        {
+        case 0:
+            break;
+
+        case D3DFVF_XYZRHW:
+        case D3DFVF_XYZW:
+            il.emplace_back(
+                D3D11_INPUT_ELEMENT_DESC{ "SV_Position", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            );
+            break;
+
+        default:
+            il.emplace_back(
+                D3D11_INPUT_ELEMENT_DESC{ "SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT,
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+                );
+            break;
+        }
+
+        size_t weights = 0;
+        switch (fvfCode & D3DFVF_POSITION_MASK)
+        {
+        case D3DFVF_XYZB1: weights = 1; break;
+        case D3DFVF_XYZB2: weights = 2; break;
+        case D3DFVF_XYZB3: weights = 3; break;
+        case D3DFVF_XYZB4: weights = 4; break;
+        case D3DFVF_XYZB5: weights = 5; break;
+        }
+
+        if (weights > 0)
+        {
+            if (fvfCode & (D3DFVF_LASTBETA_UBYTE4 | D3DFVF_LASTBETA_D3DCOLOR))
+            {
+                // subtract one for where the blendindices were
+                if (weights > 1)
+                {
+                    il.emplace_back(
+                        D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, s_blendFormats[weights - 2],
+                        0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+                    );
+                }
+
+                il.emplace_back(
+                    D3D11_INPUT_ELEMENT_DESC{ "BLENDINDICES", 0,
+                    (fvfCode & D3DFVF_LASTBETA_UBYTE4) ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_B8G8R8A8_UNORM,
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+                );
+            }
+            else if (weights == 5)
+            {
+                // D3DFVF_XYZB5 is only supported when the 5th beta is D3DFVF_LASTBETA_UBYTE4/D3DCOLOR
+                il.clear();
+                return false;
+            }
+            else
+            {
+                il.emplace_back(
+                    D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, s_blendFormats[weights - 1],
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+                );
+            }
+        }
+
+        if (fvfCode & D3DFVF_NORMAL)
+        {
+            il.emplace_back(
+                D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT,
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            );
+        }
+
+        if (fvfCode & D3DFVF_PSIZE)
+        {
+            il.emplace_back(
+                D3D11_INPUT_ELEMENT_DESC{ "PSIZE", 0, DXGI_FORMAT_R32_FLOAT,
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            );
+        }
+
+        if (fvfCode & D3DFVF_DIFFUSE)
+        {
+            il.emplace_back(
+                D3D11_INPUT_ELEMENT_DESC{ "COLOR", 0, DXGI_FORMAT_B8G8R8A8_UNORM,
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            );
+        }
+
+        if (fvfCode & D3DFVF_SPECULAR)
+        {
+            il.emplace_back(
+                D3D11_INPUT_ELEMENT_DESC{ "COLOR", 1, DXGI_FORMAT_B8G8R8A8_UNORM,
+                    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            );
+        }
+
+        if (nTexCoords > 0)
+        {
+            for (uint32_t t = 0; t < nTexCoords; ++t)
+            {
+                size_t index = (fvfCode >> (16 + t * 2)) & 0x3;
+                il.emplace_back(
+                    D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", static_cast<UINT>(t),
+                        s_texCoordFormats[index],
+                        0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+                );
+            }
+        }
+
+        return true;
     }
-#endif
+#endif // __d3d11_h__
 
 #ifdef __d3d12_h__
     _Success_(return != false)
@@ -368,7 +503,7 @@ namespace FVF
         // TODO -
         return false;
     }
-#endif
+#endif // __d3d12_h__
 
     inline uint32_t ComputeFVF(const D3DVERTEXELEMENT9* pDecl)
     {
