@@ -42,6 +42,14 @@ namespace FVF
 
     static_assert(std::size(g_declTypeSizes) == D3DDECLTYPE_UNUSED, "Mismatch of array size");
 
+    constexpr size_t g_texCoordSizes[] =
+    {
+        2 * sizeof(float),
+        3 * sizeof(float),
+        4 * sizeof(float),
+        sizeof(float)
+    };
+
     inline size_t ComputeVertexSize(uint32_t fvfCode)
     {
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
@@ -327,13 +335,13 @@ namespace FVF
         {
             for (uint32_t t = 0; t < nTexCoords; ++t)
             {
-                size_t texCoordSize = g_declTypeSizes[(fvfCode >> (16 + t * 2)) & 0x3];
+                size_t texCoordSize = g_texCoordSizes[(fvfCode >> (16 + t * 2)) & 0x3];
 
                 // D3DDECLTYPE_FLOAT1 = 0, D3DDECLTYPE_FLOAT4 = 3
                 decl.emplace_back(
                     D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset),
                         static_cast<BYTE>(texCoordSize / sizeof(float) - 1),
-                        D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 }
+                        D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, static_cast<BYTE>(t) }
                 );
                 offset += texCoordSize;
             }
