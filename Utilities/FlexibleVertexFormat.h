@@ -14,24 +14,57 @@
 #include <d3d9.h>
 
 #include <cstdint>
+#include <iterator>
+
 
 namespace FVF
 {
-    inline size_t ComputeFVFVertexSize(uint32_t fvfCode)
+    constexpr uint8_t g_declTypeSizes[] =
     {
+        4,  // D3DDECLTYPE_FLOAT1
+        8,  // D3DDECLTYPE_FLOAT2
+        12, // D3DDECLTYPE_FLOAT3
+        16, // D3DDECLTYPE_FLOAT4
+        4,  // D3DDECLTYPE_D3DCOLOR
+        4,  // D3DDECLTYPE_UBYTE4
+        4,  // D3DDECLTYPE_SHORT2
+        8,  // D3DDECLTYPE_SHORT4
+        4,  // D3DDECLTYPE_UBYTE4N
+        4,  // D3DDECLTYPE_SHORT2N
+        8,  // D3DDECLTYPE_SHORT4N
+        4,  // D3DDECLTYPE_USHORT2N
+        8,  // D3DDECLTYPE_USHORT4N
+        4,  // D3DDECLTYPE_UDEC3
+        4,  // D3DDECLTYPE_DEC3N
+        4,  // D3DDECLTYPE_FLOAT16_2
+        8,  // D3DDECLTYPE_FLOAT16_4
+    };
+
+    static_assert(std::size(g_declTypeSizes) == D3DDECLTYPE_UNUSED, "Mismatch of array size");
+
+    inline size_t ComputeVertexSize(uint32_t fvfCode)
+    {
+        if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
+            return 0;
+
         size_t vertexSize = 0;
 
         switch (fvfCode & D3DFVF_POSITION_MASK)
         {
+        case 0: break;
         case D3DFVF_XYZ:    vertexSize = 3 * sizeof(float); break;
-        case D3DFVF_XYZRHW: vertexSize = 4 * sizeof(float); break;
-        case D3DFVF_XYZB1:  vertexSize = 4 * sizeof(float); break;
+
+        case D3DFVF_XYZRHW:
+        case D3DFVF_XYZB1:
+        case D3DFVF_XYZW:
+            vertexSize = 4 * sizeof(float);
+            break;
+
         case D3DFVF_XYZB2:  vertexSize = 5 * sizeof(float); break;
         case D3DFVF_XYZB3:  vertexSize = 6 * sizeof(float); break;
         case D3DFVF_XYZB4:  vertexSize = 7 * sizeof(float); break;
         case D3DFVF_XYZB5:  vertexSize = 8 * sizeof(float); break;
-        default:
-            return 0;
+        default: return 0;
         }
 
         if (fvfCode & D3DFVF_NORMAL)
@@ -47,7 +80,7 @@ namespace FVF
             vertexSize += sizeof(uint32_t);
 
         // Texture coordinates
-        size_t numCoords = (((fvfCode)&D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT);
+        size_t numCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
         uint32_t textureFormats = fvfCode >> 16u;
 
         if (textureFormats)
@@ -71,5 +104,495 @@ namespace FVF
         }
 
         return vertexSize;
+    }
+
+    inline size_t ComputeVertexSize(const D3DVERTEXELEMENT9* pDecl, uint32_t stream)
+    {
+        if (!pDecl)
+            return 0;
+
+        size_t currentSize = 0;
+        size_t count = 0;
+
+        //search for the max offset in the stream,
+        //(min)vertex size = max offset + type size
+        while (pDecl->Stream != 0xFF)
+        {
+            ++count;
+            if (count > MAXD3DDECLLENGTH)
+                return 0;
+
+            // only look at items of this stream and vertex elements actually in the data stream (not generated)
+            // UV is phantom data.
+            if ((pDecl->Stream == stream) && (pDecl->Method != D3DDECLMETHOD_UV))
+            {
+                if (pDecl->Type >= std::size(g_declTypeSizes))
+                    return 0;
+
+                if (currentSize < g_declTypeSizes[pDecl->Type] + pDecl->Offset)
+                    currentSize = g_declTypeSizes[pDecl->Type] + pDecl->Offset;
+            }
+
+            ++pDecl;
+        }
+
+        return currentSize;
+    }
+
+    // More secure version
+    inline size_t ComputeVertexSize(
+        _In_reads_(maxDeclLength) const D3DVERTEXELEMENT9* pDecl, size_t maxDeclLength, uint32_t stream)
+    {
+        if (!pDecl)
+            return 0;
+
+        if (maxDeclLength > MAXD3DDECLLENGTH + 1)
+            return 0;
+
+        size_t currentSize = 0;
+        size_t count = 0;
+
+        //search for the max offset in the stream,
+        //(min)vertex size = max offset + type size
+        while (pDecl->Stream != 0xFF)
+        {
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+
+            // only look at items of this stream and vertex elements actually in the data stream (not generated)
+            // UV is phantom data.
+            if ((pDecl->Stream == stream) && (pDecl->Method != D3DDECLMETHOD_UV))
+            {
+                if (pDecl->Type >= std::size(g_declTypeSizes))
+                    return 0;
+
+                if (currentSize < g_declTypeSizes[pDecl->Type] + pDecl->Offset)
+                    currentSize = g_declTypeSizes[pDecl->Type] + pDecl->Offset;
+            }
+
+            ++pDecl;
+        }
+
+        return currentSize;
+    }
+
+    inline size_t GetDeclLength(const D3DVERTEXELEMENT9* pDecl)
+    {
+        size_t length = 0;
+        while (pDecl->Stream != 0xFF)
+        {
+            if (length > MAXD3DDECLLENGTH)
+                return 0;
+
+            ++pDecl;
+            ++length;
+        }
+        return length;
+    }
+
+    inline uint32_t ComputeFVF(const D3DVERTEXELEMENT9* pDecl)
+    {
+        if (!pDecl)
+            return 0;
+
+        // validate vertex declaration
+        auto pCurrent = pDecl;
+        size_t count = 0;
+        size_t offset = 0;
+        while (pCurrent->Stream != 0xFF)
+        {
+            ++count;
+            if (count > MAXD3DDECLLENGTH)
+                return 0;
+
+            if (pCurrent->Stream != 0)
+                return 0;
+
+            if (pCurrent->Type > D3DDECLTYPE_SHORT4)
+                return 0;
+
+            if (offset != pCurrent->Offset)
+                return 0;
+
+            if (pCurrent->Method > D3DDECLMETHOD_LOOKUP)
+                return 0;
+
+            if (((pCurrent->Usage > D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Usage != D3DDECLUSAGE_POSITIONT)
+                && (pCurrent->Usage != D3DDECLUSAGE_COLOR)))
+            {
+                return 0;
+            }
+
+            if ((pCurrent->Usage == D3DDECLUSAGE_COLOR) && (pCurrent->UsageIndex > 1))
+            {
+                return 0;
+            }
+
+            offset += g_declTypeSizes[pCurrent->Type];
+
+            ++pCurrent;
+        }
+
+        // Build FVF code
+        pCurrent = pDecl;
+        uint32_t fvfCode = 0;
+        if (pCurrent->Usage == D3DDECLUSAGE_POSITION)
+        {
+            if (pCurrent->Type == D3DDECLTYPE_FLOAT3)
+            {
+                size_t weights = 0;
+                ++pCurrent;
+
+                if (pCurrent->Usage == D3DDECLUSAGE_BLENDWEIGHT)
+                {
+                    if ((pCurrent->Type >= D3DDECLTYPE_FLOAT1) && (pCurrent->Type <= D3DDECLTYPE_FLOAT4))
+                    {
+                        weights = pCurrent->Type - D3DDECLTYPE_FLOAT1 + 1;
+                        ++pCurrent;
+                    }
+                }
+
+                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
+                    && (pCurrent->Type == D3DDECLTYPE_UBYTE4))
+                {
+                    fvfCode |= D3DFVF_LASTBETA_UBYTE4;
+
+                    ++weights;
+                    ++pCurrent;
+                }
+
+                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
+                    && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
+                {
+                    fvfCode |= D3DFVF_LASTBETA_D3DCOLOR;
+
+                    ++weights;
+                    ++pCurrent;
+                }
+
+                switch (weights)
+                {
+                case 0: fvfCode |= D3DFVF_XYZ;   break;
+                case 1: fvfCode |= D3DFVF_XYZB1; break;
+                case 2: fvfCode |= D3DFVF_XYZB2; break;
+                case 3: fvfCode |= D3DFVF_XYZB3; break;
+                case 4: fvfCode |= D3DFVF_XYZB4; break;
+                case 5: fvfCode |= D3DFVF_XYZB5; break;
+                }
+            }
+            else if (pCurrent->Type == D3DDECLTYPE_FLOAT4)
+            {
+                fvfCode |= D3DFVF_XYZW;
+                ++pCurrent;
+            }
+        }
+        else if ((pCurrent->Usage == D3DDECLUSAGE_POSITIONT)
+            && (pCurrent->Type == D3DDECLTYPE_FLOAT4))
+        {
+            fvfCode |= D3DFVF_XYZRHW;
+            ++pCurrent;
+        }
+
+        // Normal
+        if ((pCurrent->Usage == D3DDECLUSAGE_NORMAL)
+            && (pCurrent->Type == D3DDECLTYPE_FLOAT3))
+        {
+            fvfCode |= D3DFVF_NORMAL;
+            ++pCurrent;
+        }
+
+        // Point size
+        if ((pCurrent->Usage == D3DDECLUSAGE_PSIZE)
+            && (pCurrent->Type == D3DDECLTYPE_FLOAT1))
+        {
+            fvfCode |= D3DFVF_PSIZE;
+            ++pCurrent;
+        }
+
+        // Diffuse
+        if ((pCurrent->Usage == D3DDECLUSAGE_COLOR)
+            && (pCurrent->UsageIndex == 0)
+            && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
+        {
+            fvfCode |= D3DFVF_DIFFUSE;
+            ++pCurrent;
+        }
+
+        // Specular
+        if ((pCurrent->Usage == D3DDECLUSAGE_COLOR)
+            && (pCurrent->UsageIndex == 1)
+            && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
+        {
+            fvfCode |= D3DFVF_SPECULAR;
+            ++pCurrent;
+        }
+
+        // Texture coordinates
+        size_t i;
+
+        for (i = 0; i < 8; ++i)
+        {
+            if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT1)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE1(i));
+            }
+            else if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT2)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE2(i));
+            }
+            else if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT3)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE3(i));
+            }
+            else if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT4)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE4(i));
+            }
+            else
+                break;
+
+            ++pCurrent;
+        }
+
+        fvfCode |= static_cast<uint32_t>(i << D3DFVF_TEXCOUNT_SHIFT);
+
+        if (pCurrent->Stream != 0xff)
+        {
+            return 0;
+        }
+
+        return fvfCode;
+    }
+
+    // More secure version
+    inline uint32_t ComputeFVF(
+        _In_reads_(maxDeclLength) const D3DVERTEXELEMENT9* pDecl, size_t maxDeclLength)
+    {
+        if (!pDecl)
+            return 0;
+
+        if (maxDeclLength > MAXD3DDECLLENGTH + 1)
+            return 0;
+
+        // validate vertex declaration
+        auto pCurrent = pDecl;
+        size_t count = 0;
+        size_t offset = 0;
+        while (pCurrent->Stream != 0xFF)
+        {
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+
+            if (pCurrent->Stream != 0)
+                return 0;
+
+            if (pCurrent->Type > D3DDECLTYPE_SHORT4)
+                return 0;
+
+            if (offset != pCurrent->Offset)
+                return 0;
+
+            if (pCurrent->Method > D3DDECLMETHOD_LOOKUP)
+                return 0;
+
+            if (((pCurrent->Usage > D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Usage != D3DDECLUSAGE_POSITIONT)
+                && (pCurrent->Usage != D3DDECLUSAGE_COLOR)))
+            {
+                return 0;
+            }
+
+            if ((pCurrent->Usage == D3DDECLUSAGE_COLOR) && (pCurrent->UsageIndex > 1))
+            {
+                return 0;
+            }
+
+            offset += g_declTypeSizes[pCurrent->Type];
+
+            ++pCurrent;
+        }
+
+        // Build FVF code
+        pCurrent = pDecl;
+        count = 0;
+        uint32_t fvfCode = 0;
+        if (pCurrent->Usage == D3DDECLUSAGE_POSITION)
+        {
+            if (pCurrent->Type == D3DDECLTYPE_FLOAT3)
+            {
+                size_t weights = 0;
+                ++count;
+                if (count > maxDeclLength)
+                    return 0;
+                ++pCurrent;
+
+                if (pCurrent->Usage == D3DDECLUSAGE_BLENDWEIGHT)
+                {
+                    if ((pCurrent->Type >= D3DDECLTYPE_FLOAT1) && (pCurrent->Type <= D3DDECLTYPE_FLOAT4))
+                    {
+                        weights = pCurrent->Type - D3DDECLTYPE_FLOAT1 + 1;
+                        ++count;
+                        if (count > maxDeclLength)
+                            return 0;
+                        ++pCurrent;
+                    }
+                }
+
+                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
+                    && (pCurrent->Type == D3DDECLTYPE_UBYTE4))
+                {
+                    fvfCode |= D3DFVF_LASTBETA_UBYTE4;
+
+                    ++weights;
+                    ++count;
+                    if (count > maxDeclLength)
+                        return 0;
+                    ++pCurrent;
+                }
+
+                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
+                    && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
+                {
+                    fvfCode |= D3DFVF_LASTBETA_D3DCOLOR;
+
+                    ++weights;
+                    ++count;
+                    if (count > maxDeclLength)
+                        return 0;
+                    ++pCurrent;
+                }
+
+                switch (weights)
+                {
+                case 0: fvfCode |= D3DFVF_XYZ;   break;
+                case 1: fvfCode |= D3DFVF_XYZB1; break;
+                case 2: fvfCode |= D3DFVF_XYZB2; break;
+                case 3: fvfCode |= D3DFVF_XYZB3; break;
+                case 4: fvfCode |= D3DFVF_XYZB4; break;
+                case 5: fvfCode |= D3DFVF_XYZB5; break;
+                }
+            }
+            else if (pCurrent->Type == D3DDECLTYPE_FLOAT4)
+            {
+                fvfCode |= D3DFVF_XYZW;
+                ++count;
+                if (count > maxDeclLength)
+                    return 0;
+                ++pCurrent;
+            }
+        }
+        else if ((pCurrent->Usage == D3DDECLUSAGE_POSITIONT)
+            && (pCurrent->Type == D3DDECLTYPE_FLOAT4))
+        {
+            fvfCode |= D3DFVF_XYZRHW;
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+            ++pCurrent;
+        }
+
+        // Normal
+        if ((pCurrent->Usage == D3DDECLUSAGE_NORMAL)
+            && (pCurrent->Type == D3DDECLTYPE_FLOAT3))
+        {
+            fvfCode |= D3DFVF_NORMAL;
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+            ++pCurrent;
+        }
+
+        // Point size
+        if ((pCurrent->Usage == D3DDECLUSAGE_PSIZE)
+            && (pCurrent->Type == D3DDECLTYPE_FLOAT1))
+        {
+            fvfCode |= D3DFVF_PSIZE;
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+            ++pCurrent;
+        }
+
+        // Diffuse
+        if ((pCurrent->Usage == D3DDECLUSAGE_COLOR)
+            && (pCurrent->UsageIndex == 0)
+            && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
+        {
+            fvfCode |= D3DFVF_DIFFUSE;
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+            ++pCurrent;
+        }
+
+        // Specular
+        if ((pCurrent->Usage == D3DDECLUSAGE_COLOR)
+            && (pCurrent->UsageIndex == 1)
+            && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
+        {
+            fvfCode |= D3DFVF_SPECULAR;
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+            ++pCurrent;
+        }
+
+        // Texture coordinates
+        size_t i;
+
+        for (i = 0; i < 8; ++i)
+        {
+            if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT1)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE1(i));
+            }
+            else if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT2)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE2(i));
+            }
+            else if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT3)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE3(i));
+            }
+            else if ((pCurrent->Usage == D3DDECLUSAGE_TEXCOORD)
+                && (pCurrent->Type == D3DDECLTYPE_FLOAT4)
+                && (pCurrent->UsageIndex == i))
+            {
+                fvfCode |= static_cast<uint32_t>(D3DFVF_TEXCOORDSIZE4(i));
+            }
+            else
+                break;
+
+            ++count;
+            if (count > maxDeclLength)
+                return 0;
+            ++pCurrent;
+        }
+
+        fvfCode |= static_cast<uint32_t>(i << D3DFVF_TEXCOUNT_SHIFT);
+
+        if (pCurrent->Stream != 0xff)
+        {
+            return 0;
+        }
+
+        return fvfCode;
     }
 }
