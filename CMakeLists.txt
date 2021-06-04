@@ -84,6 +84,7 @@ endif()
 
 #--- Utilities
 set(UTILS_HEADERS
+    Utilities/FlexibleVertexFormat.h
     Utilities/WaveFrontReader.h)
 
 add_library(Utilities INTERFACE)

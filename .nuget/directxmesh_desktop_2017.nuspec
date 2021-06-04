@@ -26,7 +26,7 @@ DirectXMesh, a shared source library for performing various geometry content pro
         <file target="include" src="DirectXMesh\DirectXMesh.h" />
         <file target="include" src="DirectXMesh\DirectXMesh.inl" />
 
-        <file target="include" src="Utilities\WaveFrontReader.h" />
+        <file target="include" src="Utilities\*.h" />
 
         <file target="native\lib\Win32\Debug" src="DirectXMesh\Bin\Desktop_2017\Win32\Debug\*.lib" />
         <file target="native\lib\Win32\Debug" src="DirectXMesh\Bin\Desktop_2017\Win32\Debug\*.pdb" />
