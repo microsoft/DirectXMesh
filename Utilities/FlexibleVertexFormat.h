@@ -700,24 +700,32 @@ namespace FVF
                         weights = pCurrent->Type - D3DDECLTYPE_FLOAT1 + 1;
                         ++pCurrent;
                     }
+                    else
+                    {
+                        return 0;
+                    }
                 }
 
-                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
-                    && (pCurrent->Type == D3DDECLTYPE_UBYTE4))
+                if (pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
                 {
-                    fvfCode |= D3DFVF_LASTBETA_UBYTE4;
+                    if (pCurrent->Type == D3DDECLTYPE_UBYTE4)
+                    {
+                        fvfCode |= D3DFVF_LASTBETA_UBYTE4;
 
-                    ++weights;
-                    ++pCurrent;
-                }
+                        ++weights;
+                        ++pCurrent;
+                    }
+                    else if (pCurrent->Type == D3DDECLTYPE_D3DCOLOR)
+                    {
+                        fvfCode |= D3DFVF_LASTBETA_D3DCOLOR;
 
-                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
-                    && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
-                {
-                    fvfCode |= D3DFVF_LASTBETA_D3DCOLOR;
-
-                    ++weights;
-                    ++pCurrent;
+                        ++weights;
+                        ++pCurrent;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
                 }
 
                 switch (weights)
@@ -895,30 +903,38 @@ namespace FVF
                             return 0;
                         ++pCurrent;
                     }
+                    else
+                    {
+                        return 0;
+                    }
                 }
 
-                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
-                    && (pCurrent->Type == D3DDECLTYPE_UBYTE4))
+                if (pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
                 {
-                    fvfCode |= D3DFVF_LASTBETA_UBYTE4;
+                    if (pCurrent->Type == D3DDECLTYPE_UBYTE4)
+                    {
+                        fvfCode |= D3DFVF_LASTBETA_UBYTE4;
 
-                    ++weights;
-                    ++count;
-                    if (count > maxDeclLength)
+                        ++weights;
+                        ++count;
+                        if (count > maxDeclLength)
+                            return 0;
+                        ++pCurrent;
+                    }
+                    else if (pCurrent->Type == D3DDECLTYPE_D3DCOLOR)
+                    {
+                        fvfCode |= D3DFVF_LASTBETA_D3DCOLOR;
+
+                        ++weights;
+                        ++count;
+                        if (count > maxDeclLength)
+                            return 0;
+                        ++pCurrent;
+                    }
+                    else
+                    {
                         return 0;
-                    ++pCurrent;
-                }
-
-                if ((pCurrent->Usage == D3DDECLUSAGE_BLENDINDICES)
-                    && (pCurrent->Type == D3DDECLTYPE_D3DCOLOR))
-                {
-                    fvfCode |= D3DFVF_LASTBETA_D3DCOLOR;
-
-                    ++weights;
-                    ++count;
-                    if (count > maxDeclLength)
-                        return 0;
-                    ++pCurrent;
+                    }
                 }
 
                 switch (weights)
