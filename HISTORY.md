@@ -6,6 +6,11 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### June 9, 2021
+* meshconvert: improved ``-flist`` switch to support wildcards and file exclusions
+* FlexibleVertexFormat.h header added to Utilities folder
+* Code cleanup for meshconvert
+
 ### April 6, 2021
 * New function **ConcatenateMesh**
 * Minor code and project cleanup
