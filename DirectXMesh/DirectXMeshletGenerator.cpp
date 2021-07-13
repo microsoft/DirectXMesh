@@ -180,6 +180,11 @@ namespace
         if (meshlet.PrimitiveIndices.size() >= maxPrims)
             return false;
 
+        // Cull degenerate triangle and return success
+        // newCount calculation will break if such triangle is passed
+        if (tri[0] == tri[1] || tri[1] == tri[2] || tri[0] == tri[2])
+            return true;
+
         uint32_t indices[3] = { uint32_t(-1), uint32_t(-1), uint32_t(-1) };
         uint8_t newCount = 3;
 
