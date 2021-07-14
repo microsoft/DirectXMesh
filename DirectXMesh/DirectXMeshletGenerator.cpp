@@ -172,6 +172,11 @@ namespace
         _In_reads_(3) const T* tri,
         InlineMeshlet<T>& meshlet)
     {
+        // Cull degenerate triangle and return success
+        // newCount calculation will break if such triangle is passed
+        if (tri[0] == tri[1] || tri[1] == tri[2] || tri[0] == tri[2])
+            return true;
+        
         // Are we already full of vertices?
         if (meshlet.UniqueVertexIndices.size() >= maxVerts)
             return false;
