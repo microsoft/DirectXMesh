@@ -172,6 +172,11 @@ namespace
         _In_reads_(3) const T* tri,
         InlineMeshlet<T>& meshlet)
     {
+        // Cull degenerate triangle and return success
+        // newCount calculation will break if such triangle is passed
+        if (tri[0] == tri[1] || tri[1] == tri[2] || tri[0] == tri[2])
+            return true;
+        
         // Are we already full of vertices?
         if (meshlet.UniqueVertexIndices.size() >= maxVerts)
             return false;
@@ -179,11 +184,6 @@ namespace
         // Are we full, or can we store an additional primitive?
         if (meshlet.PrimitiveIndices.size() >= maxPrims)
             return false;
-
-        // Cull degenerate triangle and return success
-        // newCount calculation will break if such triangle is passed
-        if (tri[0] == tri[1] || tri[1] == tri[2] || tri[0] == tri[2])
-            return true;
 
         uint32_t indices[3] = { uint32_t(-1), uint32_t(-1), uint32_t(-1) };
         uint8_t newCount = 3;
