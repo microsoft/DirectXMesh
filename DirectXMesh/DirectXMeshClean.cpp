@@ -382,9 +382,9 @@ namespace
             assert((nVerts + dupVerts.size()) == curNewVert);
 
 #ifndef NDEBUG
-            for (auto it = dupVerts.begin(); it != dupVerts.end(); ++it)
+            for (const auto it : dupVerts)
             {
-                assert(*it < nVerts);
+                assert(it < nVerts);
             }
 #endif
         }

@@ -584,22 +584,22 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     memset(faceRemap, 0, sizeof(uint32_t) * nFaces);
 
-    for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
+    for (const auto& it : subsets)
     {
-        if (it->first >= nFaces)
+        if (it.first >= nFaces)
             return E_UNEXPECTED;
 
-        if ((uint64_t(it->first) + uint64_t(it->second)) >= UINT32_MAX)
+        if ((uint64_t(it.first) + uint64_t(it.second)) >= UINT32_MAX)
             return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-        uint32_t faceMax = uint32_t(it->first + it->second);
+        uint32_t faceMax = uint32_t(it.first + it.second);
 
         if (faceMax > nFaces)
             return E_UNEXPECTED;
 
         HRESULT hr = OptimizeFacesImpl<uint16_t>(
-            &indices[it->first * 3], static_cast<uint32_t>(it->second * 3),
-            &faceRemap[it->first], lruCacheSize, uint32_t(it->first));
+            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3),
+            &faceRemap[it.first], lruCacheSize, uint32_t(it.first));
         if (FAILED(hr))
             return hr;
     }
@@ -637,22 +637,22 @@ HRESULT DirectX::OptimizeFacesLRUEx(
 
     memset(faceRemap, 0, sizeof(uint32_t) * nFaces);
 
-    for (auto it = subsets.cbegin(); it != subsets.cend(); ++it)
+    for (const auto& it : subsets)
     {
-        if (it->first >= nFaces)
+        if (it.first >= nFaces)
             return E_UNEXPECTED;
 
-        if ((uint64_t(it->first) + uint64_t(it->second)) >= UINT32_MAX)
+        if ((uint64_t(it.first) + uint64_t(it.second)) >= UINT32_MAX)
             return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-        uint32_t faceMax = uint32_t(it->first + it->second);
+        uint32_t faceMax = uint32_t(it.first + it.second);
 
         if (faceMax > nFaces)
             return E_UNEXPECTED;
 
         HRESULT hr = OptimizeFacesImpl<uint32_t>(
-            &indices[it->first * 3], static_cast<uint32_t>(it->second * 3),
-            &faceRemap[it->first], lruCacheSize, uint32_t(it->first));
+            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3),
+            &faceRemap[it.first], lruCacheSize, uint32_t(it.first));
         if (FAILED(hr))
             return hr;
     }

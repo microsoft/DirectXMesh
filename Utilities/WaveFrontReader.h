@@ -619,9 +619,9 @@ public:
             vboFile.read(reinterpret_cast<char*>(tmp.data()), sizeof(uint16_t) * numIndices);
 
             indices.reserve(numIndices);
-            for (auto it = tmp.cbegin(); it != tmp.cend(); ++it)
+            for (const auto it : tmp)
             {
-                indices.emplace_back(*it);
+                indices.emplace_back(it);
             }
         }
 
