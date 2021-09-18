@@ -53,6 +53,12 @@ For the latest version of DirectXMesh, bug reports, etc. please visit the projec
 
 * The UWP projects and the VS 2019 Win10 classic desktop project include configurations for the ARM64 platform. These require VS 2017 (15.9 update) or VS 2019 to build, with the ARM64 toolset installed.
 
+## Support
+
+For questions, consider using [Stack Overflow](https://stackoverflow.com/questions/tagged/directxtk) with the *directxtk* tag, or the [DirectX Discord Server](https://discord.gg/directx) in the *dx12-developers* or *dx9-dx11-developers* channel.
+
+For bug reports and feature requests, please use GitHub [issues](https://github.com/microsoft/DirectXTK12/issues) for this project.
+
 ## Contributing
 
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
@@ -64,3 +70,11 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 ## Trademarks
 
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general). Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
+
+## Credits
+
+The DirectXMesh library is the work of Chuck Walbourn, with contributions from Dr. Hugues Hoppe, Alex Nankervis, James Stanard, Craig Peeper, and the numerous other Microsoft engineers who developed the D3DX utility library over the years.
+
+Thanks to Matt Hurliman for his contribution of the meshlet generation functions.
+
+Thanks to Adrian Stone (Game Angst) for the public domain implementation of Tom Forsyth's linear-speed vertex cache optimization, and thanks to Tom Forsyth for his contribution.
