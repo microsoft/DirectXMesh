@@ -6,6 +6,10 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### September 28, 2021
+* Fixed overflow case in meshlet generation with degenerate triangles
+* Minor code review and project cleanup
+
 ### June 9, 2021
 * meshconvert: improved ``-flist`` switch to support wildcards and file exclusions
 * FlexibleVertexFormat.h header added to Utilities folder
