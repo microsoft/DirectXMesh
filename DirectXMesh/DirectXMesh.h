@@ -92,8 +92,8 @@ namespace DirectX
     {
     public:
         VBReader() noexcept(false);
-        VBReader(VBReader&& moveFrom) noexcept;
-        VBReader& operator= (VBReader&& moveFrom) noexcept;
+        VBReader(VBReader&&) noexcept;
+        VBReader& operator= (VBReader&&) noexcept;
 
         VBReader(VBReader const&) = delete;
         VBReader& operator= (VBReader const&) = delete;
@@ -148,8 +148,8 @@ namespace DirectX
     {
     public:
         VBWriter() noexcept(false);
-        VBWriter(VBWriter&& moveFrom) noexcept;
-        VBWriter& operator= (VBWriter&& moveFrom) noexcept;
+        VBWriter(VBWriter&&) noexcept;
+        VBWriter& operator= (VBWriter&&) noexcept;
 
         VBWriter(VBWriter const&) = delete;
         VBWriter& operator= (VBWriter const&) = delete;
