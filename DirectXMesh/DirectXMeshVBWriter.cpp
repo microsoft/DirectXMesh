@@ -652,28 +652,6 @@ VBWriter::VBWriter() noexcept(false)
 {
 }
 
-
-// Move constructor.
-VBWriter::VBWriter(VBWriter&& moveFrom) noexcept
-    : pImpl(std::move(moveFrom.pImpl))
-{
-}
-
-
-// Move assignment.
-VBWriter& VBWriter::operator= (VBWriter&& moveFrom) noexcept
-{
-    pImpl = std::move(moveFrom.pImpl);
-    return *this;
-}
-
-
-// Public destructor.
-VBWriter::~VBWriter()
-{
-}
-
-
 //-------------------------------------------------------------------------------------
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 _Use_decl_annotations_

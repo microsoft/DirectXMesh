@@ -654,28 +654,6 @@ VBReader::VBReader() noexcept(false)
 {
 }
 
-
-// Move constructor.
-VBReader::VBReader(VBReader&& moveFrom) noexcept
-    : pImpl(std::move(moveFrom.pImpl))
-{
-}
-
-
-// Move assignment.
-VBReader& VBReader::operator= (VBReader&& moveFrom) noexcept
-{
-    pImpl = std::move(moveFrom.pImpl);
-    return *this;
-}
-
-
-// Public destructor.
-VBReader::~VBReader()
-{
-}
-
-
 //-------------------------------------------------------------------------------------
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 _Use_decl_annotations_

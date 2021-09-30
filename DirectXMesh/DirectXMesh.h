@@ -92,13 +92,6 @@ namespace DirectX
     {
     public:
         VBReader() noexcept(false);
-        VBReader(VBReader&& moveFrom) noexcept;
-        VBReader& operator= (VBReader&& moveFrom) noexcept;
-
-        VBReader(VBReader const&) = delete;
-        VBReader& operator= (VBReader const&) = delete;
-
-        ~VBReader();
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
         HRESULT __cdecl Initialize(_In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl);
@@ -148,13 +141,6 @@ namespace DirectX
     {
     public:
         VBWriter() noexcept(false);
-        VBWriter(VBWriter&& moveFrom) noexcept;
-        VBWriter& operator= (VBWriter&& moveFrom) noexcept;
-
-        VBWriter(VBWriter const&) = delete;
-        VBWriter& operator= (VBWriter const&) = delete;
-
-        ~VBWriter();
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
         HRESULT __cdecl Initialize(_In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl);
