@@ -1,4 +1,4 @@
-![DirectX Logo](https://github.com/Microsoft/DirectXMesh/wiki/X_jpg.jpg)
+![DirectX Logo](https://raw.githubusercontent.com/wiki/Microsoft/DirectXMesh/X_jpg.jpg)
 
 # DirectXMesh geometry processing library
 

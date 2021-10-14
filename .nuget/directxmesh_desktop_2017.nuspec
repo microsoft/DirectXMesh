@@ -12,7 +12,9 @@
 DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.</description>
         <releaseNotes>Matches the September 28, 2021 release on GitHub.</releaseNotes>
         <projectUrl>http://go.microsoft.com/fwlink/?LinkID=324981</projectUrl>
+        <repository type="git" url="https://github.com/microsoft/DirectXMesh" />
         <icon>images\icon.jpg</icon>
+        <readme>docs\README.md</readme>
         <license type="expression">MIT</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
@@ -21,7 +23,7 @@ DirectXMesh, a shared source library for performing various geometry content pro
 
     <files>
 
-        <file target="docs" src="Readme.*" />
+        <file target="docs" src="*.md" />
 
         <file target="include" src="DirectXMesh\DirectXMesh.h" />
         <file target="include" src="DirectXMesh\DirectXMesh.inl" />
