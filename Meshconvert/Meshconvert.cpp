@@ -34,6 +34,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <tuple>
 
 #include "Mesh.h"
 
@@ -994,7 +995,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
         if (dwOptions & (1 << OPT_TOLOWER))
         {
-            (void)_wcslwr_s(outputPath);
+            std::ignore = _wcslwr_s(outputPath);
         }
 
         if (~dwOptions & (1 << OPT_OVERWRITE))
