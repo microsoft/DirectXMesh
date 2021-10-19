@@ -66,7 +66,7 @@ public:
     {
         Clear();
 
-        static const size_t MAX_POLY = 64;
+        constexpr size_t MAX_POLY = 64;
 
         using namespace DirectX;
 
