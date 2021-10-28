@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <fstream>
+#include <locale>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -73,6 +74,8 @@ public:
         std::wifstream InFile(szFileName);
         if (!InFile)
             return /* HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) */ static_cast<HRESULT>(0x80070002L);
+
+        InFile.imbue(std::locale::classic());
 
 #ifdef WIN32
         wchar_t fname[_MAX_FNAME] = {};
@@ -416,6 +419,8 @@ public:
         std::wifstream InFile(szFileName);
         if (!InFile)
             return /* HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) */ static_cast<HRESULT>(0x80070002L);
+
+        InFile.imbue(std::locale::classic());
 
         auto curMaterial = materials.end();
 
