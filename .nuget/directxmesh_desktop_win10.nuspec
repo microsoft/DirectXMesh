@@ -3,11 +3,11 @@
     <metadata minClientVersion="2.8.6">
         <id>directxmesh_desktop_win10</id>
         <version>0.0.0-SpecifyVersionOnCommandline</version>
-        <title>DirectXMesh Library (VS 2017/2019 Win32 for Windows 10/11)</title>
+        <title>DirectXMesh Library (VS 2017/2019/2022 Win32 for Windows 10/11)</title>
         <authors>Microsoft</authors>
         <owners>microsoft,directxtk</owners>
         <summary>DirectXMesh geometry processing library</summary>
-        <description>This version is for Windows desktop applications using Visual Studio 2017 or Visual Studio 2019 and supports Windows 10 / Windows 11 including both DirectX 11 and DirectX 12.
+        <description>This version is for Windows desktop applications using Visual Studio 2017, Visual Studio 2019, or Visual Studio 2022 and supports Windows 10 / Windows 11 including both DirectX 11 and DirectX 12.
 
 DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.</description>
         <releaseNotes>Matches the September 28, 2021 release on GitHub.</releaseNotes>
