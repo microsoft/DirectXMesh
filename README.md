@@ -6,7 +6,7 @@ http://go.microsoft.com/fwlink/?LinkID=324981
 
 Copyright (c) Microsoft Corporation.
 
-**September 28, 2021**
+**November 8, 2021**
 
 This package contains DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.
 
