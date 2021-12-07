@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshUtil.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Utilities
 //
 // Copyright (c) Microsoft Corporation.

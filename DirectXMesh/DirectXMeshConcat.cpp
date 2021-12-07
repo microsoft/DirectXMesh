@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshConcat.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Concatenate mesh
 //
 // Copyright (c) Microsoft Corporation.

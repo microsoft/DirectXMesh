@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMeshletGenerator.cpp
-//  
+//
 // DirectX Mesh Geometry Library - Meshlet Computation
 //
 // Copyright (c) Microsoft Corporation.
@@ -134,7 +134,7 @@ namespace
         constexpr float c_wtLocation = 0.333f;
         constexpr float c_wtOrientation = 1.0f - (c_wtReuse + c_wtLocation);
 
-        // Vertex reuse - 
+        // Vertex reuse -
         uint8_t reuse = ComputeReuse(meshlet, triIndices);
         float scrReuse = 1.0f - (float(reuse) / 3.0f);
 
@@ -214,7 +214,7 @@ namespace
             }
         }
 
-        // Add the new primitive 
+        // Add the new primitive
         MeshletTriangle mtri = { indices[0], indices[1], indices[2] };
         meshlet.PrimitiveIndices.emplace_back(mtri);
 

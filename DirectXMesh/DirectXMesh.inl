@@ -1,6 +1,6 @@
 //-------------------------------------------------------------------------------------
 // DirectXMesh.inl
-//  
+//
 // DirectX Mesh Geometry Library
 //
 // Copyright (c) Microsoft Corporation.
