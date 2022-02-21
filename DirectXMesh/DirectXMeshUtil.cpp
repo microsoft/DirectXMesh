@@ -126,7 +126,7 @@ bool DirectX::IsValid(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl) noex
 
     for (size_t j = 0; j < nDecl; ++j)
     {
-        size_t bpe = BytesPerElement(vbDecl[j].Format);
+        const size_t bpe = BytesPerElement(vbDecl[j].Format);
         if (!bpe)
         {
             // Not a valid DXGI format or it's not valid for VB usage
@@ -288,7 +288,7 @@ void DirectX::ComputeInputLayout(
             continue;
         }
 
-        size_t bpe = BytesPerElement(vbDecl[j].Format);
+        const size_t bpe = BytesPerElement(vbDecl[j].Format);
         if (!bpe)
         {
             // ignore invalid format
@@ -318,7 +318,7 @@ void DirectX::ComputeInputLayout(
 
         if (strides)
         {
-            uint32_t istride = uint32_t(alignedByteOffset + bpe);
+            const uint32_t istride = uint32_t(alignedByteOffset + bpe);
             strides[slot] = std::max<uint32_t>(strides[slot], istride);
         }
 

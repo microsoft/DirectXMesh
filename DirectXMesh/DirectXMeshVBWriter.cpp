@@ -383,7 +383,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(uint32_t)) > eptr)
                 return E_UNEXPECTED;
-            XMVECTOR v = XMConvertVectorFloatToUInt(*buffer++, 0);
+            const XMVECTOR v = XMConvertVectorFloatToUInt(*buffer++, 0);
             XMStoreInt(reinterpret_cast<uint32_t*>(ptr), v);
             ptr += stride;
         }
@@ -394,7 +394,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(int32_t)) > eptr)
                 return E_UNEXPECTED;
-            XMVECTOR v = XMConvertVectorFloatToInt(*buffer++, 0);
+            const XMVECTOR v = XMConvertVectorFloatToInt(*buffer++, 0);
             XMStoreInt(reinterpret_cast<uint32_t*>(ptr), v);
             ptr += stride;
         }
@@ -417,7 +417,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(HALF)) > eptr)
                 return E_UNEXPECTED;
-            float f = XMVectorGetX(*buffer++);
+            const float f = XMVectorGetX(*buffer++);
             *reinterpret_cast<HALF*>(ptr) = XMConvertFloatToHalf(f);
             ptr += stride;
         }

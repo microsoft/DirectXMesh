@@ -239,12 +239,12 @@ namespace DirectX
         {
             assert(!done());
 
-            uint32_t ret = m_currentFace;
+            const uint32_t ret = m_currentFace;
             m_currentEdge = m_nextEdge;
 
             for (;;)
             {
-                uint32_t prevFace = m_currentFace;
+                const uint32_t prevFace = m_currentFace;
 
                 assert((size_t(m_currentFace) * 3 + m_nextEdge) < (m_nFaces * 3));
                 _Analysis_assume_((size_t(m_currentFace) * 3 + m_nextEdge) < (m_nFaces * 3));
@@ -313,7 +313,7 @@ namespace DirectX
             m_currentFace = m_face;
 
             m_nextEdge = find(m_currentFace, m_pointIndex);
-            uint32_t initialNextEdge = m_nextEdge;
+            const uint32_t initialNextEdge = m_nextEdge;
             assert(m_nextEdge < 3);
             _Analysis_assume_(m_nextEdge < 3);
 
