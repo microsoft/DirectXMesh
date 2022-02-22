@@ -257,7 +257,7 @@ public:
                     // list. Store the index in the Indices array. The Vertices and Indices
                     // lists will eventually become the Vertex Buffer and Index Buffer for
                     // the mesh.
-                    uint32_t index = AddVertex(vertexIndex, &vertex, vertexCache);
+                    const uint32_t index = AddVertex(vertexIndex, &vertex, vertexCache);
                     if (index == uint32_t(-1))
                         return E_OUTOFMEMORY;
 
@@ -281,7 +281,7 @@ public:
                     bool faceEnd = false;
                     for (;;)
                     {
-                        wchar_t p = InFile.peek();
+                        const wchar_t p = InFile.peek();
 
                         if ('\n' == p || !InFile)
                         {
@@ -305,12 +305,12 @@ public:
                 }
 
                 // Convert polygons to triangles
-                uint32_t i0 = faceIndex[0];
+                const uint32_t i0 = faceIndex[0];
                 uint32_t i1 = faceIndex[1];
 
                 for (size_t j = 2; j < iFace; ++j)
                 {
-                    uint32_t index = faceIndex[j];
+                    const uint32_t index = faceIndex[j];
                     indices.emplace_back(static_cast<index_t>(i0));
                     if (ccw)
                     {
