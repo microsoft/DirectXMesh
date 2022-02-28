@@ -6,6 +6,10 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### February 28, 2022
+* Code and project review
+* Added CMakePresets.json
+
 ### November 8, 2021
 * VS 2022 support
 * Fixed locale issue with WaveFront OBJ reading/writing
