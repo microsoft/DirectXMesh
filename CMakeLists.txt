@@ -210,10 +210,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
 if(WIN32)
-    # Windows 10 is used here to build the DirectX 12 code paths as well as 11
     target_compile_definitions(${PROJECT_NAME} PRIVATE _UNICODE UNICODE)
     if(BUILD_TOOLS AND (NOT WINDOWS_STORE))
       target_compile_definitions(meshconvert PRIVATE _UNICODE UNICODE _WIN32_WINNT=0x0601)
+    endif()
+
+    if(WINDOWS_STORE)
+      target_compile_definitions(${PROJECT_NAME} PRIVATE WINAPI_FAMILY=WINAPI_FAMILY_APP)
     endif()
 
     if(BUILD_DX12 OR WINDOWS_STORE)
