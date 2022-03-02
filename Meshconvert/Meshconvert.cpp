@@ -357,7 +357,7 @@ namespace
     {
         while (pValue->name)
         {
-            size_t cchName = wcslen(pValue->name);
+            const size_t cchName = wcslen(pValue->name);
 
             if (cch + cchName + 2 >= 80)
             {
@@ -380,7 +380,7 @@ namespace
         wchar_t appName[_MAX_PATH] = {};
         if (GetModuleFileNameW(nullptr, appName, static_cast<DWORD>(std::size(appName))))
         {
-            DWORD size = GetFileVersionInfoSizeW(appName, nullptr);
+            const DWORD size = GetFileVersionInfoSizeW(appName, nullptr);
             if (size > 0)
             {
                 auto verInfo = std::make_unique<uint8_t[]>(size);
@@ -462,7 +462,7 @@ namespace
 
         LPWSTR errorText = nullptr;
 
-        DWORD result = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+        const DWORD result = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER,
             nullptr, static_cast<DWORD>(hr),
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&errorText), 0, nullptr);
 
@@ -473,9 +473,8 @@ namespace
             swprintf_s(desc, L": %ls", errorText);
 
             size_t len = wcslen(desc);
-            if (len >= 2)
+            if (len >= 1)
             {
-                desc[len - 2] = 0;
                 desc[len - 1] = 0;
             }
 
@@ -524,7 +523,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             if (*pValue)
                 *pValue++ = 0;
 
-            uint32_t dwOption = LookupByName(pArg, g_pOptions);
+            const uint32_t dwOption = LookupByName(pArg, g_pOptions);
 
             if (!dwOption || (dwOptions & (1 << dwOption)))
             {
@@ -690,7 +689,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else if (wcspbrk(pArg, L"?*") != nullptr)
         {
-            size_t count = conversion.size();
+            const size_t count = conversion.size();
             SearchForFiles(pArg, conversion, (dwOptions & (1 << OPT_RECURSIVE)) != 0);
             if (conversion.size() <= count)
             {
@@ -775,7 +774,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
 
         size_t nVerts = inMesh->GetVertexCount();
-        size_t nFaces = inMesh->GetFaceCount();
+        const size_t nFaces = inMesh->GetFaceCount();
 
         if (!nVerts || !nFaces)
         {
@@ -825,7 +824,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         if (dwOptions & ((1 << OPT_OPTIMIZE) | (1 << OPT_CLEAN)))
         {
             // Adjacency
-            float epsilon = (dwOptions & (1 << OPT_GEOMETRIC_ADJ)) ? 1e-5f : 0.f;
+            const float epsilon = (dwOptions & (1 << OPT_GEOMETRIC_ADJ)) ? 1e-5f : 0.f;
 
             hr = inMesh->GenerateAdjacency(epsilon);
             if (FAILED(hr))
@@ -854,7 +853,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
             else
             {
-                size_t nNewVerts = inMesh->GetVertexCount();
+                const size_t nNewVerts = inMesh->GetVertexCount();
                 if (nVerts != nNewVerts)
                 {
                     wprintf(L" [%zu vertex dups] ", nNewVerts - nVerts);
