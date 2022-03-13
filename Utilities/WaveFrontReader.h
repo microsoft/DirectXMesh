@@ -261,16 +261,10 @@ public:
                     if (index == uint32_t(-1))
                         return E_OUTOFMEMORY;
 
-#pragma warning( suppress : 4127 )
-                    if (sizeof(index_t) == 2 && (index >= 0xFFFF))
+                    constexpr uint32_t maxIndex = (sizeof(index_t) == 2) ? UINT16_MAX : UINT32_MAX;
+                    if (index >= maxIndex)
                     {
-                        // Too many indices for 16-bit IB!
-                        return E_FAIL;
-                    }
-#pragma warning( suppress : 4127 )
-                    else if (sizeof(index_t) == 4 && (index >= 0xFFFFFFFF))
-                    {
-                        // Too many indices for 32-bit IB!
+                        // Too many indices for IB!
                         return E_FAIL;
                     }
 
@@ -611,8 +605,12 @@ public:
         vertices.resize(numVertices);
         vboFile.read(reinterpret_cast<char*>(vertices.data()), sizeof(Vertex) * numVertices);
 
+#if (__cplusplus >= 201703L)
+        if constexpr (sizeof(index_t) == 2)
+#else
 #pragma warning( suppress : 4127 )
         if (sizeof(index_t) == 2)
+#endif
         {
             indices.resize(numIndices);
             vboFile.read(reinterpret_cast<char*>(indices.data()), sizeof(uint16_t) * numIndices);
