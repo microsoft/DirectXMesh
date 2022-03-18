@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-cmake_minimum_required (VERSION 3.11)
+cmake_minimum_required (VERSION 3.13)
 
 set(DIRECTXMESH_VERSION 1.6.2)
 
@@ -189,17 +189,30 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
       target_compile_options(meshconvert PRIVATE /permissive- /JMC- /Zc:__cplusplus)
     endif()
 
-   if(ENABLE_CODE_ANALYSIS)
+    if(ENABLE_CODE_ANALYSIS)
       target_compile_options(${PROJECT_NAME} PRIVATE /analyze)
       if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
         target_compile_options(meshconvert PRIVATE /analyze)
       endif()
-   endif()
+    endif()
+
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.24)
+        target_compile_options(${PROJECT_NAME} PRIVATE /ZH:SHA_256)
+        if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
+          target_compile_options(meshconvert PRIVATE /ZH:SHA_256)
+        endif()
+    endif()
 
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.26)
         target_compile_options(${PROJECT_NAME} PRIVATE /Zc:preprocessor /wd5105)
         if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
           target_compile_options(meshconvert PRIVATE /Zc:preprocessor /wd5105)
+        endif()
+    endif()
+
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.27)
+        if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
+          target_link_options(meshconvert PRIVATE /CETCOMPAT)
         endif()
     endif()
 
