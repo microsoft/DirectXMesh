@@ -26,6 +26,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/CMake")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/CMake")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/CMake")
 
+if (DEFINED VCPKG_TARGET_ARCHITECTURE)
+    set(DIRECTX_ARCH ${VCPKG_TARGET_ARCHITECTURE})
+endif()
+
 #--- Library
 set(LIBRARY_HEADERS
     DirectXMesh/DirectXMesh.h
@@ -166,7 +170,7 @@ if(MSVC)
       target_compile_options(meshconvert PRIVATE /fp:fast)
     endif()
 
-    if(${CMAKE_SIZEOF_VOID_P} EQUAL "4" AND (NOT ${CMAKE_VS_PLATFORM_NAME} MATCHES "arm"))
+    if((${CMAKE_SIZEOF_VOID_P} EQUAL 4) AND (NOT ${DIRECTX_ARCH} MATCHES "arm"))
         target_compile_options(${PROJECT_NAME} PRIVATE /arch:SSE2)
         if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
           target_compile_options(meshconvert PRIVATE /arch:SSE2)
@@ -209,8 +213,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
           target_compile_options(meshconvert PRIVATE /Zc:preprocessor /wd5105)
         endif()
     endif()
-
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.27)
+    
+    if ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.27) AND (NOT (${DIRECTX_ARCH} MATCHES "arm(64)?")))
         if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
           target_link_options(meshconvert PRIVATE /CETCOMPAT)
         endif()
