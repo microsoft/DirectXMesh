@@ -174,12 +174,10 @@ if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
 endif()
 
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /fp:fast "$<$<CONFIG:RELEASE>:/guard:cf>")
-    target_link_options(${PROJECT_NAME} PRIVATE /DEBUG)
+    target_compile_options(${PROJECT_NAME} PRIVATE /fp:fast "$<$<NOT:$<CONFIG:DEBUG>>:/guard:cf>")
 
     if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
-      target_compile_options(meshconvert PRIVATE /fp:fast "$<$<CONFIG:RELEASE>:/guard:cf>")
-      target_link_options(meshconvert PRIVATE /DEBUG)
+      target_compile_options(meshconvert PRIVATE /fp:fast "$<$<NOT:$<CONFIG:DEBUG>>:/guard:cf>")
     endif()
 
     if((${CMAKE_SIZEOF_VOID_P} EQUAL 4) AND (NOT ${DIRECTX_ARCH} MATCHES "arm"))
