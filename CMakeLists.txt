@@ -178,11 +178,11 @@ if(MSVC)
 
     if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
       target_compile_options(meshconvert PRIVATE /fp:fast "$<$<NOT:$<CONFIG:DEBUG>>:/guard:cf>")
+      target_link_options(meshconvert PRIVATE /DYNAMICBASE /NXCOMPAT)
     endif()
 
     if((${CMAKE_SIZEOF_VOID_P} EQUAL 4) AND (NOT ${DIRECTX_ARCH} MATCHES "arm"))
         target_compile_options(${PROJECT_NAME} PRIVATE /arch:SSE2)
-        target_link_options(${PROJECT_NAME} PRIVATE /SAFESEH)
 
         if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
           target_compile_options(meshconvert PRIVATE /arch:SSE2)
