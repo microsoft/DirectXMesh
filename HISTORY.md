@@ -6,6 +6,12 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### March 24, 2022
+* Update build switches for SDL recommendations
+* CMake project updates and UWP platform CMakePresets
+* Code cleaup for meshconvert tool
+* Optional C++17 usage in WaveFrontReader.h
+
 ### February 28, 2022
 * Code and project review
 * Added CMakePresets.json
