@@ -82,11 +82,11 @@ namespace
     static INIT_ONCE s_initOnce = INIT_ONCE_STATIC_INIT;
 
     BOOL WINAPI ComputeVertexScores(PINIT_ONCE, PVOID, PVOID*) noexcept
-#else
+    #else
     std::once_flag s_initOnce;
 
     void ComputeVertexScores() noexcept
-#endif
+    #endif
     {
         for (uint32_t cacheSize = 0; cacheSize <= kMaxVertexCacheSize; ++cacheSize)
         {
@@ -101,9 +101,9 @@ namespace
             s_vertexValenceScores[valence] = ComputeVertexValenceScore(valence);
         }
 
-#ifdef WIN32
+    #ifdef WIN32
         return TRUE;
-#endif
+    #endif
     }
 
     float FindVertexScore(uint32_t numActiveFaces, uint32_t cachePosition, uint32_t vertexCacheSize) noexcept
@@ -143,7 +143,7 @@ namespace
         IndexType   cachePos0;
         IndexType   cachePos1;
 
-        OptimizeVertexData() noexcept : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) { }
+        OptimizeVertexData() noexcept : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) {}
     };
 
     template <typename T, typename IndexType>
@@ -152,7 +152,7 @@ namespace
     {
         const IndexType *_indexData;
 
-        IndexSortCompareIndexed(const IndexType *indexData) noexcept : _indexData(indexData) { }
+        IndexSortCompareIndexed(const IndexType *indexData) noexcept : _indexData(indexData) {}
 
         bool operator()(T a, T b) const noexcept
         {
@@ -171,7 +171,7 @@ namespace
     {
         const OptimizeVertexData<IndexType> *_vertexData;
 
-        FaceValenceSort(const OptimizeVertexData<IndexType> *vertexData) noexcept : _vertexData(vertexData) { }
+        FaceValenceSort(const OptimizeVertexData<IndexType> *vertexData) noexcept : _vertexData(vertexData) {}
 
         bool operator()(T a, T b) const noexcept
         {

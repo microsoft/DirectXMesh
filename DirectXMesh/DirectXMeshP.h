@@ -198,7 +198,9 @@ namespace DirectX
             m_indices(indices),
             m_nFaces(nFaces),
             m_clockWise(false),
-            m_stopOnBoundary(false) {}
+            m_stopOnBoundary(false)
+        {
+        }
 
         void initialize(uint32_t face, uint32_t point, WalkType wtype) noexcept
         {
@@ -341,7 +343,8 @@ namespace DirectX
 
                     m_nextEdge = (m_nextEdge + 2) % 3;
                 }
-            } while ((m_currentFace != m_face) && (m_currentFace != UNUSED32));
+            }
+            while ((m_currentFace != m_face) && (m_currentFace != UNUSED32));
 
             if (m_currentFace == UNUSED32)
             {

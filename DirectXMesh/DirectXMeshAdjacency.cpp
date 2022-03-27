@@ -601,11 +601,11 @@ namespace
 
                         if (point2 < 3)
                         {
-#ifndef NDEBUG
+                        #ifndef NDEBUG
                             uint32_t testPoint = indices[foundFace * 3 + ((point2 + 1) % 3)];
                             testPoint = pointRep[testPoint];
                             assert(testPoint == vb);
-#endif
+                        #endif
                             assert(adjacency[foundFace * 3 + point2] == UNUSED32);
 
                             // update neighbor to point back to this face match edge

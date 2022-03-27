@@ -381,12 +381,12 @@ namespace
 
             assert((nVerts + dupVerts.size()) == curNewVert);
 
-#ifndef NDEBUG
+        #ifndef NDEBUG
             for (const auto it : dupVerts)
             {
                 assert(it < nVerts);
             }
-#endif
+        #endif
         }
 
         if ((uint64_t(nVerts) + uint64_t(dupVerts.size())) >= index_t(-1))

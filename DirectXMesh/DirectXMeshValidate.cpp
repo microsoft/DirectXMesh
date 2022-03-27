@@ -21,7 +21,7 @@ namespace
 {
 #ifndef WIN32
     template<size_t sizeOfBuffer>
-    inline int swprintf_s(wchar_t (&buffer)[sizeOfBuffer], const wchar_t* format, ...)
+    inline int swprintf_s(wchar_t(&buffer)[sizeOfBuffer], const wchar_t* format, ...)
     {
         // This is adapter code. It is not a full implementation of swprintf_s!
         va_list ap;
