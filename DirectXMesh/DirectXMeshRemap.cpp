@@ -220,16 +220,16 @@ namespace
             while (dest != j)
             {
                 // Swap vertex
-#ifdef _PREFAST_
-#pragma prefast(push)
-#pragma prefast(disable : 26019, "PREfast noise: Esp:1307")
-#endif
+            #ifdef _PREFAST_
+            #pragma prefast(push)
+            #pragma prefast(disable : 26019, "PREfast noise: Esp:1307")
+            #endif
                 memcpy(vbtemp, ptr + dest*stride, stride);
                 memcpy(ptr + dest*stride, ptr + j*stride, stride);
                 memcpy(ptr + j*stride, vbtemp, stride);
-#ifdef _PREFAST_
-#pragma prefast(pop)
-#endif
+            #ifdef _PREFAST_
+            #pragma prefast(pop)
+            #endif
 
                 if (pointRep)
                 {

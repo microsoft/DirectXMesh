@@ -536,46 +536,46 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         break;
 
     case DXGI_FORMAT_B5G6R5_UNORM:
-    {
-        static const XMVECTORF32 s_Scale = { { { 31.f, 63.f, 31.f, 1.f } } };
-        for (size_t icount = 0; icount < count; ++icount)
         {
-            if ((ptr + sizeof(XMU565)) > eptr)
-                return E_UNEXPECTED;
-            XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
-            if (x2bias)
+            static const XMVECTORF32 s_Scale = { { { 31.f, 63.f, 31.f, 1.f } } };
+            for (size_t icount = 0; icount < count; ++icount)
             {
-                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
-                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+                if ((ptr + sizeof(XMU565)) > eptr)
+                    return E_UNEXPECTED;
+                XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
+                if (x2bias)
+                {
+                    v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                    v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+                }
+                v = XMVectorMultiply(v, s_Scale);
+                XMStoreU565(reinterpret_cast<XMU565*>(ptr), v);
+                ptr += stride;
             }
-            v = XMVectorMultiply(v, s_Scale);
-            XMStoreU565(reinterpret_cast<XMU565*>(ptr), v);
-            ptr += stride;
         }
-    }
-    break;
+        break;
 
     case DXGI_FORMAT_B5G5R5A1_UNORM:
-    {
-        static const XMVECTORF32 s_Scale = { { { 31.f, 31.f, 31.f, 1.f } } };
-        for (size_t icount = 0; icount < count; ++icount)
         {
-            if ((ptr + sizeof(XMU555)) > eptr)
-                return E_UNEXPECTED;
-            XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
-            if (x2bias)
+            static const XMVECTORF32 s_Scale = { { { 31.f, 31.f, 31.f, 1.f } } };
+            for (size_t icount = 0; icount < count; ++icount)
             {
-                XMVECTOR v2 = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
-                v2 = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
-                v = XMVectorSelect(v, v2, g_XMSelect1110);
+                if ((ptr + sizeof(XMU555)) > eptr)
+                    return E_UNEXPECTED;
+                XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
+                if (x2bias)
+                {
+                    XMVECTOR v2 = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                    v2 = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
+                    v = XMVectorSelect(v, v2, g_XMSelect1110);
+                }
+                v = XMVectorMultiply(v, s_Scale);
+                XMStoreU555(reinterpret_cast<XMU555*>(ptr), v);
+                reinterpret_cast<XMU555*>(ptr)->w = (XMVectorGetW(v) > 0.5f) ? 1u : 0u;
+                ptr += stride;
             }
-            v = XMVectorMultiply(v, s_Scale);
-            XMStoreU555(reinterpret_cast<XMU555*>(ptr), v);
-            reinterpret_cast<XMU555*>(ptr)->w = (XMVectorGetW(v) > 0.5f) ? 1u : 0u;
-            ptr += stride;
         }
-    }
-    break;
+        break;
 
     case DXGI_FORMAT_B8G8R8A8_UNORM:
         for (size_t icount = 0; icount < count; ++icount)
@@ -611,24 +611,24 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         break;
 
     case DXGI_FORMAT_B4G4R4A4_UNORM:
-    {
-        static const XMVECTORF32 s_Scale = { { { 15.f, 15.f, 15.f, 15.f } } };
-        for (size_t icount = 0; icount < count; ++icount)
         {
-            if ((ptr + sizeof(XMUNIBBLE4)) > eptr)
-                return E_UNEXPECTED;
-            XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
-            if (x2bias)
+            static const XMVECTORF32 s_Scale = { { { 15.f, 15.f, 15.f, 15.f } } };
+            for (size_t icount = 0; icount < count; ++icount)
             {
-                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
-                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+                if ((ptr + sizeof(XMUNIBBLE4)) > eptr)
+                    return E_UNEXPECTED;
+                XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
+                if (x2bias)
+                {
+                    v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                    v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
+                }
+                v = XMVectorMultiply(v, s_Scale);
+                XMStoreUNibble4(reinterpret_cast<XMUNIBBLE4*>(ptr), v);
+                ptr += stride;
             }
-            v = XMVectorMultiply(v, s_Scale);
-            XMStoreUNibble4(reinterpret_cast<XMUNIBBLE4*>(ptr), v);
-            ptr += stride;
         }
-    }
-    break;
+        break;
 
     case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
         // Xbox One specific format

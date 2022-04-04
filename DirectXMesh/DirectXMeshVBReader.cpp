@@ -542,44 +542,44 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
         break;
 
     case DXGI_FORMAT_B5G6R5_UNORM:
-    {
-        static const XMVECTORF32 s_Scale = { { { 1.f / 31.f, 1.f / 63.f, 1.f / 31.f, 1.f } } };
-        for (size_t icount = 0; icount < count; ++icount)
         {
-            if ((ptr + sizeof(XMU565)) > eptr)
-                return E_UNEXPECTED;
-            XMVECTOR v = XMLoadU565(reinterpret_cast<const XMU565*>(ptr));
-            v = XMVectorMultiply(v, s_Scale);
-            if (x2bias)
+            static const XMVECTORF32 s_Scale = { { { 1.f / 31.f, 1.f / 63.f, 1.f / 31.f, 1.f } } };
+            for (size_t icount = 0; icount < count; ++icount)
             {
-                const XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
-                v = XMVectorSelect(v, v2, g_XMSelect1110);
+                if ((ptr + sizeof(XMU565)) > eptr)
+                    return E_UNEXPECTED;
+                XMVECTOR v = XMLoadU565(reinterpret_cast<const XMU565*>(ptr));
+                v = XMVectorMultiply(v, s_Scale);
+                if (x2bias)
+                {
+                    const XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                    v = XMVectorSelect(v, v2, g_XMSelect1110);
+                }
+                *buffer++ = XMVectorSwizzle<2, 1, 0, 3>(v);
+                ptr += stride;
             }
-            *buffer++ = XMVectorSwizzle<2, 1, 0, 3>(v);
-            ptr += stride;
         }
-    }
-    break;
+        break;
 
     case DXGI_FORMAT_B5G5R5A1_UNORM:
-    {
-        static const XMVECTORF32 s_Scale = { { { 1.f / 31.f, 1.f / 31.f, 1.f / 31.f, 1.f } } };
-        for (size_t icount = 0; icount < count; ++icount)
         {
-            if ((ptr + sizeof(XMU555)) > eptr)
-                return E_UNEXPECTED;
-            XMVECTOR v = XMLoadU555(reinterpret_cast<const XMU555*>(ptr));
-            v = XMVectorMultiply(v, s_Scale);
-            if (x2bias)
+            static const XMVECTORF32 s_Scale = { { { 1.f / 31.f, 1.f / 31.f, 1.f / 31.f, 1.f } } };
+            for (size_t icount = 0; icount < count; ++icount)
             {
-                const XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
-                v = XMVectorSelect(v, v2, g_XMSelect1110);
+                if ((ptr + sizeof(XMU555)) > eptr)
+                    return E_UNEXPECTED;
+                XMVECTOR v = XMLoadU555(reinterpret_cast<const XMU555*>(ptr));
+                v = XMVectorMultiply(v, s_Scale);
+                if (x2bias)
+                {
+                    const XMVECTOR v2 = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                    v = XMVectorSelect(v, v2, g_XMSelect1110);
+                }
+                *buffer++ = XMVectorSwizzle<2, 1, 0, 3>(v);
+                ptr += stride;
             }
-            *buffer++ = XMVectorSwizzle<2, 1, 0, 3>(v);
-            ptr += stride;
         }
-    }
-    break;
+        break;
 
     case DXGI_FORMAT_B8G8R8A8_UNORM:
         for (size_t icount = 0; icount < count; ++icount)
@@ -614,23 +614,23 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
         break;
 
     case DXGI_FORMAT_B4G4R4A4_UNORM:
-    {
-        static const XMVECTORF32 s_Scale = { { { 1.f / 15.f, 1.f / 15.f, 1.f / 15.f, 1.f / 15.f } } };
-        for (size_t icount = 0; icount < count; ++icount)
         {
-            if ((ptr + sizeof(XMUNIBBLE4)) > eptr)
-                return E_UNEXPECTED;
-            XMVECTOR v = XMLoadUNibble4(reinterpret_cast<const XMUNIBBLE4*>(ptr));
-            v = XMVectorMultiply(v, s_Scale);
-            if (x2bias)
+            static const XMVECTORF32 s_Scale = { { { 1.f / 15.f, 1.f / 15.f, 1.f / 15.f, 1.f / 15.f } } };
+            for (size_t icount = 0; icount < count; ++icount)
             {
-                v = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                if ((ptr + sizeof(XMUNIBBLE4)) > eptr)
+                    return E_UNEXPECTED;
+                XMVECTOR v = XMLoadUNibble4(reinterpret_cast<const XMUNIBBLE4*>(ptr));
+                v = XMVectorMultiply(v, s_Scale);
+                if (x2bias)
+                {
+                    v = XMVectorMultiplyAdd(v, g_XMTwo, g_XMNegativeOne);
+                }
+                *buffer++ = XMVectorSwizzle<2, 1, 0, 3>(v);
+                ptr += stride;
             }
-            *buffer++ = XMVectorSwizzle<2, 1, 0, 3>(v);
-            ptr += stride;
         }
-    }
-    break;
+        break;
 
     case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
         // Xbox One specific format

@@ -44,9 +44,9 @@ namespace
             if (!mPhysicalNeighbors)
                 return E_OUTOFMEMORY;
 
-#ifdef _DEBUG
+        #ifdef _DEBUG
             memset(mPhysicalNeighbors.get(), 0xcd, sizeof(neighborInfo) * nFaces);
-#endif
+        #endif
 
             mFaceOffset = 0;
             mFaceCount = 0;
