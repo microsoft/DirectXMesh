@@ -3,11 +3,11 @@
     <metadata minClientVersion="2.8.6">
         <id>directxmesh_desktop_win10</id>
         <version>0.0.0-SpecifyVersionOnCommandline</version>
-        <title>DirectXMesh Library (VS 2017/2019/2022 Win32 for Windows 10/11)</title>
+        <title>DirectXMesh Library (VS 2019/2022 Win32 for Windows 10/11)</title>
         <authors>Microsoft</authors>
         <owners>microsoft,directxtk</owners>
         <summary>DirectXMesh geometry processing library</summary>
-        <description>This version is for Windows desktop applications using Visual Studio 2017, Visual Studio 2019, or Visual Studio 2022 and supports Windows 10 / Windows 11 including both DirectX 11 and DirectX 12.
+        <description>This version is for Windows desktop applications using Visual Studio 2019 or Visual Studio 2022 and supports Windows 10 / Windows 11 including both DirectX 11 and DirectX 12.
 
 DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.</description>
         <releaseNotes>Matches the March 24, 2022 release on GitHub.</releaseNotes>
@@ -30,23 +30,23 @@ DirectXMesh, a shared source library for performing various geometry content pro
 
         <file target="include" src="Utilities\*.h" />
 
-        <file target="native\lib\Win32\Debug" src="DirectXMesh\Bin\Desktop_2017_Win10\Win32\Debug\*.lib" />
-        <file target="native\lib\Win32\Debug" src="DirectXMesh\Bin\Desktop_2017_Win10\Win32\Debug\*.pdb" />
+        <file target="native\lib\Win32\Debug" src="DirectXMesh\Bin\Desktop_2019_Win10\Win32\Debug\*.lib" />
+        <file target="native\lib\Win32\Debug" src="DirectXMesh\Bin\Desktop_2019_Win10\Win32\Debug\*.pdb" />
 
-        <file target="native\lib\Win32\Release" src="DirectXMesh\Bin\Desktop_2017_Win10\Win32\Release\*.lib" />
-        <file target="native\lib\Win32\Release" src="DirectXMesh\Bin\Desktop_2017_Win10\Win32\Release\*.pdb" />
+        <file target="native\lib\Win32\Release" src="DirectXMesh\Bin\Desktop_2019_Win10\Win32\Release\*.lib" />
+        <file target="native\lib\Win32\Release" src="DirectXMesh\Bin\Desktop_2019_Win10\Win32\Release\*.pdb" />
 
-        <file target="native\lib\x64\Debug" src="DirectXMesh\Bin\Desktop_2017_Win10\x64\Debug\*.lib" />
-        <file target="native\lib\x64\Debug" src="DirectXMesh\Bin\Desktop_2017_Win10\x64\Debug\*.pdb" />
+        <file target="native\lib\x64\Debug" src="DirectXMesh\Bin\Desktop_2019_Win10\x64\Debug\*.lib" />
+        <file target="native\lib\x64\Debug" src="DirectXMesh\Bin\Desktop_2019_Win10\x64\Debug\*.pdb" />
 
-        <file target="native\lib\x64\Release" src="DirectXMesh\Bin\Desktop_2017_Win10\x64\Release\*.lib" />
-        <file target="native\lib\x64\Release" src="DirectXMesh\Bin\Desktop_2017_Win10\x64\Release\*.pdb" />
+        <file target="native\lib\x64\Release" src="DirectXMesh\Bin\Desktop_2019_Win10\x64\Release\*.lib" />
+        <file target="native\lib\x64\Release" src="DirectXMesh\Bin\Desktop_2019_Win10\x64\Release\*.pdb" />
 
-        <file target="native\lib\ARM64\Debug" src="DirectXMesh\Bin\Desktop_2017_Win10\ARM64\Debug\*.lib" />
-        <file target="native\lib\ARM64\Debug" src="DirectXMesh\Bin\Desktop_2017_Win10\ARM64\Debug\*.pdb" />
+        <file target="native\lib\ARM64\Debug" src="DirectXMesh\Bin\Desktop_2019_Win10\ARM64\Debug\*.lib" />
+        <file target="native\lib\ARM64\Debug" src="DirectXMesh\Bin\Desktop_2019_Win10\ARM64\Debug\*.pdb" />
 
-        <file target="native\lib\ARM64\Release" src="DirectXMesh\Bin\Desktop_2017_Win10\ARM64\Release\*.lib" />
-        <file target="native\lib\ARM64\Release" src="DirectXMesh\Bin\Desktop_2017_Win10\ARM64\Release\*.pdb" />
+        <file target="native\lib\ARM64\Release" src="DirectXMesh\Bin\Desktop_2019_Win10\ARM64\Release\*.lib" />
+        <file target="native\lib\ARM64\Release" src="DirectXMesh\Bin\Desktop_2019_Win10\ARM64\Release\*.pdb" />
 
         <file src=".nuget/directxmesh_desktop_win10.targets" target="build\native" />
 
