@@ -13,13 +13,13 @@
 
 using namespace DirectX;
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <cstdarg>
 #endif
 
 namespace
 {
-#ifndef WIN32
+#ifndef _WIN32
     template<size_t sizeOfBuffer>
     inline int swprintf_s(wchar_t(&buffer)[sizeOfBuffer], const wchar_t* format, ...)
     {

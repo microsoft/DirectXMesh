@@ -118,7 +118,7 @@ bool DirectX::IsValid(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl) noex
         return false;
     }
 
-    if (nDecl > D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT)
+    if (nDecl > 32 /* D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT */)
     {
         // The upper-limit depends on feature level, so we assume highest value here
         return false;

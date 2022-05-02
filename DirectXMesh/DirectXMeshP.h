@@ -58,7 +58,7 @@
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 #endif
 
-#if defined(WIN32) || defined(_WIN32)
+#ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -75,6 +75,10 @@
 #pragma warning(pop)
 
 #include <Windows.h>
+
+#ifdef __MINGW32__
+#include <unknwn.h>
+#endif
 
 #ifndef _WIN32_WINNT_WIN10
 #define _WIN32_WINNT_WIN10 0x0A00
@@ -124,7 +128,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <mutex>
 #endif
 
@@ -159,7 +163,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     constexpr uint32_t UNUSED32 = uint32_t(-1);
 
-#if defined(__d3d11_h__) || defined(__d3d11_x_h__)
+#if (defined(__d3d11_h__) || defined(__d3d11_x_h__)) && !defined(__MINGW32__)
     static_assert(D3D11_16BIT_INDEX_STRIP_CUT_VALUE == uint16_t(-1), "Mismatch with Direct3D11");
     static_assert(D3D11_16BIT_INDEX_STRIP_CUT_VALUE == UINT16_MAX, "Mismatch with Direct3D11");
 

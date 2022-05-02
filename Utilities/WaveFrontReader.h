@@ -13,7 +13,7 @@
 
 #pragma once
 
-#if defined(WIN32) || defined(_WIN32)
+#ifdef _WIN32
 #pragma warning(push)
 #pragma warning(disable : 4005)
 #define WIN32_LEAN_AND_MEAN
@@ -43,7 +43,7 @@
 #include <vector>
 #include <unordered_map>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <filesystem>
 #endif
 
@@ -77,7 +77,7 @@ public:
 
         InFile.imbue(std::locale::classic());
 
-#ifdef WIN32
+#ifdef _WIN32
         wchar_t fname[_MAX_FNAME] = {};
         _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
         name = fname;
@@ -377,7 +377,7 @@ public:
         // If an associated material file was found, read that in as well.
         if (*strMaterialFilename)
         {
-#ifdef WIN32
+#ifdef _WIN32
             wchar_t ext[_MAX_EXT] = {};
             _wsplitpath_s(strMaterialFilename, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
 
@@ -572,7 +572,7 @@ public:
 
         Clear();
 
-#ifdef WIN32
+#ifdef _WIN32
         wchar_t fname[_MAX_FNAME] = {};
         _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
         name = fname;
@@ -740,7 +740,7 @@ private:
 
         if (!path.empty())
         {
-#ifdef WIN32
+#ifdef _WIN32
             wcscpy_s(texture, maxChar, path.c_str());
 #else
             wcscpy(texture, path.c_str());
