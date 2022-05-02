@@ -38,6 +38,8 @@ elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Aa][Rr][Mm]64$")
     set(DIRECTX_ARCH arm64)
 endif()
 
+include(GNUInstallDirs)
+
 #--- Library
 set(LIBRARY_HEADERS
     DirectXMesh/DirectXMesh.h
@@ -68,7 +70,7 @@ source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/DirectXMesh>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.16")
     target_precompile_headers(${PROJECT_NAME} PRIVATE DirectXMesh/DirectXMeshP.h)
@@ -105,7 +107,7 @@ source_group(Utilities REGULAR_EXPRESSION Utilities/*.*)
 
 target_include_directories(Utilities INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Utilities>
-  $<INSTALL_INTERFACE:utils>)
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/utils>)
 
 #--- Package
 include(CMakePackageConfigHelpers)
@@ -113,48 +115,48 @@ include(CMakePackageConfigHelpers)
 string(TOLOWER ${PROJECT_NAME} PACKAGE_NAME)
 
 write_basic_package_version_file(
-  ${PROJECT_BINARY_DIR}/cmake/${PACKAGE_NAME}-config-version.cmake
+  ${PACKAGE_NAME}-config-version.cmake
   VERSION ${DIRECTXMESH_VERSION}
   COMPATIBILITY AnyNewerVersion)
 
 install(TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT library)
 
 install(TARGETS Utilities
   EXPORT Utilities-targets
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT utils)
 
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/.nuget/${PROJECT_NAME}-config.cmake.in
-  ${PROJECT_BINARY_DIR}/cmake/${PACKAGE_NAME}-config.cmake
-  INSTALL_DESTINATION cmake/})
+  ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PACKAGE_NAME}/cmake/)
 
 install(EXPORT ${PROJECT_NAME}-targets
   FILE ${PROJECT_NAME}-targets.cmake
   NAMESPACE Microsoft::
-  DESTINATION cmake/)
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PACKAGE_NAME}/cmake/)
 
 install(EXPORT Utilities-targets
   FILE Utilities-targets.cmake
   NAMESPACE Microsoft::DirectXMesh::
-  DESTINATION cmake/)
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PACKAGE_NAME}/cmake/)
 
 install(FILES ${LIBRARY_HEADERS}
-  DESTINATION include)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(FILES ${UTILS_HEADERS}
-  DESTINATION utils)
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/utils)
 
 install(FILES
-    ${PROJECT_BINARY_DIR}/cmake/${PACKAGE_NAME}-config.cmake
-    ${PROJECT_BINARY_DIR}/cmake/${PACKAGE_NAME}-config-version.cmake
-  DESTINATION cmake/)
+    ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config-version.cmake
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PACKAGE_NAME}/cmake/)
 
 #--- Command-line tool
 if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
