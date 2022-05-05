@@ -78,7 +78,7 @@ namespace
     float s_vertexCacheScores[kMaxVertexCacheSize + 1][kMaxVertexCacheSize];
     float s_vertexValenceScores[kMaxPrecomputedVertexValenceScores];
 
-#ifdef WIN32
+#ifdef _WIN32
     static INIT_ONCE s_initOnce = INIT_ONCE_STATIC_INIT;
 
     BOOL WINAPI ComputeVertexScores(PINIT_ONCE, PVOID, PVOID*) noexcept
@@ -101,7 +101,7 @@ namespace
             s_vertexValenceScores[valence] = ComputeVertexValenceScore(valence);
         }
 
-    #ifdef WIN32
+    #ifdef _WIN32
         return TRUE;
     #endif
     }
@@ -518,7 +518,7 @@ HRESULT DirectX::OptimizeFacesLRU(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-#ifdef WIN32
+#ifdef _WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 #else
     std::call_once(s_initOnce, ComputeVertexScores);
@@ -543,7 +543,7 @@ HRESULT DirectX::OptimizeFacesLRU(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-#ifdef WIN32
+#ifdef _WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 #else
     std::call_once(s_initOnce, ComputeVertexScores);
@@ -571,7 +571,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-#ifdef WIN32
+#ifdef _WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 #else
     std::call_once(s_initOnce, ComputeVertexScores);
@@ -624,7 +624,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-#ifdef WIN32
+#ifdef _WIN32
     InitOnceExecuteOnce(&s_initOnce, ComputeVertexScores, nullptr, nullptr);
 #else
     std::call_once(s_initOnce, ComputeVertexScores);

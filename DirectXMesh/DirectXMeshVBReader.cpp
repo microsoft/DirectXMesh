@@ -14,7 +14,7 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-#ifndef WIN32
+#ifndef _WIN32
 #define _stricmp strcasecmp
 #endif
 
