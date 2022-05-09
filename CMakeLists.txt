@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.13)
 
-set(DIRECTXMESH_VERSION 1.6.2)
+set(DIRECTXMESH_VERSION 1.6.3)
 
 project(DirectXMesh
   VERSION ${DIRECTXMESH_VERSION}
