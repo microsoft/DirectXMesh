@@ -157,8 +157,8 @@ HRESULT VBWriter::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
     if (!IsValid(reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(vbDecl), nDecl))
         return E_INVALIDARG;
 
-    assert(nDecl <= D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT);
-    _Analysis_assume_(nDecl <= D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT);
+    assert(nDecl <= 32 /*D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT*/);
+    _Analysis_assume_(nDecl <= 32 /*D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT*/);
 
     ComputeInputLayout(reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(vbDecl), nDecl, offsets, mDefaultStrides);
 #endif
