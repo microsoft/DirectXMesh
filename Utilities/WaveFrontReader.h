@@ -685,20 +685,15 @@ public:
     DirectX::BoundingBox    bounds;
 
 private:
-    using VertexCache = std::unordered_multimap<uint32_t, uint32_t>;
+    using VertexCache = std::unordered_map<uint32_t, uint32_t>;
 
     uint32_t AddVertex(uint32_t hash, const Vertex* pVertex, VertexCache& cache)
     {
-        auto f = cache.equal_range(hash);
+        auto f = cache.find(hash);
 
-        for (auto it = f.first; it != f.second; ++it)
+        if (f != cache.end())
         {
-            auto& tv = vertices[it->second];
-
-            if (0 == memcmp(pVertex, &tv, sizeof(Vertex)))
-            {
-                return it->second;
-            }
+            return f->second;
         }
 
         auto index = static_cast<uint32_t>(vertices.size());
