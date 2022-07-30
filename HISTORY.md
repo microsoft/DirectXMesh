@@ -6,6 +6,9 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### July 29, 2022
+* CMake and MSBuild project updates
+
 ### May 9, 2022
 * Minor updates for VS 2022 (17.2)
 * CMake project updates (now supports MSVC, clang/LLVM, and MinGW)
