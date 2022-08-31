@@ -166,6 +166,7 @@ if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
 
   add_executable(meshconvert
     Meshconvert/Meshconvert.cpp
+    Meshconvert/Meshconvert.rc
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
