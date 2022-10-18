@@ -6,11 +6,11 @@ http://go.microsoft.com/fwlink/?LinkID=324981
 
 Copyright (c) Microsoft Corporation.
 
-**July 29, 2022**
+**October 17, 2022**
 
 This package contains DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.
 
-This code is designed to build with Visual Studio 2019 (16.9 or later), Visual Studio 2022, or clang for Windows v11 or later. Use of the Windows 10 May 2020 Update SDK ([19041](https://walbourn.github.io/windows-10-may-2020-update-sdk/)) or later is required.
+This code is designed to build with Visual Studio 2019 (16.11), Visual Studio 2022, or clang for Windows v11 or later. Use of the Windows 10 May 2020 Update SDK ([19041](https://walbourn.github.io/windows-10-may-2020-update-sdk/)) or later is required.
 
 These components are designed to work without requiring any content from the legacy DirectX SDK. For details, see [Where is the DirectX SDK?](https://aka.ms/dxsdk).
 
