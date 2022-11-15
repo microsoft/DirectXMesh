@@ -50,6 +50,7 @@ set(LIBRARY_SOURCES
     DirectXMesh/scoped.h
     DirectXMesh/DirectXMeshAdjacency.cpp
     DirectXMesh/DirectXMeshClean.cpp
+    DirectXMesh/DirectXMeshConcat.cpp
     DirectXMesh/DirectXMeshGSAdjacency.cpp
     DirectXMesh/DirectXMeshletGenerator.cpp
     DirectXMesh/DirectXMeshNormals.cpp
