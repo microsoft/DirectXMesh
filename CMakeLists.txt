@@ -11,6 +11,8 @@ project(DirectXMesh
   HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkID=324981"
   LANGUAGES CXX)
 
+option(BUILD_TESTING "Build test suite (if present)" ON)
+
 option(BUILD_TOOLS "Build meshconvert" ON)
 
 # Includes the support for DirectX 12 input layouts
@@ -277,4 +279,9 @@ endif()
 
 if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT meshconvert)
+endif()
+
+if(BUILD_TESTING AND WIN32 AND (NOT WINDOWS_STORE) AND (EXISTS "${CMAKE_CURRENT_LIST_DIR}/Tests/CMakeLists.txt"))
+  enable_testing()
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Tests)
 endif()
