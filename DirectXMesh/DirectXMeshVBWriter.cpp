@@ -548,7 +548,11 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
                     v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
                     v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
                 }
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+                v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
+#else
                 v = XMVectorMultiply(v, s_Scale);
+#endif
                 XMStoreU565(reinterpret_cast<XMU565*>(ptr), v);
                 ptr += stride;
             }
@@ -569,7 +573,11 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
                     v2 = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
                     v = XMVectorSelect(v, v2, g_XMSelect1110);
                 }
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+                v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
+#else
                 v = XMVectorMultiply(v, s_Scale);
+#endif
                 XMStoreU555(reinterpret_cast<XMU555*>(ptr), v);
                 reinterpret_cast<XMU555*>(ptr)->w = (XMVectorGetW(v) > 0.5f) ? 1u : 0u;
                 ptr += stride;
@@ -623,7 +631,11 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
                     v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
                     v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
                 }
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+                v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
+#else
                 v = XMVectorMultiply(v, s_Scale);
+#endif
                 XMStoreUNibble4(reinterpret_cast<XMUNIBBLE4*>(ptr), v);
                 ptr += stride;
             }
