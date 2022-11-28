@@ -562,6 +562,9 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
     case DXGI_FORMAT_B5G5R5A1_UNORM:
         {
             static const XMVECTORF32 s_Scale = { { { 31.f, 31.f, 31.f, 1.f } } };
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+            static const XMVECTORF32 s_OneHalfXYZ = { { { 0.5f, 0.5f, 0.5f, 0.f } } };
+#endif
             for (size_t icount = 0; icount < count; ++icount)
             {
                 if ((ptr + sizeof(XMU555)) > eptr)
@@ -574,7 +577,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
                     v = XMVectorSelect(v, v2, g_XMSelect1110);
                 }
 #if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
-                v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
+                v = XMVectorMultiplyAdd(v, s_Scale, s_OneHalfXYZ);
 #else
                 v = XMVectorMultiply(v, s_Scale);
 #endif
