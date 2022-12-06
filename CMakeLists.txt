@@ -124,7 +124,7 @@ install(TARGETS Utilities
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT utils)
 
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/.build/${PROJECT_NAME}-config.cmake.in
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/build/${PROJECT_NAME}-config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}-config.cmake
   INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PACKAGE_NAME})
 
