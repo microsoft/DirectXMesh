@@ -16,12 +16,14 @@
 
   <PropertyGroup>
     <directxmesh-LibPath>$(MSBuildThisFileDirectory)..\..\native\lib\$(PlatformTarget)\$(NuGetConfiguration)</directxmesh-LibPath>
+    <directxmesh-LibName Condition="'$(SpectreMitigation)'!='' AND '$(SpectreMitigation)'!='false'">DirectXMesh_Spectre</directxmesh-LibName>
+    <directxmesh-LibName Condition="'$(directxmesh-LibName)'==''">DirectXMesh</directxmesh-LibName>
   </PropertyGroup>
 
   <ItemDefinitionGroup>
     <Link>
       <AdditionalLibraryDirectories>$(directxmesh-LibPath);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DirectXMesh.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(directxmesh-LibName).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 
