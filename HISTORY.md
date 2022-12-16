@@ -6,6 +6,14 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### December 15, 2022
+* ARM/ARM64 platform fix for VBWriter 16bpp conversion
+* CMake project updated to require 3.20 or later
+* CMake and MSBuild project updates
+* Added Azure Dev Ops Pipeline YAML files
+* Test suite updated with CTest support
+* Spectre-mitigated libraries added to NuGet packages
+
 ### October 17, 2022
 * Minor CMake and CMakePresets updates
 
