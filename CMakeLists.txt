@@ -19,6 +19,8 @@ option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
 # https://devblogs.microsoft.com/cppblog/spectre-mitigations-in-msvc/
 option(ENABLE_SPECTRE_MITIGATION "Build using /Qspectre for MSVC" OFF)
 
+option(DISABLE_MSVC_ITERATOR_DEBUGGING "Disable iterator debugging in Debug configurations with the MSVC CRT" OFF)
+
 option(ENABLE_CODE_ANALYSIS "Use Static Code Analysis on build" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -295,6 +297,12 @@ if(WIN32)
     foreach(t IN LISTS TOOL_EXES ITEMS ${PROJECT_NAME})
       target_compile_definitions(${t} PRIVATE _UNICODE UNICODE _WIN32_WINNT=${WINVER})
     endforeach()
+
+    if(DISABLE_MSVC_ITERATOR_DEBUGGING)
+      foreach(t IN LISTS TOOL_EXES ITEMS ${PROJECT_NAME})
+        target_compile_definitions(${t} PRIVATE _ITERATOR_DEBUG_LEVEL=0)
+      endforeach()
+    endif()
 endif()
 
 if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
