@@ -26,6 +26,7 @@ resources:
         - README.md
         - HISTORY.md
         - SECURITY.md
+        - LICENSE
 
 name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
 
