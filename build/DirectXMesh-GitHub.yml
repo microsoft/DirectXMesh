@@ -27,6 +27,17 @@ resources:
         - HISTORY.md
         - SECURITY.md
         - LICENSE
+    pr:
+      branches:
+        include:
+        - main
+      paths:
+        exclude:
+        - README.md
+        - HISTORY.md
+        - SECURITY.md
+        - LICENSE
+      drafts: false
 
 name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
 
