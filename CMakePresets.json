@@ -185,7 +185,6 @@
     { "name": "x64-Debug-XboxOne"    , "description": "MSVC for x64 (Debug) for Xbox One", "inherits": [ "base", "x64", "Debug", "MSVC", "XboxOne" ] },
     { "name": "x64-Release-XboxOne"  , "description": "MSVC for x64 (Release) for Xbox One", "inherits": [ "base", "x64", "Release", "MSVC", "XboxOne" ] },
 
-
     { "name": "x64-Debug-VCPKG"    , "description": "MSVC for x64 (Debug) using VCPKG", "inherits": [ "base", "x64", "Debug", "MSVC", "VCPKG" ] },
     { "name": "x64-Release-VCPKG"  , "description": "MSVC for x64 (Release) using VCPKG", "inherits": [ "base", "x64", "Release", "MSVC", "VCPKG" ] },
     { "name": "x86-Debug-VCPKG"    , "description": "MSVC for x86 (Debug) using VCPKG", "inherits": [ "base", "x86", "Debug", "MSVC", "VCPKG" ] },
