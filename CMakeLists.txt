@@ -43,7 +43,7 @@ elseif(CMAKE_GENERATOR_PLATFORM MATCHES "^[Aa][Rr][Mm]64$")
     set(DIRECTX_ARCH arm64)
 endif()
 
-if(DEFINED XBOX_CONSOLE_TARGET)
+if(WINDOWS_STORE OR (DEFINED XBOX_CONSOLE_TARGET))
   set(BUILD_DX12 ON)
   set(BUILD_TOOLS OFF)
 endif()
@@ -196,7 +196,7 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PACKAGE_NAME})
 
 #--- Command-line tool
-if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
+if(BUILD_TOOLS AND WIN32)
   set(TOOL_EXES meshconvert)
 
   add_executable(meshconvert
@@ -342,7 +342,7 @@ if(WIN32)
       target_compile_definitions(${PROJECT_NAME} PRIVATE WINAPI_FAMILY=WINAPI_FAMILY_APP)
     endif()
 
-    if(BUILD_DX12 OR WINDOWS_STORE OR (${DIRECTX_ARCH} MATCHES "^arm64"))
+    if(BUILD_DX12 OR (${DIRECTX_ARCH} MATCHES "^arm64"))
         message(STATUS "Building with DirectX 12 Runtime support")
         set(WINVER 0x0A00)
     elseif(${DIRECTX_ARCH} MATCHES "^arm")
@@ -363,13 +363,14 @@ if(WIN32)
     endif()
 endif()
 
-if(BUILD_TOOLS AND WIN32 AND (NOT WINDOWS_STORE))
+if(BUILD_TOOLS AND WIN32)
   set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT meshconvert)
 endif()
 
 #--- Test suite
 include(CTest)
-if(BUILD_TESTING AND WIN32 AND (NOT WINDOWS_STORE) AND (EXISTS "${CMAKE_CURRENT_LIST_DIR}/Tests/CMakeLists.txt"))
+if(BUILD_TESTING AND WIN32 AND (NOT WINDOWS_STORE) AND (NOT (DEFINED XBOX_CONSOLE_TARGET))
+   AND (EXISTS "${CMAKE_CURRENT_LIST_DIR}/Tests/CMakeLists.txt"))
   enable_testing()
   add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/Tests)
 endif()
