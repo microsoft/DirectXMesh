@@ -97,8 +97,7 @@
 #include <d3d12_x.h>
 #pragma warning(pop)
 #elif defined(_XBOX_ONE) && defined(_TITLE)
-#include <d3d12_x.h>
-#include <d3d11_x.h>
+#error This library no longer supports legacy Xbox One XDK
 #elif (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
 #ifdef USING_DIRECTX_HEADERS
 #include <directx/dxgiformat.h>
