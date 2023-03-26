@@ -20,6 +20,10 @@
 #define NOHELP
 #pragma warning(pop)
 
+#if __cplusplus < 201703L
+#error Requires C++17 (and /Zc:__cplusplus with MSVC)
+#endif
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -28,6 +32,7 @@
 #include <cstring>
 #include <cwchar>
 #include <cwctype>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <list>
@@ -293,12 +298,14 @@ namespace
                 }
                 else
                 {
+                    std::filesystem::path path(fname + 1);
+                    auto& npath = path.make_preferred();
                     if (wcspbrk(fname, L"?*") != nullptr)
                     {
                         std::list<SConversion> removeFiles;
-                        SearchForFiles(&fname[1], removeFiles, false);
+                        SearchForFiles(npath.c_str(), removeFiles, false);
 
-                        for (auto it : removeFiles)
+                        for (auto& it : removeFiles)
                         {
                             _wcslwr_s(it.szSrc);
                             excludes.insert(it.szSrc);
@@ -306,7 +313,7 @@ namespace
                     }
                     else
                     {
-                        std::wstring name = (fname + 1);
+                        std::wstring name = npath.c_str();
                         std::transform(name.begin(), name.end(), name.begin(), towlower);
                         excludes.insert(name);
                     }
@@ -314,12 +321,14 @@ namespace
             }
             else if (wcspbrk(fname, L"?*") != nullptr)
             {
-                SearchForFiles(fname, flist, false);
+                std::filesystem::path path(fname);
+                SearchForFiles(path.make_preferred().c_str(), flist, false);
             }
             else
             {
                 SConversion conv = {};
-                wcscpy_s(conv.szSrc, MAX_PATH, fname);
+                std::filesystem::path path(fname);
+                wcscpy_s(conv.szSrc, path.make_preferred().c_str());
                 flist.push_back(conv);
             }
 
@@ -374,7 +383,7 @@ namespace
         wprintf(L"\n");
     }
 
-    void PrintLogo()
+    void PrintLogo(bool versionOnly)
     {
         wchar_t version[32] = {};
 
@@ -402,20 +411,27 @@ namespace
             swprintf_s(version, L"%03d (library)", DIRECTX_MESH_VERSION);
         }
 
-        wprintf(L"Microsoft (R) MeshConvert Command-line Tool Version %ls\n", version);
-        wprintf(L"Copyright (C) Microsoft Corp.\n");
-#ifdef _DEBUG
-        wprintf(L"*** Debug build ***\n");
-#endif
-        wprintf(L"\n");
+        if (versionOnly)
+        {
+            wprintf(L"meshconvert version %ls\n", version);
+        }
+        else
+        {
+            wprintf(L"Microsoft (R) MeshConvert Command-line Tool Version %ls\n", version);
+            wprintf(L"Copyright (C) Microsoft Corp.\n");
+        #ifdef _DEBUG
+            wprintf(L"*** Debug build ***\n");
+        #endif
+            wprintf(L"\n");
+        }
     }
 
     void PrintUsage()
     {
-        PrintLogo();
+        PrintLogo(false);
 
         static const wchar_t* const s_usage =
-            L"Usage: meshconvert <options> <files>\n"
+            L"Usage: meshconvert <options> [--] <files>\n"
             L"\n"
             L"   Input file type must be Wavefront Object (.obj)\n"
             L"\n"
@@ -449,7 +465,9 @@ namespace
             L"   -ib32               use 32-bit index buffer\n"
             L"   -fn <normal-format> format to use for writing normals/tangents/normals\n"
             L"   -fuv <uv-format>    format to use for texture coordinates\n"
-            L"   -fc <color-format>  format to use for writing colors\n";
+            L"   -fc <color-format>  format to use for writing colors\n"
+            L"\n"
+            L"   '-- ' is needed if any input filepath starts with the '-' or '/' character\n";
 
         wprintf(L"%ls", s_usage);
 
@@ -515,12 +533,38 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     // Process command line
     uint32_t dwOptions = 0;
     std::list<SConversion> conversion;
+    bool allowOpts = true;
 
     for (int iArg = 1; iArg < argc; iArg++)
     {
         PWSTR pArg = argv[iArg];
 
-        if (('-' == pArg[0]) || ('/' == pArg[0]))
+        if (allowOpts
+            && ('-' == pArg[0]) && ('-' == pArg[1]))
+        {
+            if (pArg[2] == 0)
+            {
+                // "-- " is the POSIX standard for "end of options" marking to escape the '-' and '/' characters at the start of filepaths.
+                allowOpts = false;
+            }
+            else if (!_wcsicmp(pArg, L"--version"))
+            {
+                PrintLogo(true);
+                return 0;
+            }
+            else if (!_wcsicmp(pArg, L"--help"))
+            {
+                PrintUsage();
+                return 0;
+            }
+            else
+            {
+                wprintf(L"Unknown option: %ls\n", pArg);
+                return 1;
+            }
+        }
+        else if (allowOpts
+            && (('-' == pArg[0]) || ('/' == pArg[0])))
         {
             pArg++;
             PWSTR pValue;
@@ -589,7 +633,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_OUTPUTFILE:
-                wcscpy_s(szOutputFile, MAX_PATH, pValue);
+                {
+                    std::filesystem::path path(pValue);
+                    wcscpy_s(szOutputFile, path.make_preferred().c_str());
+                }
                 break;
 
             case OPT_TOPOLOGICAL_ADJ:
@@ -680,7 +727,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             case OPT_FILELIST:
                 {
-                    std::wifstream inFile(pValue);
+                    std::filesystem::path path(pValue);
+                    std::wifstream inFile(path.make_preferred().c_str());
                     if (!inFile)
                     {
                         wprintf(L"Error opening -flist file %ls\n", pValue);
@@ -697,7 +745,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         else if (wcspbrk(pArg, L"?*") != nullptr)
         {
             const size_t count = conversion.size();
-            SearchForFiles(pArg, conversion, (dwOptions & (1 << OPT_RECURSIVE)) != 0);
+            std::filesystem::path path(pArg);
+            SearchForFiles(path.make_preferred().c_str(), conversion, (dwOptions & (1 << OPT_RECURSIVE)) != 0);
             if (conversion.size() <= count)
             {
                 wprintf(L"No matching files found for %ls\n", pArg);
@@ -707,8 +756,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         else
         {
             SConversion conv = {};
-            wcscpy_s(conv.szSrc, MAX_PATH, pArg);
-
+            std::filesystem::path path(pArg);
+            wcscpy_s(conv.szSrc, path.make_preferred().c_str());
             conversion.push_back(conv);
         }
     }
@@ -726,7 +775,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     }
 
     if (~dwOptions & (1 << OPT_NOLOGO))
-        PrintLogo();
+        PrintLogo(false);
 
     // Process files
     for (auto pConv = conversion.begin(); pConv != conversion.end(); ++pConv)
