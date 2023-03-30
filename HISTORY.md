@@ -6,6 +6,12 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### March 30, 2023
+* CMake project updates
+* Minor code review
+* Retired VS 2017 legacy Xbox One XDK projects
+* meshconvert: Updated to support Windows or UNIX-style path separators
+
 ### December 15, 2022
 * ARM/ARM64 platform fix for VBWriter 16bpp conversion
 * CMake project updated to require 3.20 or later
