@@ -5,6 +5,10 @@ cmake_minimum_required (VERSION 3.20)
 
 set(DIRECTXMESH_VERSION 1.6.3)
 
+if(DEFINED XBOX_CONSOLE_TARGET)
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+endif()
+
 project(DirectXMesh
   VERSION ${DIRECTXMESH_VERSION}
   DESCRIPTION "DirectXMesh geometry Library"
@@ -130,7 +134,11 @@ if(DEFINED XBOX_CONSOLE_TARGET)
             message(FATAL_ERROR "Microsoft GDK with Xbox Extensions environment needs to be set for Xbox One.")
         endif()
         target_compile_definitions(${PROJECT_NAME} PUBLIC _GAMING_XBOX _GAMING_XBOX_XBOXONE)
+    else()
+        message(FATAL_ERROR "Unknown XBOX_CONSOLE_TARGET")
     endif()
+elseif(WINDOWS_STORE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC WINAPI_FAMILY=WINAPI_FAMILY_APP)
 endif()
 
 #--- Utilities
@@ -338,10 +346,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
 if(WIN32)
-    if(WINDOWS_STORE)
-      target_compile_definitions(${PROJECT_NAME} PRIVATE WINAPI_FAMILY=WINAPI_FAMILY_APP)
-    endif()
-
     if(BUILD_DX12 OR (${DIRECTX_ARCH} MATCHES "^arm64"))
         message(STATUS "Building with DirectX 12 Runtime support")
         set(WINVER 0x0A00)
