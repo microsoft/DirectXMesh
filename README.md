@@ -86,3 +86,5 @@ The DirectXMesh library is the work of Chuck Walbourn, with contributions from D
 Thanks to Matt Hurliman for his contribution of the meshlet generation functions.
 
 Thanks to Adrian Stone (Game Angst) for the public domain implementation of Tom Forsyth's linear-speed vertex cache optimization, and thanks to Tom Forsyth for his contribution.
+
+Thanks to Andrew Farrier and Scott Matloff for their on-going help with code reviews.
