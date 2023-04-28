@@ -6,6 +6,10 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### April 28, 2023
+* CMake project updates and fixes for clang/LLVM v16 warnings
+* meshconvert: Windows on ARM64 version
+
 ### March 30, 2023
 * CMake project updates
 * Minor code review
