@@ -210,6 +210,7 @@ if(BUILD_TOOLS AND WIN32)
   add_executable(meshconvert
     Meshconvert/Meshconvert.cpp
     Meshconvert/Meshconvert.rc
+    Meshconvert/settings.manifest
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
