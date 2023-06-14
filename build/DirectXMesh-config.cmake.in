@@ -10,7 +10,7 @@ endif()
 
 include(CMakeFindDependencyMacro)
 
-if(MINGW OR (NOT WIN32) OR VCPKG_TOOLCHAIN)
+if(MINGW OR (NOT WIN32))
     find_dependency(directx-headers CONFIG)
     find_dependency(directxmath CONFIG)
 endif()
