@@ -215,12 +215,12 @@ if(BUILD_TOOLS AND WIN32)
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
     Meshconvert/SDKMesh.h)
-  target_include_directories(meshconvert PUBLIC MeshConvert Utilities)
-  target_link_libraries(meshconvert ${PROJECT_NAME} version.lib)
+  target_include_directories(meshconvert PRIVATE MeshConvert Utilities)
+  target_link_libraries(meshconvert PRIVATE ${PROJECT_NAME} version.lib)
   source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
 
   if(directxmath_FOUND)
-    target_link_libraries(meshconvert Microsoft::DirectXMath)
+    target_link_libraries(meshconvert PRIVATE Microsoft::DirectXMath)
   endif()
 endif()
 
