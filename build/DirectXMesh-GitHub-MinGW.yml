@@ -48,7 +48,6 @@ pool:
 variables:
   VCPKG_CMAKE_DIR: '$(VCPKG_ROOT)/scripts/buildsystems/vcpkg.cmake'
   GITHUB_PAT: $(GITHUBPUBLICTOKEN)
-  WIN11_SDK: '10.0.22000.0'
 
 jobs:
 - job: MINGW32_BUILD
