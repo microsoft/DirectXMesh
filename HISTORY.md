@@ -6,6 +6,11 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### October 28, 2023
+* Retired ARM (32-bit) support for the UWP platform
+* CMake project updates
+* meshconvert: -flist option updated to support filenames with spaces
+
 ### June 13, 2023
 * CMake project updates
 * meshconvert: Fix minor display issue with error messages
