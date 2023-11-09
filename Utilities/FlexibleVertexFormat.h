@@ -266,15 +266,15 @@ namespace FVF
                 if (weights > 1)
                 {
                     decl.emplace_back(
-                        D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), static_cast<BYTE>(weights - 2),
+                        D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset), static_cast<uint8_t>(weights - 2),
                             D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0 }
                     );
                     offset += sizeof(float) * (weights - 1);
                 }
 
                 decl.emplace_back(
-                    D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset),
-                        static_cast<BYTE>((fvfCode & D3DFVF_LASTBETA_UBYTE4) ? D3DDECLTYPE_UBYTE4 : D3DDECLTYPE_D3DCOLOR),
+                    D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset),
+                        static_cast<uint8_t>((fvfCode & D3DFVF_LASTBETA_UBYTE4) ? D3DDECLTYPE_UBYTE4 : D3DDECLTYPE_D3DCOLOR),
                         D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES, 0 }
                 );
                 offset += sizeof(uint32_t);
@@ -289,7 +289,7 @@ namespace FVF
             {
                 // subtract one to convert to D3DDECLTYPE_FLOAT*
                 decl.emplace_back(
-                    D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), static_cast<BYTE>(weights - 1),
+                    D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset), static_cast<uint8_t>(weights - 1),
                         D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT, 0 }
                 );
                 offset += sizeof(float) * (weights - 1);
@@ -299,7 +299,7 @@ namespace FVF
         if (fvfCode & D3DFVF_NORMAL)
         {
             decl.emplace_back(
-                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_FLOAT3,
+                D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset), D3DDECLTYPE_FLOAT3,
                     D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 }
             );
             offset += sizeof(float) * 3;
@@ -308,7 +308,7 @@ namespace FVF
         if (fvfCode & D3DFVF_PSIZE)
         {
             decl.emplace_back(
-                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_FLOAT1,
+                D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset), D3DDECLTYPE_FLOAT1,
                     D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_PSIZE, 0 }
             );
             offset += sizeof(float);
@@ -317,7 +317,7 @@ namespace FVF
         if (fvfCode & D3DFVF_DIFFUSE)
         {
             decl.emplace_back(
-                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_D3DCOLOR,
+                D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset), D3DDECLTYPE_D3DCOLOR,
                     D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 }
             );
             offset += sizeof(uint32_t);
@@ -326,7 +326,7 @@ namespace FVF
         if (fvfCode & D3DFVF_SPECULAR)
         {
             decl.emplace_back(
-                D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset), D3DDECLTYPE_D3DCOLOR,
+                D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset), D3DDECLTYPE_D3DCOLOR,
                     D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1 }
             );
             offset += sizeof(uint32_t);
@@ -340,9 +340,9 @@ namespace FVF
 
                 // D3DDECLTYPE_FLOAT1 = 0, D3DDECLTYPE_FLOAT4 = 3
                 decl.emplace_back(
-                    D3DVERTEXELEMENT9{ 0, static_cast<WORD>(offset),
-                        static_cast<BYTE>(texCoordSize / sizeof(float) - 1),
-                        D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, static_cast<BYTE>(t) }
+                    D3DVERTEXELEMENT9{ 0, static_cast<uint16_t>(offset),
+                        static_cast<uint8_t>(texCoordSize / sizeof(float) - 1),
+                        D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, static_cast<uint8_t>(t) }
                 );
                 offset += texCoordSize;
             }
