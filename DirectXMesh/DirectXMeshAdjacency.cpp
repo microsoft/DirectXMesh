@@ -39,9 +39,9 @@ namespace
         _Out_writes_(nVerts) uint32_t *index,
         _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts) noexcept
     {
-        for (uint32_t vert = 0; vert < nVerts; ++vert)
+        for (size_t vert = 0; vert < nVerts; ++vert)
         {
-            index[vert] = vert;
+            index[vert] = static_cast<uint32_t>(vert);
         }
 
         if (nVerts > 1)

@@ -570,12 +570,12 @@ namespace
         // inverse remap
         memset(faceRemap, 0xff, sizeof(uint32_t) * nFaces);
 
-        for (uint32_t j = 0; j < nFaces; ++j)
+        for (size_t j = 0; j < nFaces; ++j)
         {
             uint32_t f = faceRemapInverse[j];
             if (f < nFaces)
             {
-                faceRemap[f] = j;
+                faceRemap[f] = static_cast<uint32_t>(j);
             }
         }
 
@@ -751,12 +751,12 @@ namespace
         // inverse remap
         memset(faceRemap, 0xff, sizeof(uint32_t) * nFaces);
 
-        for (uint32_t j = 0; j < nFaces; ++j)
+        for (size_t j = 0; j < nFaces; ++j)
         {
             uint32_t f = faceRemapInverse[j];
             if (f < nFaces)
             {
-                faceRemap[f] = j;
+                faceRemap[f] = static_cast<uint32_t>(j);
             }
         }
 

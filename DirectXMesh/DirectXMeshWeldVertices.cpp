@@ -114,7 +114,7 @@ namespace
             return S_FALSE;
 
         // Apply map to indices
-        for (uint32_t j = 0; j < nFaces * 3; ++j)
+        for (size_t j = 0; j < nFaces * 3; ++j)
         {
             index_t i = indices[j];
             if (i == index_t(-1))

@@ -853,7 +853,7 @@ HRESULT DirectX::FinalizeVBAndPointReps(
     HRESULT hr = SwapVertices(vb, stride, nVerts, pointRep, vertexRemap);
 
     // clean up point reps for any removed vertices
-    for (uint32_t i = 0; i < nVerts; ++i)
+    for (size_t i = 0; i < nVerts; ++i)
     {
         if (vertexRemap[i] == UNUSED32)
         {

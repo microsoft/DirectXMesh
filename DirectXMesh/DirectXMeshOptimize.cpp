@@ -108,9 +108,9 @@ HRESULT DirectX::AttributeSort(
 
     std::vector<intpair_t> list;
     list.reserve(nFaces);
-    for (uint32_t j = 0; j < nFaces; ++j)
+    for (size_t j = 0; j < nFaces; ++j)
     {
-        list.emplace_back(intpair_t(attributes[j], j));
+        list.emplace_back(intpair_t(attributes[j], static_cast<uint32_t>(j)));
     }
 
     std::stable_sort(list.begin(), list.end(), [](const intpair_t& a, const intpair_t& b) noexcept -> bool
@@ -119,7 +119,7 @@ HRESULT DirectX::AttributeSort(
         });
 
     auto it = list.begin();
-    for (uint32_t j = 0; j < nFaces; ++j, ++it)
+    for (size_t j = 0; j < nFaces; ++j, ++it)
     {
         attributes[j] = it->first;
         faceRemap[j] = it->second;
