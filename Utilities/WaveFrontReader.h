@@ -26,6 +26,9 @@
 #pragma warning(pop)
 
 #include <Windows.h>
+#ifdef __MINGW32__
+#include <unknwn.h>
+#endif
 #else // !WIN32
 #include <wsl/winadapter.h>
 #include <wsl/wrladapter.h>
@@ -103,6 +106,7 @@ public:
         for (;; )
         {
             std::wstring strCommand;
+            InFile.width(MAX_PATH);
             InFile >> strCommand;
             if (!InFile)
                 break;
@@ -327,12 +331,14 @@ public:
             else if (0 == wcscmp(strCommand.c_str(), L"mtllib"))
             {
                 // Material library
+                InFile.width(MAX_PATH);
                 InFile >> strMaterialFilename;
             }
             else if (0 == wcscmp(strCommand.c_str(), L"usemtl"))
             {
                 // Material
                 wchar_t strName[MAX_PATH] = {};
+                InFile.width(MAX_PATH);
                 InFile >> strName;
 
                 bool bFound = false;
@@ -429,6 +435,7 @@ public:
             {
                 // Switching active materials
                 wchar_t strName[MAX_PATH] = {};
+                InFile.width(MAX_PATH);
                 InFile >> strName;
 
                 curMaterial = materials.end();
