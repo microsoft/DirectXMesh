@@ -42,15 +42,15 @@ HRESULT __cdecl DirectX::ConcatenateMesh(
         return E_FAIL;
 
     auto const baseFace = static_cast<uint32_t>(totalFaces);
-    for (uint32_t j = 0; j < nFaces; ++j)
+    for (size_t j = 0; j < nFaces; ++j)
     {
-        faceDestMap[j] = baseFace + j;
+        faceDestMap[j] = baseFace + static_cast<uint32_t>(j);
     }
 
     auto const baseVert = static_cast<uint32_t>(totalVerts);
-    for (uint32_t j = 0; j < nVerts; ++j)
+    for (size_t j = 0; j < nVerts; ++j)
     {
-        vertexDestMap[j] = baseVert + j;
+        vertexDestMap[j] = baseVert + static_cast<uint32_t>(j);
     }
 
     totalFaces = static_cast<size_t>(newFaceCount);
