@@ -215,6 +215,7 @@ if(BUILD_TOOLS AND WIN32)
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
     Meshconvert/SDKMesh.h)
+  target_link_options(meshconvert PRIVATE -municode)
   target_include_directories(meshconvert PRIVATE MeshConvert Utilities)
   target_link_libraries(meshconvert PRIVATE ${PROJECT_NAME} version.lib)
   source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)

@@ -9,6 +9,7 @@
 // http://go.microsoft.com/fwlink/?LinkID=324981
 //-------------------------------------------------------------------------------------
 
+#ifdef _MSC_VER
 #pragma once
 
 // Off by default warnings
@@ -49,6 +50,7 @@
 // Xbox One XDK related Off by default warnings
 #pragma warning(disable : 4643)
 // C4643 Forward declaring in namespace std is not permitted by the C++ Standard
+#endif
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wc++98-compat"
@@ -67,8 +69,10 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4005)
+#endif
 #define NOMINMAX 1
 #define NODRAWTEXT
 #define NOGDI
@@ -76,7 +80,9 @@
 #define NOMCX
 #define NOSERVICE
 #define NOHELP
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 #include <Windows.h>
 
