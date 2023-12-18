@@ -171,6 +171,19 @@ install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT library)
 
+# Create pkg-config file
+include(build/JoinPaths.cmake)
+# from: https://github.com/jtojnar/cmake-snips#concatenating-paths-when-building-pkg-config-files
+join_paths(DIRECTXMESH_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
+join_paths(DIRECTXMESH_LIBDIR_FOR_PKG_CONFIG "\${prefix}"     "${CMAKE_INSTALL_LIBDIR}")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/build/DirectXMesh.pc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.pc" @ONLY)
+
+# Install the pkg-config file
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.pc"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
 install(TARGETS Utilities
   EXPORT Utilities-targets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
