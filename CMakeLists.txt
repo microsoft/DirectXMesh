@@ -176,6 +176,15 @@ include(build/JoinPaths.cmake)
 # from: https://github.com/jtojnar/cmake-snips#concatenating-paths-when-building-pkg-config-files
 join_paths(DIRECTXMESH_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
 join_paths(DIRECTXMESH_LIBDIR_FOR_PKG_CONFIG "\${prefix}"     "${CMAKE_INSTALL_LIBDIR}")
+
+if(directxmath_FOUND)
+list(APPEND DIRECTXMESH_DEP_L "DirectX-Headers")
+endif()
+list(LENGTH DIRECTXMESH_DEP_L DEP_L)
+if(DEP_L)
+STRING(REPLACE ";" ", " DIRECTXMESH_DEP " ${DIRECTXMESH_DEP_L}")
+endif()
+
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/build/DirectXMesh.pc.in"
     "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.pc" @ONLY)
