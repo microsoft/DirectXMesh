@@ -177,6 +177,7 @@ include(build/JoinPaths.cmake)
 join_paths(DIRECTXMESH_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
 join_paths(DIRECTXMESH_LIBDIR_FOR_PKG_CONFIG "\${prefix}"     "${CMAKE_INSTALL_LIBDIR}")
 
+set(DIRECTXMESH_DEP_L "")
 if(directxmath_FOUND)
 list(APPEND DIRECTXMESH_DEP_L "DirectX-Headers")
 endif()
