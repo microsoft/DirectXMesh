@@ -26,8 +26,10 @@ namespace
 #endif
 
     //---------------------------------------------------------------------------------
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning( disable : 6101 )
+#endif
 
     template<class index_t>
     HRESULT ReorderFaces(
@@ -70,8 +72,9 @@ namespace
         return S_OK;
     }
 
+#ifdef _MSC_VER
 #pragma warning(pop)
-
+#endif
 
     //---------------------------------------------------------------------------------
     template<class index_t>
@@ -604,8 +607,10 @@ HRESULT DirectX::FinalizeIB(
 //-------------------------------------------------------------------------------------
 // Applies a vertex remap and/or a vertex duplication set to a vertex buffer
 //-------------------------------------------------------------------------------------
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning( disable : 6101 )
+#endif
 
 _Use_decl_annotations_
 HRESULT DirectX::FinalizeVB(
@@ -680,7 +685,9 @@ HRESULT DirectX::FinalizeVB(
     return S_OK;
 }
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 _Use_decl_annotations_
 HRESULT DirectX::FinalizeVB(
@@ -700,8 +707,10 @@ HRESULT DirectX::FinalizeVB(
 // Applies a vertex remap and/or a vertex duplication set to a vertex buffer and
 // point representatives
 //-------------------------------------------------------------------------------------
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning( disable : 6101 )
+#endif
 
 _Use_decl_annotations_
 HRESULT DirectX::FinalizeVBAndPointReps(
@@ -834,7 +843,9 @@ HRESULT DirectX::FinalizeVBAndPointReps(
     return S_OK;
 }
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif
 
 _Use_decl_annotations_
 HRESULT DirectX::FinalizeVBAndPointReps(
