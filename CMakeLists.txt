@@ -179,11 +179,11 @@ join_paths(DIRECTXMESH_LIBDIR_FOR_PKG_CONFIG "\${prefix}"     "${CMAKE_INSTALL_L
 
 set(DIRECTXMESH_DEP_L "")
 if(directxmath_FOUND)
-list(APPEND DIRECTXMESH_DEP_L "DirectX-Headers")
+  list(APPEND DIRECTXMESH_DEP_L "DirectX-Headers")
 endif()
 list(LENGTH DIRECTXMESH_DEP_L DEP_L)
 if(DEP_L)
-STRING(REPLACE ";" ", " DIRECTXMESH_DEP " ${DIRECTXMESH_DEP_L}")
+  string(REPLACE ";" ", " DIRECTXMESH_DEP " ${DIRECTXMESH_DEP_L}")
 endif()
 
 configure_file(
