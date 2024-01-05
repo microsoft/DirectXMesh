@@ -61,7 +61,14 @@ inline ScopedAlignedArrayFloat make_AlignedArrayFloat(uint64_t count)
     return ScopedAlignedArrayFloat(static_cast<float*>(ptr));
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+#endif
 using ScopedAlignedArrayXMVECTOR = std::unique_ptr<DirectX::XMVECTOR[], aligned_deleter>;
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 inline ScopedAlignedArrayXMVECTOR make_AlignedArrayXMVECTOR(uint64_t count)
 {

@@ -3,7 +3,7 @@
 
 cmake_minimum_required (VERSION 3.20)
 
-set(DIRECTXMESH_VERSION 1.6.5)
+set(DIRECTXMESH_VERSION 1.6.4)
 
 if(WINDOWS_STORE OR (DEFINED XBOX_CONSOLE_TARGET))
   set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
@@ -80,17 +80,41 @@ set(LIBRARY_SOURCES
     DirectXMesh/DirectXMeshWeldVertices.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
+if(BUILD_SHARED_LIBS)
+  if(WIN32)
+    string(REPLACE "." "," _RC_VER "${PROJECT_VERSION}.0")
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/build/DirectXMesh.rc.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.rc" @ONLY)
+    add_library(${PROJECT_NAME}_shared SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS} "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.rc")
+  else()
+    add_library(${PROJECT_NAME}_shared SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
+  endif()
+
+  set_target_properties(${PROJECT_NAME}_shared PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+endif()
 
 source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
+if(BUILD_SHARED_LIBS)
+  source_group(${PROJECT_NAME}_shared REGULAR_EXPRESSION DirectXMesh/*.*)
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/DirectXMesh>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+if(BUILD_SHARED_LIBS)
+  target_include_directories(${PROJECT_NAME}_shared PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/DirectXMesh>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+endif()
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
 
 if(NOT MINGW)
     target_precompile_headers(${PROJECT_NAME} PRIVATE DirectXMesh/DirectXMeshP.h)
+    if(BUILD_SHARED_LIBS)
+      target_precompile_headers(${PROJECT_NAME}_shared PRIVATE DirectXMesh/DirectXMeshP.h)
+    endif()
 endif()
 
 if(MINGW OR (NOT WIN32))
@@ -104,12 +128,19 @@ endif()
 if(directxmath_FOUND)
     message(STATUS "Using DirectXMath package")
     target_link_libraries(${PROJECT_NAME} PUBLIC Microsoft::DirectXMath)
+    if(BUILD_SHARED_LIBS)
+      target_link_libraries(${PROJECT_NAME}_shared PUBLIC Microsoft::DirectXMath)
+    endif()
 endif()
 
 if(directx-headers_FOUND)
     message(STATUS "Using DirectX-Headers package")
     target_link_libraries(${PROJECT_NAME} PUBLIC Microsoft::DirectX-Headers)
     target_compile_definitions(${PROJECT_NAME} PUBLIC USING_DIRECTX_HEADERS)
+    if(BUILD_SHARED_LIBS)
+      target_link_libraries(${PROJECT_NAME}_shared PUBLIC Microsoft::DirectX-Headers)
+      target_compile_definitions(${PROJECT_NAME}_shared PUBLIC USING_DIRECTX_HEADERS)
+    endif()
 endif()
 
 include(CheckIncludeFileCXX)
@@ -139,6 +170,9 @@ if(DEFINED XBOX_CONSOLE_TARGET)
     endif()
 elseif(WINDOWS_STORE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC WINAPI_FAMILY=WINAPI_FAMILY_APP)
+    if(BUILD_SHARED_LIBS)
+      target_compile_definitions(${PROJECT_NAME}_shared PUBLIC WINAPI_FAMILY=WINAPI_FAMILY_APP)
+    endif()
 endif()
 
 #--- Utilities
@@ -170,6 +204,13 @@ install(TARGETS ${PROJECT_NAME}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   COMPONENT library)
+if(BUILD_SHARED_LIBS)
+  install(TARGETS ${PROJECT_NAME}_shared
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT library)
+endif()
 
 # Create pkg-config file
 include(build/JoinPaths.cmake)
