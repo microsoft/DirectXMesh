@@ -647,6 +647,8 @@ HRESULT DirectX::FinalizeVB(
         return HRESULT_E_NOT_SUPPORTED;
 
     const size_t newVerts = nVerts + nDupVerts;
+    if (!newVerts)
+        return E_INVALIDARG;
 
     auto sptr = static_cast<const uint8_t*>(vbin);
     auto dptr = static_cast<uint8_t*>(vbout);
@@ -749,6 +751,8 @@ HRESULT DirectX::FinalizeVBAndPointReps(
         return HRESULT_E_NOT_SUPPORTED;
 
     const size_t newVerts = nVerts + nDupVerts;
+    if (!newVerts)
+        return E_INVALIDARG;
 
     std::unique_ptr<uint32_t[]> vertexRemapInverse;
     if (vertexRemap)
@@ -778,7 +782,7 @@ HRESULT DirectX::FinalizeVBAndPointReps(
     memset(vbout, 0, newVerts * stride);
 #endif
 
-    std::unique_ptr<uint32_t[]> pointRep(new (std::nothrow) uint32_t[nVerts + nDupVerts]);
+    std::unique_ptr<uint32_t[]> pointRep(new (std::nothrow) uint32_t[newVerts]);
     if (!pointRep)
         return E_OUTOFMEMORY;
 
@@ -904,6 +908,8 @@ HRESULT DirectX::CompactVB(
         return HRESULT_E_NOT_SUPPORTED;
 
     const size_t newVerts = nVerts - trailingUnused;
+    if (!newVerts)
+        return E_INVALIDARG;
 
     auto sptr = static_cast<const uint8_t*>(vbin);
     auto dptr = static_cast<uint8_t*>(vbout);
