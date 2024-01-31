@@ -19,7 +19,9 @@
 #pragma warning(disable : 4005)
 #endif
 #define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
 #define NOMINMAX 1
+#endif
 #define NODRAWTEXT
 #define NOGDI
 #define NOMCX
