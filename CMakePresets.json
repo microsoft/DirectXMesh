@@ -231,8 +231,8 @@
     { "name": "x86-Debug-MinGW"  , "description": "MinG-W32 (Debug)", "inherits": [ "base", "x86", "Debug", "GNUC", "VCPKG", "MinGW32" ] },
     { "name": "x86-Release-MinGW", "description": "MinG-W32 (Release)", "inherits": [ "base", "x86", "Release", "GNUC", "VCPKG", "MinGW32" ] },
 
-    { "name": "x64-Debug-ICC"     , "description": "Intel Classic Compiler (Debug) - SSE/SSE2", "inherits": [ "base", "x64", "Debug", "Intel" ] },
-    { "name": "x64-Release-ICC"   , "description": "Intel Classic Compiler (Release) - SSE/SSE2", "inherits": [ "base", "x64", "Release", "Intel" ] },
+    { "name": "x64-Debug-ICC"     , "description": "Intel Classic Compiler (Debug) with DX12", "inherits": [ "base", "x64", "Debug", "Intel" ] },
+    { "name": "x64-Release-ICC"   , "description": "Intel Classic Compiler (Release) with DX12", "inherits": [ "base", "x64", "Release", "Intel" ] },
 
     { "name": "x64-Debug-ICX"    , "description": "Intel oneAPI Compiler (Debug) with DX12", "inherits": [ "base", "x64", "Debug", "IntelLLVM" ] },
     { "name": "x64-Release-ICX"  , "description": "Intel oneAPI Compiler (Release) with DX12", "inherits": [ "base", "x64", "Release", "IntelLLVM" ] },
