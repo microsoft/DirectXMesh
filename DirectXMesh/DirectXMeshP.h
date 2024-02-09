@@ -52,6 +52,11 @@
 // C4643 Forward declaring in namespace std is not permitted by the C++ Standard
 #endif
 
+#ifdef __INTEL_COMPILER
+#pragma warning(disable : 161)
+// warning #161: unrecognized #pragma
+#endif
+
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
