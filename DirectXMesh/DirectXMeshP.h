@@ -39,18 +39,7 @@
 // C5246 the initialization of a subobject should be wrapped in braces
 // C5264 'const' variable is not used
 // 26812: The enum type 'x' is unscoped. Prefer 'enum class' over 'enum' (Enum.3).
-
-// Windows 8.1 SDK related Off by default warnings
-#pragma warning(disable : 4471 4917 4986 5029)
-// C4471 forward declaration of an unscoped enumeration must have an underlying type
-// C4917 a GUID can only be associated with a class, interface or namespace
-// C4986 exception specification does not match previous declaration
-// C5029 nonstandard extension used
-
-// Xbox One XDK related Off by default warnings
-#pragma warning(disable : 4643)
-// C4643 Forward declaring in namespace std is not permitted by the C++ Standard
-#endif
+#endif // _MSC_VER
 
 #ifdef __INTEL_COMPILER
 #pragma warning(disable : 161)
