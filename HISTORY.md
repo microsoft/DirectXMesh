@@ -6,6 +6,11 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### February 21, 2024
+* Project updates for GDK validation
+* CMake project updates and refactor
+* Minor code review for Clang, MinGW, and Intel compilers
+
 ### December 31, 2023
 * CMake project updates including pkg-config file generation
 * Code review
