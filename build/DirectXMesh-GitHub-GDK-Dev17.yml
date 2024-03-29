@@ -32,6 +32,7 @@ variables:
   GDKEnableBWOI: true
   GITHUB_PAT: $(GITHUBPUBLICTOKEN)
   URL_FEED: $(ADOFeedURL)
+  skipNugetSecurityAnalysis: true # We explicitly call this task so we don't need it to be auto-injected
 
 jobs:
 - job: BUILD_GDK
