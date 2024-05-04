@@ -25,6 +25,7 @@ trigger:
     - CMake*
     - '.nuget/*'
     - build/*.cmake
+    - build/*.cmd
     - build/*.in
     - build/*.ps1
 
@@ -39,6 +40,7 @@ pr:
     - CMake*
     - '.nuget/*'
     - build/*.cmake
+    - build/*.cmd
     - build/*.in
     - build/*.ps1
   drafts: false
@@ -58,7 +60,6 @@ variables:
   EXTRACTED_FOLDER: $(ExtractedFolder)
   GDK_EDITION: $(GDKEditionNumber)
   GDKEnableBWOI: true
-  GITHUB_PAT: $(GITHUBPUBLICTOKEN)
   URL_FEED: $(ADOFeedURL)
   skipNugetSecurityAnalysis: true # We explicitly call this task so we don't need it to be auto-injected
 
