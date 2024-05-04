@@ -23,6 +23,7 @@ trigger:
     - CMake*
     - '.nuget/*'
     - build/*.cmake
+    - build/*.cmd
     - build/*.in
     - build/*.props
     - build/*.ps1
@@ -39,6 +40,7 @@ pr:
     - CMake*
     - '.nuget/*'
     - build/*.cmake
+    - build/*.cmd
     - build/*.in
     - build/*.props
     - build/*.ps1
