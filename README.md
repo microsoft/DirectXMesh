@@ -49,6 +49,10 @@ For the latest version of DirectXMesh, bug reports, etc. please visit the projec
 
 ## Release Notes
 
+FOR SECURITY ADVISORIES, see [GitHub](https://github.com/microsoft/DirectXMesh/security/advisories).
+
+For a full change history, see [CHANGELOG.md](https://github.com/microsoft/DirectXMesh/blob/main/CHANGELOG.md).
+
 * Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the _C++ Standard_ section *17.5.2.1.3 Bitmask types*. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have *breaking change* impacts to client code:
 
   * You cannot pass the ``0`` literal as your flags value. Instead you must make use of the appropriate default enum value: ``CNORM_DEFAULT``, ``VALIDATE_DEFAULT``, or ``MESHLET_DEFAULT``.
@@ -70,6 +74,8 @@ For bug reports and feature requests, please use GitHub [issues](https://github.
 This project welcomes contributions and suggestions. Most contributions require you to agree to a Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 
 When you submit a pull request, a CLA bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repos using our CLA.
+
+Tests for new features should also be submitted as a PR to the [Test Suite](https://github.com/walbourn/directxmeshtest/wiki) repository.
 
 ## Code of Conduct
 
