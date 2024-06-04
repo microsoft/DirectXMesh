@@ -6,6 +6,10 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### June 4, 2024
+* CMake project updates
+* Retired VS 2019 projects for the UWP platform
+
 ### February 21, 2024
 * Project updates for GDK validation
 * CMake project updates and refactor
