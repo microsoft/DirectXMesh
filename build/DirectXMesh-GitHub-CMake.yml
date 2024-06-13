@@ -69,7 +69,7 @@ jobs:
     displayName: 'CMake (MSVC): Config x64'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
   - task: CMake@1
     displayName: 'CMake (MSVC): Build x64 Debug'
     inputs:
@@ -84,7 +84,7 @@ jobs:
     displayName: 'CMake (MSVC): Config x86'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A Win32 -B out2 -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A Win32 -B out2 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
   - task: CMake@1
     displayName: 'CMake (MSVC): Build x86 Debug'
     inputs:
@@ -99,7 +99,7 @@ jobs:
     displayName: 'CMake (MSVC): Config ARM64'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A ARM64 -B out3 -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A ARM64 -B out3 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
   - task: CMake@1
     displayName: 'CMake (MSVC): Build ARM64 Debug'
     inputs:
@@ -114,7 +114,7 @@ jobs:
     displayName: 'CMake (UWP): Config x64'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out4 -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out4 -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=10.0'
   - task: CMake@1
     displayName: 'CMake (UWP): Build x64'
     inputs:
@@ -149,7 +149,7 @@ jobs:
     displayName: 'CMake (Win10): Config'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out8 -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=ON'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out8 -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=ON'
   - task: CMake@1
     displayName: 'CMake (Win10): Build'
     inputs:
@@ -159,7 +159,7 @@ jobs:
     displayName: 'CMake (MSVC Spectre): Config x64'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out9 -DENABLE_SPECTRE_MITIGATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out9 -DENABLE_SPECTRE_MITIGATION=ON -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
   - task: CMake@1
     displayName: 'CMake (MSVC Spectre): Build x64 Debug'
     inputs:
@@ -174,7 +174,7 @@ jobs:
     displayName: 'CMake (MSVC Spectre): Config ARM64'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A ARM64 -B out10 -DENABLE_SPECTRE_MITIGATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A ARM64 -B out10 -DENABLE_SPECTRE_MITIGATION=ON -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=OFF'
   - task: CMake@1
     displayName: 'CMake (MSVC Spectre): Build ARM64 Debug'
     inputs:
@@ -189,7 +189,7 @@ jobs:
     displayName: 'CMake (Win10 Spectre): Config'
     inputs:
       cwd: '$(Build.SourcesDirectory)'
-      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out11 -DENABLE_SPECTRE_MITIGATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=ON'
+      cmakeArgs: '-G "$(VS_GENERATOR)" -A x64 -B out11 -DENABLE_SPECTRE_MITIGATION=ON -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DCMAKE_SYSTEM_VERSION=$(WIN10_SDK) -DBUILD_DX12=ON'
   - task: CMake@1
     displayName: 'CMake (Win10 Spectre): Build'
     inputs:
