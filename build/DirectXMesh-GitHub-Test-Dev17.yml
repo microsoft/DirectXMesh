@@ -325,6 +325,9 @@ jobs:
     inputs:
       cwd: '$(Build.SourcesDirectory)'
       cmakeArgs: --build out/build/arm64-Release-Clang -v
+  - task: DeleteFiles@1
+    inputs:
+      Contents: 'out'
   - task: CMake@1
     displayName: CMake (MSVC; arm64ec-Debug) Config
     inputs:
