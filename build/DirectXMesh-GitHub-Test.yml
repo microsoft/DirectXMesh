@@ -21,6 +21,7 @@ trigger:
     - '*.md'
     - LICENSE
     - CMake*
+    - '.github/*'
     - '.nuget/*'
     - build/*.cmake
     - build/*.cmd
@@ -39,6 +40,7 @@ pr:
     - LICENSE
     - CMake*
     - '.nuget/*'
+    - '.github/*'
     - build/*.cmake
     - build/*.cmd
     - build/*.in
