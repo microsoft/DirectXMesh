@@ -20,6 +20,9 @@ on:
       - build/*.targets
       - build/*.yml
 
+env:
+  DIRECTXMESH_MEDIA_PATH: ${{ github.workspace }}/Media
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -79,6 +82,14 @@ jobs:
         path: Tests
         ref: main
 
+    - if: ${{ matrix.build_type }} == 'x64-Release'
+      name: Clone media repository
+      uses: actions/checkout@v4
+      with:
+        repository: walbourn/directxmeshmedia
+        path: Media
+        ref: main
+
     - name: 'Install Ninja'
       run: choco install ninja
 
@@ -93,3 +104,8 @@ jobs:
     - name: 'Build'
       working-directory: ${{ github.workspace }}
       run: cmake --build out\build\${{ matrix.build_type }}
+
+    - if: ${{ matrix.build_type }} == 'x64-Release'
+      name: 'Test'
+      working-directory: ${{ github.workspace }}
+      run: ctest --preset=x64-Release
