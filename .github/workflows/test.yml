@@ -26,6 +26,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
 
     strategy:
       fail-fast: false
@@ -106,7 +107,8 @@ jobs:
       working-directory: ${{ github.workspace }}
       run: cmake --build out\build\${{ matrix.build_type }}
 
-    - if: ${{ matrix.build_type }} == 'x64-Release'
+    - if: (${{ matrix.build_type }} == 'x64-Release') || (${{ matrix.build_type }} == 'x86-Release')
+      timeout-minutes: 10
       name: 'Test'
       working-directory: ${{ github.workspace }}
-      run: ctest --preset=x64-Release --test-dir out
+      run: ctest --preset=${{ matrix.build_type }} --test-dir out
