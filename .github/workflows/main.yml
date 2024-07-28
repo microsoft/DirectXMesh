@@ -86,3 +86,11 @@ jobs:
     - name: 'Build'
       working-directory: ${{ github.workspace }}
       run: cmake --build out\build\${{ matrix.build_type }}
+
+    - name: 'Configure CMake (Spectre)'
+      working-directory: ${{ github.workspace }}
+      run: cmake --preset=${{ matrix.build_type }} -DENABLE_SPECTRE_MITIGATION=ON
+
+    - name: 'Build (Spectre)'
+      working-directory: ${{ github.workspace }}
+      run: cmake --build out\build\${{ matrix.build_type }}
