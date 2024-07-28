@@ -89,6 +89,7 @@ jobs:
         repository: walbourn/directxmeshmedia
         path: Media
         ref: main
+        lfs: true
 
     - name: 'Install Ninja'
       run: choco install ninja
@@ -108,4 +109,4 @@ jobs:
     - if: ${{ matrix.build_type }} == 'x64-Release'
       name: 'Test'
       working-directory: ${{ github.workspace }}
-      run: ctest --preset=x64-Release
+      run: ctest --preset=x64-Release --test-dir out
