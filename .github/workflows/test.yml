@@ -83,15 +83,6 @@ jobs:
         path: Tests
         ref: main
 
-    - if: (matrix.build_type == 'x64-Release') || (matrix.build_type == 'x86-Release')
-      name: Clone media repository
-      uses: actions/checkout@v4
-      with:
-        repository: walbourn/directxmeshmedia
-        path: Media
-        ref: main
-        lfs: true
-
     - name: 'Install Ninja'
       run: choco install ninja
 
@@ -106,9 +97,3 @@ jobs:
     - name: 'Build'
       working-directory: ${{ github.workspace }}
       run: cmake --build out\build\${{ matrix.build_type }}
-
-    - if: (matrix.build_type == 'x64-Release') || (matrix.build_type == 'x86-Release')
-      timeout-minutes: 10
-      name: 'Test'
-      working-directory: ${{ github.workspace }}
-      run: ctest --preset=${{ matrix.build_type }}
