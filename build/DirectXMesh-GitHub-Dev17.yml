@@ -12,22 +12,15 @@ schedules:
     include:
     - main
 
-trigger:
+# GitHub Actions handles MSBuild for CI/PR
+trigger: none
+pr:
   branches:
     include:
     - main
   paths:
-    exclude:
-    - '*.md'
-    - LICENSE
-    - CMake*
-    - '.nuget/*'
-    - build/*.cmake
-    - build/*.cmd
-    - build/*.in
-    - build/*.props
-    - build/*.ps1
-    - build/*.targets
+    include:
+    - build/DirectXMesh-GitHub-Dev17.yml
 
 pr:
   branches:
@@ -38,6 +31,7 @@ pr:
     - '*.md'
     - LICENSE
     - CMake*
+    - '.github/*'
     - '.nuget/*'
     - build/*.cmake
     - build/*.cmd
