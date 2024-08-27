@@ -67,6 +67,12 @@ public:
         mDefaultStrides{},
         mTempSize(0) {}
 
+    Impl(const Impl&) = delete;
+    Impl& operator=(const Impl&) = delete;
+
+    Impl(Impl&&) = default;
+    Impl& operator=(Impl&&) = default;
+
     HRESULT Initialize(_In_reads_(nDecl) const InputElementDesc* vbDecl, size_t nDecl);
     HRESULT AddStream(_In_reads_bytes_(stride*nVerts) const void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept;
     HRESULT Read(_Out_writes_(count) XMVECTOR* buffer, _In_z_ const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const;
