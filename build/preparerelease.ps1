@@ -9,23 +9,24 @@ This script is used to do the edits required for preparing a release PR.
 .PARAMETER TargetBranch
 This the branch to use as the base of the release. Defaults to 'main'.
 
+.PARAMETER UpdateVersion
+This is a $true or $false value that indicates if the library version should be incremented. Defaults to $true. 
+
 .LINK
 https://github.com/microsoft/DirectXMesh/wiki
 
 #>
 
 param(
-    $TargetBranch="main",
+    [string]$TargetBranch = "main",
     [bool]$UpdateVersion = $true
 )
 
 $reporoot = Split-Path -Path $PSScriptRoot -Parent
-Write-Host $reporoot
 $cmake = $reporoot + "\CMakeLists.txt"
 $header = $reporoot + "\DirectXMesh\DirectXMesh.h"
 $readme = $reporoot + "\README.md"
 $history = $reporoot + "\CHANGELOG.md"
-Write-Host $cmake
 
 if ((-Not (Test-Path $cmake)) -Or (-Not (Test-Path $header)) -Or (-Not (Test-Path $readme)) -Or (-Not (Test-Path $history)))
 {
@@ -91,5 +92,5 @@ for ($i=0; $i -lt $file.count; $i++) {
     }
 }
 
-$file.insert($inserthere[0], "`n#### $newreleasedate`n* change history here")
+$file.insert($inserthere[0], "`n### $newreleasedate`n* change history here")
 Set-Content -Path $history -Value $file
