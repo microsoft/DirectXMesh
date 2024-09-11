@@ -23,6 +23,9 @@ on:
 env:
   DIRECTXMESH_MEDIA_PATH: ${{ github.workspace }}/Media
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
