@@ -295,6 +295,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshOBJ.cpp" />
     <ClInclude Include="..\Utilities\WaveFrontReader.h" />
+    <ClInclude Include="CmdLineHelpers.h" />
     <CLInclude Include="Mesh.h" />
     <ClInclude Include="SDKMesh.h" />
   </ItemGroup>

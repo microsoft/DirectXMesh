@@ -22,6 +22,7 @@
       <Filter>Wavefront OBJ</Filter>
     </ClInclude>
     <ClInclude Include="SDKMesh.h" />
+    <ClInclude Include="CmdLineHelpers.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Meshconvert.rc">

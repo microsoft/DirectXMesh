@@ -197,6 +197,7 @@ if(BUILD_TOOLS AND WIN32)
     Meshconvert/Meshconvert.cpp
     Meshconvert/Meshconvert.rc
     Meshconvert/settings.manifest
+    Meshconvert/CmdLineHelpers.h
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
@@ -209,6 +210,10 @@ if(BUILD_TOOLS AND WIN32)
   if(directxmath_FOUND)
     target_link_libraries(meshconvert PRIVATE Microsoft::DirectXMath)
   endif()
+endif()
+
+if(TOOL_EXES)
+  message(STATUS "Building tools: ${TOOL_EXES}")
 endif()
 
 if(MSVC)
@@ -248,6 +253,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 14)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     if(ENABLE_CODE_ANALYSIS)
+      message(STATUS "Building with Code Analysis (PREFIX)")
       foreach(t IN LISTS TOOL_EXES ITEMS ${PROJECT_NAME})
         target_compile_options(${t} PRIVATE /analyze /WX)
       endforeach()
