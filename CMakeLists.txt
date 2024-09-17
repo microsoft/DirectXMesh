@@ -213,7 +213,7 @@ if(BUILD_TOOLS AND WIN32)
 endif()
 
 if(TOOL_EXES)
-  message("INFO: Building tools: ${TOOL_EXES}")
+  message(STATUS "Building tools: ${TOOL_EXES}")
 endif()
 
 if(MSVC)
