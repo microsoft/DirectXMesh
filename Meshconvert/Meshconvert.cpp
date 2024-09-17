@@ -47,6 +47,8 @@
 #include <tuple>
 
 #include "Mesh.h"
+
+#define TOOL_VERSION DIRECTX_MESH_VERSION
 #include "CmdLineHelpers.h"
 
 using namespace Helpers;
