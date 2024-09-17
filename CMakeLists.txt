@@ -197,6 +197,7 @@ if(BUILD_TOOLS AND WIN32)
     Meshconvert/Meshconvert.cpp
     Meshconvert/Meshconvert.rc
     Meshconvert/settings.manifest
+    Meshconvert/CmdLineHelpers.h
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp

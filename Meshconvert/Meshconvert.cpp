@@ -47,11 +47,16 @@
 #include <tuple>
 
 #include "Mesh.h"
+#include "CmdLineHelpers.h"
 
+using namespace Helpers;
 using namespace DirectX;
 
 namespace
 {
+    const wchar_t* g_ToolName = L"meshconvert";
+    const wchar_t* g_Description = L"Microsoft (R) MeshConvert Command-line Tool [DirectXMesh]";
+
     enum OPTIONS : uint32_t
     {
         OPT_RECURSIVE = 1,
@@ -90,22 +95,11 @@ namespace
 
     static_assert(OPT_MAX <= 32, "dwOptions is a unsigned int bitfield");
 
-    struct SConversion
-    {
-        std::wstring szSrc;
-    };
-
-    struct SValue
-    {
-        const wchar_t*  name;
-        uint32_t        value;
-    };
-
     //////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    const SValue g_pOptions[] =
+    const SValue<uint32_t> g_pOptions[] =
     {
         { L"r",         OPT_RECURSIVE },
         { L"ta",        OPT_TOPOLOGICAL_ADJ },
@@ -141,22 +135,22 @@ namespace
         { nullptr,      0 }
     };
 
-    const SValue g_vertexNormalFormats[] =
+    const SValue<DXGI_FORMAT> g_vertexNormalFormats[] =
     {
         { L"float3",    DXGI_FORMAT_R32G32B32_FLOAT },
         { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
         { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
-        { nullptr,      0 }
+        { nullptr,      DXGI_FORMAT_UNKNOWN }
     };
 
-    const SValue g_vertexUVFormats[] =
+    const SValue<DXGI_FORMAT> g_vertexUVFormats[] =
     {
         { L"float2",    DXGI_FORMAT_R32G32_FLOAT },
         { L"float16_2", DXGI_FORMAT_R16G16_FLOAT },
-        { nullptr,      0 }
+        { nullptr,      DXGI_FORMAT_UNKNOWN }
     };
 
-    const SValue g_vertexColorFormats[] =
+    const SValue<DXGI_FORMAT> g_vertexColorFormats[] =
     {
         { L"bgra",      DXGI_FORMAT_B8G8R8A8_UNORM },
         { L"rgba",      DXGI_FORMAT_R8G8B8A8_UNORM },
@@ -164,7 +158,7 @@ namespace
         { L"float16_4", DXGI_FORMAT_R16G16B16A16_FLOAT },
         { L"rgba_10",   DXGI_FORMAT_R10G10B10A2_UNORM },
         { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
-        { nullptr,      0 }
+        { nullptr,      DXGI_FORMAT_UNKNOWN }
     };
 }
 
@@ -182,237 +176,9 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename,
 
 namespace
 {
-    inline HANDLE safe_handle(HANDLE h) noexcept { return (h == INVALID_HANDLE_VALUE) ? nullptr : h; }
-
-    struct find_closer { void operator()(HANDLE h) noexcept { assert(h != INVALID_HANDLE_VALUE); if (h) FindClose(h); } };
-
-    using ScopedFindHandle = std::unique_ptr<void, find_closer>;
-
-#ifdef __PREFAST__
-#pragma prefast(disable : 26018, "Only used with static internal arrays")
-#endif
-
-    uint32_t LookupByName(const wchar_t* pName, const SValue* pArray)
-    {
-        while (pArray->name)
-        {
-            if (!_wcsicmp(pName, pArray->name))
-                return pArray->value;
-
-            pArray++;
-        }
-
-        return 0;
-    }
-
-    void SearchForFiles(const std::filesystem::path& path, std::list<SConversion>& files, bool recursive)
-    {
-        // Process files
-        WIN32_FIND_DATAW findData = {};
-        ScopedFindHandle hFile(safe_handle(FindFirstFileExW(path.c_str(),
-            FindExInfoBasic, &findData,
-            FindExSearchNameMatch, nullptr,
-            FIND_FIRST_EX_LARGE_FETCH)));
-        if (hFile)
-        {
-            for (;;)
-            {
-                if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_DIRECTORY)))
-                {
-                    SConversion conv = {};
-                    conv.szSrc = path.parent_path().append(findData.cFileName).native();
-                    files.push_back(conv);
-                }
-
-                if (!FindNextFileW(hFile.get(), &findData))
-                    break;
-            }
-        }
-
-        // Process directories
-        if (recursive)
-        {
-            auto searchDir = path.parent_path().append(L"*");
-
-            hFile.reset(safe_handle(FindFirstFileExW(searchDir.c_str(),
-                FindExInfoBasic, &findData,
-                FindExSearchLimitToDirectories, nullptr,
-                FIND_FIRST_EX_LARGE_FETCH)));
-            if (!hFile)
-                return;
-
-            for (;;)
-            {
-                if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    if (findData.cFileName[0] != L'.')
-                    {
-                        auto subdir = path.parent_path().append(findData.cFileName).append(path.filename().c_str());
-
-                        SearchForFiles(subdir, files, recursive);
-                    }
-                }
-
-                if (!FindNextFileW(hFile.get(), &findData))
-                    break;
-            }
-        }
-    }
-
-    void ProcessFileList(std::wifstream& inFile, std::list<SConversion>& files)
-    {
-        std::list<SConversion> flist;
-        std::set<std::wstring> excludes;
-
-        for (;;)
-        {
-            std::wstring fname;
-            std::getline(inFile, fname);
-            if (!inFile)
-                break;
-
-            if (fname[0] == L'#')
-            {
-                // Comment
-            }
-            else if (fname[0] == L'-')
-            {
-                if (flist.empty())
-                {
-                    wprintf(L"WARNING: Ignoring the line '%ls' in -flist\n", fname.c_str());
-                }
-                else
-                {
-                    std::filesystem::path path(fname.c_str() + 1);
-                    auto& npath = path.make_preferred();
-                    if (wcspbrk(fname.c_str(), L"?*") != nullptr)
-                    {
-                        std::list<SConversion> removeFiles;
-                        SearchForFiles(npath, removeFiles, false);
-
-                        for (auto& it : removeFiles)
-                        {
-                            std::wstring name = it.szSrc;
-                            std::transform(name.begin(), name.end(), name.begin(), towlower);
-                            excludes.insert(name);
-                        }
-                    }
-                    else
-                    {
-                        std::wstring name = npath.c_str();
-                        std::transform(name.begin(), name.end(), name.begin(), towlower);
-                        excludes.insert(name);
-                    }
-                }
-            }
-            else if (wcspbrk(fname.c_str(), L"?*") != nullptr)
-            {
-                std::filesystem::path path(fname.c_str());
-                SearchForFiles(path.make_preferred(), flist, false);
-            }
-            else
-            {
-                SConversion conv = {};
-                std::filesystem::path path(fname.c_str());
-                conv.szSrc = path.make_preferred().native();
-                flist.push_back(conv);
-            }
-        }
-
-        inFile.close();
-
-        if (!excludes.empty())
-        {
-            // Remove any excluded files
-            for (auto it = flist.begin(); it != flist.end();)
-            {
-                std::wstring name = it->szSrc;
-                std::transform(name.begin(), name.end(), name.begin(), towlower);
-                auto item = it;
-                ++it;
-                if (excludes.find(name) != excludes.end())
-                {
-                    flist.erase(item);
-                }
-            }
-        }
-
-        if (flist.empty())
-        {
-            wprintf(L"WARNING: No file names found in -flist\n");
-        }
-        else
-        {
-            files.splice(files.end(), flist);
-        }
-    }
-
-    void PrintList(size_t cch, const SValue* pValue)
-    {
-        while (pValue->name)
-        {
-            const size_t cchName = wcslen(pValue->name);
-
-            if (cch + cchName + 2 >= 80)
-            {
-                wprintf(L"\n      ");
-                cch = 6;
-            }
-
-            wprintf(L"%ls ", pValue->name);
-            cch += cchName + 2;
-            pValue++;
-        }
-
-        wprintf(L"\n");
-    }
-
-    void PrintLogo(bool versionOnly)
-    {
-        wchar_t version[32] = {};
-
-        wchar_t appName[_MAX_PATH] = {};
-        if (GetModuleFileNameW(nullptr, appName, _MAX_PATH))
-        {
-            const DWORD size = GetFileVersionInfoSizeW(appName, nullptr);
-            if (size > 0)
-            {
-                auto verInfo = std::make_unique<uint8_t[]>(size);
-                if (GetFileVersionInfoW(appName, 0, size, verInfo.get()))
-                {
-                    LPVOID lpstr = nullptr;
-                    UINT strLen = 0;
-                    if (VerQueryValueW(verInfo.get(), L"\\StringFileInfo\\040904B0\\ProductVersion", &lpstr, &strLen))
-                    {
-                        wcsncpy_s(version, reinterpret_cast<const wchar_t*>(lpstr), strLen);
-                    }
-                }
-            }
-        }
-
-        if (!*version || wcscmp(version, L"1.0.0.0") == 0)
-        {
-            swprintf_s(version, L"%03d (library)", DIRECTX_MESH_VERSION);
-        }
-
-        if (versionOnly)
-        {
-            wprintf(L"meshconvert version %ls\n", version);
-        }
-        else
-        {
-            wprintf(L"Microsoft (R) MeshConvert Command-line Tool Version %ls\n", version);
-            wprintf(L"Copyright (C) Microsoft Corp.\n");
-        #ifdef _DEBUG
-            wprintf(L"*** Debug build ***\n");
-        #endif
-            wprintf(L"\n");
-        }
-    }
-
     void PrintUsage()
     {
-        PrintLogo(false);
+        PrintLogo(false, g_ToolName, g_Description);
 
         static const wchar_t* const s_usage =
             L"Usage: meshconvert <options> [--] <files>\n"
@@ -464,43 +230,6 @@ namespace
         wprintf(L"\n   <color-format>: ");
         PrintList(13, g_vertexColorFormats);
     }
-
-    const wchar_t* GetErrorDesc(HRESULT hr)
-    {
-        static wchar_t desc[1024] = {};
-
-        LPWSTR errorText = nullptr;
-
-        const DWORD result = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ALLOCATE_BUFFER,
-            nullptr, static_cast<DWORD>(hr),
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&errorText), 0, nullptr);
-
-        *desc = 0;
-
-        if (result > 0 && errorText)
-        {
-            swprintf_s(desc, L": %ls", errorText);
-
-            size_t len = wcslen(desc);
-            if (len >= 1)
-            {
-                desc[len - 1] = 0;
-            }
-
-            if (errorText)
-                LocalFree(errorText);
-
-            for (wchar_t* ptr = desc; *ptr != 0; ++ptr)
-            {
-                if (*ptr == L'\r' || *ptr == L'\n')
-                {
-                    *ptr = L' ';
-                }
-            }
-        }
-
-        return desc;
-    }
 }
 
 //--------------------------------------------------------------------------------------
@@ -541,7 +270,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
             else if (!_wcsicmp(pArg, L"--version"))
             {
-                PrintLogo(true);
+                PrintLogo(true, g_ToolName, g_Description);
                 return 0;
             }
             else if (!_wcsicmp(pArg, L"--help"))
@@ -738,7 +467,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         {
             const size_t count = conversion.size();
             std::filesystem::path path(pArg);
-            SearchForFiles(path.make_preferred(), conversion, (dwOptions & (1 << OPT_RECURSIVE)) != 0);
+            SearchForFiles(path.make_preferred(), conversion, (dwOptions & (1 << OPT_RECURSIVE)) != 0, nullptr);
             if (conversion.size() <= count)
             {
                 wprintf(L"No matching files found for %ls\n", pArg);
@@ -767,7 +496,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     }
 
     if (~dwOptions & (1 << OPT_NOLOGO))
-        PrintLogo(false);
+        PrintLogo(false, g_ToolName, g_Description);
 
     // Process files
     for (auto pConv = conversion.begin(); pConv != conversion.end(); ++pConv)
