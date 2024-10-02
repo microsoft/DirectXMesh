@@ -33,7 +33,7 @@ jobs:
 
       matrix:
         os: [windows-2019, windows-2022]
-        build_type: [x64-Debug]
+        build_type: [x64-Debug, x64-Release]
         arch: [amd64]
 
     steps:
