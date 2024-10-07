@@ -286,7 +286,6 @@
     { "name": "arm64-Release-Linux", "description": "WSL Linux ARM64 (Release)", "inherits": [ "base", "ARM64", "Release", "VCPKG" ] },
 
     { "name": "x64-Analyze"      , "description": "MSVC for x64 (Debug) with DX12 using /analyze", "inherits": [ "base", "x64", "Debug", "MSVC", "Analyze" ] },
-
     { "name": "x64-Coverage"      , "description": "MSVC for x64 (Debug) with DX12 w/ Code Coverage", "inherits": [ "base", "x64", "Debug", "MSVC", "Coverage" ] },
     { "name": "x64-Coverage-Clang", "description": "Clang/LLVM for x64 (Debug) with DX12 w/ Code Coverage", "inherits": [ "base", "x64", "Debug", "Clang", "Coverage" ] }
   ],
