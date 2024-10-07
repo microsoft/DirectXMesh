@@ -187,7 +187,7 @@
       "name": "Analyze",
       "cacheVariables":
       {
-          "ENABLE_CODE_ANALYSIS": true
+        "ENABLE_CODE_ANALYSIS": true
       },
       "hidden": true
     },
@@ -195,8 +195,8 @@
       "name": "Coverage",
       "cacheVariables":
       {
-          "BUILD_TOOLS": false,
-          "ENABLE_CODE_COVERAGE": true
+        "BUILD_TOOLS": false,
+        "ENABLE_CODE_COVERAGE": true
       },
       "hidden": true
     },
@@ -285,7 +285,7 @@
     { "name": "arm64-Debug-Linux",   "description": "WSL Linux ARM64 (Debug)", "inherits": [ "base", "ARM64", "Debug", "VCPKG" ] },
     { "name": "arm64-Release-Linux", "description": "WSL Linux ARM64 (Release)", "inherits": [ "base", "ARM64", "Release", "VCPKG" ] },
 
-    { "name": "x64-Analyze"      , "description": "MSVC for x64 (Debug) with DX12 using /analyze", "inherits": [ "base", "x64", "Debug", "MSVC", "Analyze" ] },
+    { "name": "x64-Analyze"       , "description": "MSVC for x64 (Debug) with DX12 using /analyze", "inherits": [ "base", "x64", "Debug", "MSVC", "Analyze" ] },
     { "name": "x64-Coverage"      , "description": "MSVC for x64 (Debug) with DX12 w/ Code Coverage", "inherits": [ "base", "x64", "Debug", "MSVC", "Coverage" ] },
     { "name": "x64-Coverage-Clang", "description": "Clang/LLVM for x64 (Debug) with DX12 w/ Code Coverage", "inherits": [ "base", "x64", "Debug", "Clang", "Coverage" ] }
   ],
