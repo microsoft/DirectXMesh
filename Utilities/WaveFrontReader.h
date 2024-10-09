@@ -78,6 +78,9 @@ namespace DX
         {
             Clear();
 
+            if (!szFileName)
+                return E_INVALIDARG;
+
             constexpr size_t MAX_POLY = 64;
 
             using namespace DirectX;
@@ -421,6 +424,9 @@ namespace DX
 
         HRESULT LoadMTL(_In_z_ const wchar_t* szFileName)
         {
+            if (!szFileName)
+                return E_INVALIDARG;
+
             using namespace DirectX;
 
             // Assumes MTL is in CWD along with OBJ
@@ -583,6 +589,9 @@ namespace DX
 
         HRESULT LoadVBO(_In_z_ const wchar_t* szFileName)
         {
+            if (!szFileName)
+                return E_INVALIDARG;
+
             using namespace DirectX;
 
             Clear();
