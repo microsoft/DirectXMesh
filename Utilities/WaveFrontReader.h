@@ -589,12 +589,12 @@ namespace DX
 
         HRESULT LoadVBO(_In_z_ const wchar_t* szFileName)
         {
+            Clear();
+
             if (!szFileName)
                 return E_INVALIDARG;
 
             using namespace DirectX;
-
-            Clear();
 
     #ifdef _WIN32
             wchar_t fname[_MAX_FNAME] = {};
