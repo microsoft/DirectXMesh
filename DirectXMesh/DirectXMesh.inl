@@ -14,9 +14,9 @@
 //=====================================================================================
 // Bitmask flags enumerator operators
 //=====================================================================================
-DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS);
-DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS);
-DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS);
+DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS)
+DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS)
+DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS)
 
 
 //=====================================================================================
