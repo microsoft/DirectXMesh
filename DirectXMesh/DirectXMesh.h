@@ -244,7 +244,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Normals, Tangents, and Bi-Tangents Computation
 
-    enum CNORM_FLAGS : unsigned long
+    enum CNORM_FLAGS : uint32_t
     {
         CNORM_DEFAULT = 0x0,
         // Default is to compute normals using weight-by-angle
@@ -316,7 +316,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh clean-up and validation
 
-    enum VALIDATE_FLAGS : unsigned long
+    enum VALIDATE_FLAGS : uint32_t
     {
         VALIDATE_DEFAULT = 0x0,
 
@@ -549,7 +549,7 @@ namespace DirectX
     constexpr size_t MESHLET_MINIMUM_SIZE = 32u;
     constexpr size_t MESHLET_MAXIMUM_SIZE = 256u;
 
-    enum MESHLET_FLAGS : unsigned long
+    enum MESHLET_FLAGS : uint32_t
     {
         MESHLET_DEFAULT = 0x0,
 
