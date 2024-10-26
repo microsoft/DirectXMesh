@@ -266,7 +266,7 @@ namespace
             L"                                  vertex cache optimize the mesh (implies -c)\n"
             L"   -c, --clean                    mesh cleaning including vertex dups for attribute sets\n"
             L"   -ta, --topological-adjacency -or- -ga, --geometric-adjacency\n"
-            L"                                  generate topological vs. geometric adjancecy (def: ta)\n"
+            L"                                  generate topological vs. geometric adjacency (def: ta)\n"
             L"\n"
             L"   -nodds                         prevents extension renaming in exported materials\n"
             L"   -flip, --flip-face-winding     reverse winding of faces\n"
