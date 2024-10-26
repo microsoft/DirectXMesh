@@ -72,12 +72,10 @@ namespace
         OPT_OPTIMIZE,
         OPT_OPTIMIZE_LRU,
         OPT_CLEAN,
-        OPT_OUTPUTFILE,
         OPT_TOLOWER,
         OPT_CLOCKWISE,
         OPT_FORCE_32BIT_IB,
         OPT_OVERWRITE,
-        OPT_FILETYPE,
         OPT_NODDS,
         OPT_FLIP,
         OPT_FLIPU,
@@ -87,8 +85,10 @@ namespace
         OPT_VERT_UV_FORMAT,
         OPT_VERT_COLOR_FORMAT,
         OPT_NOLOGO,
-        OPT_FILELIST,
         OPT_FLAGS_MAX,
+        OPT_FILETYPE,
+        OPT_OUTPUTFILE,
+        OPT_FILELIST,
         OPT_SDKMESH,
         OPT_SDKMESH_V2,
         OPT_CMO,
@@ -383,12 +383,15 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 wprintf(L"ERROR: Unknown option: `%ls`\n\nUse %ls --help\n", pArg, g_ToolName);
                 return 1;
 
+            case OPT_FILETYPE:
+            case OPT_OUTPUTFILE:
+            case OPT_FILELIST:
             case OPT_SDKMESH:
             case OPT_SDKMESH_V2:
             case OPT_CMO:
             case OPT_VBO:
             case OPT_WAVEFRONT_OBJ:
-                // These legacy selection for file type don't use flag bits
+                // These don't use flag bits
                 break;
 
             case OPT_VERSION:
