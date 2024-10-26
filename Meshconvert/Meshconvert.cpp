@@ -74,14 +74,10 @@ namespace
         OPT_CLEAN,
         OPT_OUTPUTFILE,
         OPT_TOLOWER,
-        OPT_SDKMESH,
-        OPT_SDKMESH_V2,
-        OPT_CMO,
-        OPT_VBO,
-        OPT_WAVEFRONT_OBJ,
         OPT_CLOCKWISE,
         OPT_FORCE_32BIT_IB,
         OPT_OVERWRITE,
+        OPT_FILETYPE,
         OPT_NODDS,
         OPT_FLIP,
         OPT_FLIPU,
@@ -92,10 +88,17 @@ namespace
         OPT_VERT_COLOR_FORMAT,
         OPT_NOLOGO,
         OPT_FILELIST,
-        OPT_MAX
+        OPT_FLAGS_MAX,
+        OPT_SDKMESH,
+        OPT_SDKMESH_V2,
+        OPT_CMO,
+        OPT_VBO,
+        OPT_WAVEFRONT_OBJ,
+        OPT_VERSION,
+        OPT_HELP,
     };
 
-    static_assert(OPT_MAX <= 32, "dwOptions is a unsigned int bitfield");
+    static_assert(OPT_FLAGS_MAX <= 32, "dwOptions is a unsigned int bitfield");
 
     //////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
@@ -116,25 +119,60 @@ namespace
         { L"c",         OPT_CLEAN },
         { L"o",         OPT_OUTPUTFILE },
         { L"l",         OPT_TOLOWER },
-        { L"sdkmesh",   OPT_SDKMESH },
-        { L"sdkmesh2",  OPT_SDKMESH_V2 },
-        { L"cmo",       OPT_CMO },
-        { L"vbo",       OPT_VBO },
-        { L"wf",        OPT_WAVEFRONT_OBJ },
         { L"cw",        OPT_CLOCKWISE },
         { L"ib32",      OPT_FORCE_32BIT_IB },
         { L"y",         OPT_OVERWRITE },
+        { L"ft",        OPT_FILETYPE },
         { L"nodds",     OPT_NODDS },
         { L"flip",      OPT_FLIP },
-        { L"flipu",     OPT_FLIPU },
-        { L"flipv",     OPT_FLIPV },
-        { L"flipz",     OPT_FLIPZ },
         { L"fn",        OPT_VERT_NORMAL_FORMAT },
         { L"fuv",       OPT_VERT_UV_FORMAT },
         { L"fc",        OPT_VERT_COLOR_FORMAT },
         { L"nologo",    OPT_NOLOGO },
         { L"flist",     OPT_FILELIST },
+
+        // Legacy selection switches for file type (use -ft instead)
+        { L"sdkmesh",   OPT_SDKMESH },
+        { L"sdkmesh2",  OPT_SDKMESH_V2 },
+        { L"cmo",       OPT_CMO },
+        { L"vbo",       OPT_VBO },
+        { L"wf",        OPT_WAVEFRONT_OBJ },
+
+        // Deprecated options (recommend using new -- alternatives)
+        { L"flipu",     OPT_FLIPU },
+        { L"flipv",     OPT_FLIPV },
+        { L"flipz",     OPT_FLIPZ },
         { nullptr,      0 }
+    };
+
+    const SValue<uint64_t> g_pOptionsLong[] =
+    {
+        { L"clean",                     OPT_CLEAN },
+        { L"clockwise",                 OPT_CLOCKWISE },
+        { L"color-format",              OPT_VERT_COLOR_FORMAT },
+        { L"file-list",                 OPT_FILELIST },
+        { L"file-type",                 OPT_FILETYPE },
+        { L"flip-face-winding",         OPT_FLIP },
+        { L"flip-u",                    OPT_FLIPU },
+        { L"flip-v",                    OPT_FLIPV },
+        { L"flip-z",                    OPT_FLIPZ },
+        { L"geometric-adjacency",       OPT_GEOMETRIC_ADJ },
+        { L"help",                      OPT_HELP },
+        { L"index-buffer-32-bit",       OPT_FORCE_32BIT_IB },
+        { L"normal-format",             OPT_VERT_NORMAL_FORMAT },
+        { L"normals-by-angle",          OPT_NORMALS },
+        { L"normals-by-area",           OPT_WEIGHT_BY_AREA },
+        { L"normals-by-equal",          OPT_WEIGHT_BY_EQUAL },
+        { L"optimize-lru",              OPT_OPTIMIZE_LRU },
+        { L"optimize",                  OPT_OPTIMIZE },
+        { L"overwrite",                 OPT_OVERWRITE },
+        { L"tangent-frame",             OPT_CTF },
+        { L"tangents",                  OPT_TANGENTS },
+        { L"to-lowercase",              OPT_TOLOWER },
+        { L"topological-adjacency",     OPT_TOPOLOGICAL_ADJ },
+        { L"uv-format",                 OPT_VERT_UV_FORMAT },
+        { L"version",                   OPT_VERSION },
+        { nullptr,                      0 }
     };
 
     const SValue<DXGI_FORMAT> g_vertexNormalFormats[] =
@@ -162,6 +200,26 @@ namespace
         { L"r11g11b10", DXGI_FORMAT_R11G11B10_FLOAT },
         { nullptr,      DXGI_FORMAT_UNKNOWN }
     };
+
+    enum MESH_CODEC : uint32_t
+    {
+        CODEC_SDKMESH = 1,
+        CODEC_SDKMESH_V2,
+        CODEC_CMO,
+        CODEC_VBO,
+        CODEC_WAVEFRONT_OBJ,
+    };
+
+    const SValue<uint32_t> g_pMeshFileTypes[] = // valid formats to write to
+    {
+        { L"sdkmesh",   CODEC_SDKMESH },
+        { L"sdkmesh2",  CODEC_SDKMESH_V2 },
+        { L"cmo",       CODEC_CMO },
+        { L"vbo",       CODEC_VBO },
+        { L"obj",       CODEC_WAVEFRONT_OBJ },
+        { L"_obj",      CODEC_WAVEFRONT_OBJ },
+        { nullptr,      0 }
+    };
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -187,37 +245,47 @@ namespace
             L"\n"
             L"   Input file type must be Wavefront Object (.obj)\n"
             L"\n"
-            L"   Output file type:\n"
-            L"       -sdkmesh        DirectX SDK .sdkmesh format (default)\n"
-            L"       -sdkmesh2       .sdkmesh format version 2 (PBR materials)\n"
-            L"       -cmo            Visual Studio Content Pipeline .cmo format\n"
-            L"       -vbo            Vertex Buffer Object (.vbo) format\n"
-            L"       -wf             WaveFront Object (.obj) format\n"
+            L"   -ft <filetype>, --file-type <filetype>  output file type\n"
+            L"       sdkmesh:  DirectX SDK .sdkmesh format (default)\n"
+            L"       sdkmesh2: sdkmesh format version 2 (PBR materials)\n"
+            L"       cmo:      Visual Studio Content Pipeline .cmo format\n"
+            L"       vbo:      Vertex Buffer Object (.vbo) format\n"
+            L"       obj:      WaveFront Object (.obj) format\n"
             L"\n"
             L"   -r                  wildcard filename search is recursive\n"
-            L"   -n | -na | -ne      generate normals weighted by angle/area/equal\n"
-            L"   -t                  generate tangents\n"
-            L"   -tb                 generate tangents & bi-tangents\n"
-            L"   -cw                 faces are clockwise (defaults to counter-clockwise)\n"
-            L"   -op | -oplru        vertex cache optimize the mesh (implies -c)\n"
-            L"   -c                  mesh cleaning including vertex dups for atttribute sets\n"
-            L"   -ta | -ga           generate topological vs. geometric adjancecy (def: ta)\n"
-            L"   -nodds              prevents extension renaming in exported materials\n"
-            L"   -flip               reverse winding of faces\n"
-            L"   -flipu              inverts the u texcoords\n"
-            L"   -flipv              inverts the v texcoords\n"
-            L"   -flipz              flips the handedness of the positions/normals\n"
-            L"   -o <filename>       output filename\n"
-            L"   -l                  force output filename to lower case\n"
-            L"   -y                  overwrite existing output file (if any)\n"
-            L"   -nologo             suppress copyright message\n"
-            L"   -flist <filename>   use text file with a list of input files (one per line)\n"
+            L"   -flist <filename>, --file-list <filename>\n"
+            L"                       use text file with a list of input files (one per line)\n"
+            L"\n"
+            L"   -n, --normal-by-angle   -na, --normal-by-area   -ne, --normal-by-equal\n"
+            L"                                  generate normals weighted by angle/area/equal\n"
+            L"   -t, --tangents                 generate tangents\n"
+            L"   -tb, --tangent-frame           generate tangents & bi-tangents\n"
+            L"   -cw, --clockwise               faces are clockwise (defaults to counter-clockwise)\n"
+            L"\n"
+            L"   -op, --optimize   -oplru, --optimize-lru\n"
+            L"                                  vertex cache optimize the mesh (implies -c)\n"
+            L"   -c, --clean                    mesh cleaning including vertex dups for attribute sets\n"
+            L"   -ta, --topological-adjacency -or- -ga, --geometric-adjacency\n"
+            L"                                  generate topological vs. geometric adjancecy (def: ta)\n"
+            L"\n"
+            L"   -nodds                         prevents extension renaming in exported materials\n"
+            L"   -flip, --flip-face-winding     reverse winding of faces\n"
+            L"   -flip-u                        inverts the u texcoords\n"
+            L"   -flip-v                        inverts the v texcoords\n"
+            L"   -flip-z                        flips the handedness of the positions/normals\n"
+            L"   -o <filename>                  output filename\n"
+            L"   -l, --to-lowercase             force output filename to lower case\n"
+            L"   -y, --overwrite                overwrite existing output file (if any)\n"
+            L"   -nologo                        suppress copyright message\n"
             L"\n"
             L"       (sdkmesh/sdkmesh2 only)\n"
-            L"   -ib32               use 32-bit index buffer\n"
-            L"   -fn <normal-format> format to use for writing normals/tangents/normals\n"
-            L"   -fuv <uv-format>    format to use for texture coordinates\n"
-            L"   -fc <color-format>  format to use for writing colors\n"
+            L"   -ib32, --index-buffer-32-bit   use 32-bit index buffer\n"
+            L"   -fn <normal-format>, --normal-format <normal-format>\n"
+            L"                                  format to use for writing normals/tangents/binormals\n"
+            L"   -fuv <uv-format>, --uv-format <uv-format>\n"
+            L"                                  format to use for texture coordinates\n"
+            L"   -fc <color-format>, --color-format <color-format>\n"
+            L"                                  format to use for writing colors\n"
             L"\n"
             L"   '-- ' is needed if any input filepath starts with the '-' or '/' character\n";
 
@@ -247,6 +315,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     DXGI_FORMAT normalFormat = DXGI_FORMAT_R32G32B32_FLOAT;
     DXGI_FORMAT uvFormat = DXGI_FORMAT_R32G32_FLOAT;
     DXGI_FORMAT colorFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    uint32_t fileType = 0;
 
     std::wstring outputFile;
 
@@ -262,51 +331,84 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     {
         PWSTR pArg = argv[iArg];
 
-        if (allowOpts
-            && ('-' == pArg[0]) && ('-' == pArg[1]))
+        if (allowOpts && (('-' == pArg[0]) || ('/' == pArg[0])))
         {
-            if (pArg[2] == 0)
+            uint64_t dwOption = 0;
+            PWSTR pValue = nullptr;
+
+            if (('-' == pArg[0]) && ('-' == pArg[1]))
             {
-                // "-- " is the POSIX standard for "end of options" marking to escape the '-' and '/' characters at the start of filepaths.
-                allowOpts = false;
-            }
-            else if (!_wcsicmp(pArg, L"--version"))
-            {
-                PrintLogo(true, g_ToolName, g_Description);
-                return 0;
-            }
-            else if (!_wcsicmp(pArg, L"--help"))
-            {
-                PrintUsage();
-                return 0;
+                if (pArg[2] == 0)
+                {
+                    // "-- " is the POSIX standard for "end of options" marking to escape the '-' and '/' characters at the start of filepaths.
+                    allowOpts = false;
+                    continue;
+                }
+                else
+                {
+                    pArg += 2;
+
+                    for (pValue = pArg; *pValue && (':' != *pValue) && ('=' != *pValue); ++pValue);
+
+                    if (*pValue)
+                        *pValue++ = 0;
+
+                    dwOption = LookupByName(pArg, g_pOptionsLong);
+                }
             }
             else
             {
-                wprintf(L"Unknown option: %ls\n", pArg);
-                return 1;
+                pArg++;
+
+                for (pValue = pArg; *pValue && (':' != *pValue) && ('=' != *pValue); ++pValue);
+
+                if (*pValue)
+                    *pValue++ = 0;
+
+                dwOption = LookupByName(pArg, g_pOptions);
+
+                if (!dwOption)
+                {
+                    if (LookupByName(pArg, g_pOptionsLong))
+                    {
+                        wprintf(L"ERROR: did you mean `--%ls` (with two dashes)?\n", pArg);
+                        return 1;
+                    }
+                }
             }
-        }
-        else if (allowOpts
-            && (('-' == pArg[0]) || ('/' == pArg[0])))
-        {
-            pArg++;
-            PWSTR pValue;
 
-            for (pValue = pArg; *pValue && (':' != *pValue); pValue++);
-
-            if (*pValue)
-                *pValue++ = 0;
-
-            const uint32_t dwOption = LookupByName(pArg, g_pOptions);
-
-            if (!dwOption || (dwOptions & (1 << dwOption)))
+            switch(dwOption)
             {
-                wprintf(L"ERROR: unknown command-line option '%ls'\n\n", pArg);
-                PrintUsage();
+            case 0:
+                wprintf(L"ERROR: Unknown option: `%ls`\n\nUse %ls --help\n", pArg, g_ToolName);
                 return 1;
-            }
 
-            dwOptions |= (1 << dwOption);
+            case OPT_SDKMESH:
+            case OPT_SDKMESH_V2:
+            case OPT_CMO:
+            case OPT_VBO:
+            case OPT_WAVEFRONT_OBJ:
+                // These legacy selection for file type don't use flag bits
+                break;
+
+            case OPT_VERSION:
+                PrintLogo(true, g_ToolName, g_Description);
+                return 0;
+
+            case OPT_HELP:
+                PrintUsage();
+                return 0;
+
+            default:
+                if (dwOptions & (1u << dwOption))
+                {
+                    wprintf(L"ERROR: Duplicate option: `%ls`\n\n", pArg);
+                    return 1;
+                }
+
+                dwOptions |= (1u << dwOption);
+                break;
+            }
 
             // Handle options with additional value parameter
             switch (dwOption)
@@ -316,6 +418,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             case OPT_VERT_UV_FORMAT:
             case OPT_VERT_COLOR_FORMAT:
             case OPT_FILELIST:
+            case OPT_FILETYPE:
                 if (!*pValue)
                 {
                     if ((iArg + 1 >= argc))
@@ -334,25 +437,25 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             switch (dwOption)
             {
             case OPT_OPTIMIZE_LRU:
-                dwOptions |= (1 << OPT_OPTIMIZE);
+                dwOptions |= (1u << OPT_OPTIMIZE);
                 break;
 
             case OPT_WEIGHT_BY_AREA:
-                if (dwOptions & (1 << OPT_WEIGHT_BY_EQUAL))
+                if (dwOptions & (1u << OPT_WEIGHT_BY_EQUAL))
                 {
                     wprintf(L"Cannot use both na and ne at the same time\n");
                     return 1;
                 }
-                dwOptions |= (1 << OPT_NORMALS);
+                dwOptions |= (1u << OPT_NORMALS);
                 break;
 
             case OPT_WEIGHT_BY_EQUAL:
-                if (dwOptions & (1 << OPT_WEIGHT_BY_AREA))
+                if (dwOptions & (1u << OPT_WEIGHT_BY_AREA))
                 {
                     wprintf(L"Cannot use both na and ne at the same time\n");
                     return 1;
                 }
-                dwOptions |= (1 << OPT_NORMALS);
+                dwOptions |= (1u << OPT_NORMALS);
                 break;
 
             case OPT_OUTPUTFILE:
@@ -362,8 +465,18 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 }
                 break;
 
+            case OPT_FILETYPE:
+                fileType = LookupByName(pValue, g_pMeshFileTypes);
+                if (!fileType)
+                {
+                    wprintf(L"Invalid value specified with -ft (%ls)\n\n", pValue);
+                    PrintUsage();
+                    return 1;
+                }
+                break;
+
             case OPT_TOPOLOGICAL_ADJ:
-                if (dwOptions & (1 << OPT_GEOMETRIC_ADJ))
+                if (dwOptions & (1u << OPT_GEOMETRIC_ADJ))
                 {
                     wprintf(L"Cannot use both ta and ga at the same time\n");
                     return 1;
@@ -371,7 +484,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_GEOMETRIC_ADJ:
-                if (dwOptions & (1 << OPT_TOPOLOGICAL_ADJ))
+                if (dwOptions & (1u << OPT_TOPOLOGICAL_ADJ))
                 {
                     wprintf(L"Cannot use both ta and ga at the same time\n");
                     return 1;
@@ -379,48 +492,55 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_SDKMESH:
-            case OPT_SDKMESH_V2:
-                if (dwOptions & ((1 << OPT_VBO) | (1 << OPT_CMO) | (1 << OPT_WAVEFRONT_OBJ)))
+                if (fileType != 0 && fileType != CODEC_SDKMESH)
                 {
                     wprintf(L"Can only use one of sdkmesh, cmo, vbo, or wf\n");
                     return 1;
                 }
-                if (dwOption == OPT_SDKMESH_V2)
+                fileType = CODEC_SDKMESH;
+                break;
+
+            case OPT_SDKMESH_V2:
+                if (fileType != 0 && fileType != CODEC_SDKMESH && fileType != CODEC_SDKMESH_V2)
                 {
-                    dwOptions |= (1 << OPT_SDKMESH);
+                    wprintf(L"-sdkmesh2 requires sdkmesh\n");
+                    return 1;
                 }
+                fileType = CODEC_SDKMESH_V2;
                 break;
 
             case OPT_CMO:
-                if (dwOptions & ((1 << OPT_VBO) | (1 << OPT_SDKMESH) | (1 << OPT_WAVEFRONT_OBJ)))
+                if (fileType != 0 && fileType != CODEC_CMO)
                 {
                     wprintf(L"Can only use one of sdkmesh, cmo, vbo, or wf\n");
                     return 1;
                 }
+                fileType = CODEC_CMO;
                 break;
 
             case OPT_VBO:
-                if (dwOptions & ((1 << OPT_SDKMESH) | (1 << OPT_CMO) | (1 << OPT_WAVEFRONT_OBJ)))
+                if (fileType != 0 && fileType != CODEC_VBO)
                 {
                     wprintf(L"Can only use one of sdkmesh, cmo, vbo, or wf\n");
                     return 1;
                 }
+                fileType = CODEC_VBO;
                 break;
 
             case OPT_WAVEFRONT_OBJ:
-                if (dwOptions & ((1 << OPT_VBO) | (1 << OPT_SDKMESH) | (1 << OPT_CMO)))
+                if (fileType != 0 && fileType != CODEC_WAVEFRONT_OBJ)
                 {
                     wprintf(L"Can only use one of sdkmesh, cmo, vbo, or wf\n");
                     return 1;
                 }
+                fileType = CODEC_WAVEFRONT_OBJ;
                 break;
 
             case OPT_VERT_NORMAL_FORMAT:
                 normalFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexNormalFormats));
                 if (!normalFormat)
                 {
-                    wprintf(L"Invalid value specified with -fn (%ls)\n", pValue);
-                    wprintf(L"\n");
+                    wprintf(L"Invalid value specified with -fn (%ls)\n\n", pValue);
                     PrintUsage();
                     return 1;
                 }
@@ -430,8 +550,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 uvFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexUVFormats));
                 if (!uvFormat)
                 {
-                    wprintf(L"Invalid value specified with -fuv (%ls)\n", pValue);
-                    wprintf(L"\n");
+                    wprintf(L"Invalid value specified with -fuv (%ls)\n\n", pValue);
                     PrintUsage();
                     return 1;
                 }
@@ -441,8 +560,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 colorFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexColorFormats));
                 if (!colorFormat)
                 {
-                    wprintf(L"Invalid value specified with -fc (%ls)\n", pValue);
-                    wprintf(L"\n");
+                    wprintf(L"Invalid value specified with -fc (%ls)\n\n", pValue);
                     PrintUsage();
                     return 1;
                 }
@@ -469,7 +587,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         {
             const size_t count = conversion.size();
             std::filesystem::path path(pArg);
-            SearchForFiles(path.make_preferred(), conversion, (dwOptions & (1 << OPT_RECURSIVE)) != 0, nullptr);
+            SearchForFiles(path.make_preferred(), conversion, (dwOptions & (1u << OPT_RECURSIVE)) != 0, nullptr);
             if (conversion.size() <= count)
             {
                 wprintf(L"No matching files found for %ls\n", pArg);
@@ -497,8 +615,11 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         return 1;
     }
 
-    if (~dwOptions & (1 << OPT_NOLOGO))
+    if (~dwOptions & (1u << OPT_NOLOGO))
         PrintLogo(false, g_ToolName, g_Description);
+
+    if (!fileType)
+        fileType = CODEC_SDKMESH;
 
     // Process files
     for (auto pConv = conversion.begin(); pConv != conversion.end(); ++pConv)
@@ -542,8 +663,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         else
         {
             hr = LoadFromOBJ(curpath.c_str(), inMesh, inMaterial,
-                (dwOptions & (1 << OPT_CLOCKWISE)) ? false : true,
-                (dwOptions & (1 << OPT_NODDS)) ? false : true);
+                (dwOptions & (1u << OPT_CLOCKWISE)) ? false : true,
+                (dwOptions & (1u << OPT_NODDS)) ? false : true);
         }
         if (FAILED(hr))
         {
@@ -565,7 +686,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
         wprintf(L"\n%zu vertices, %zu faces", nVerts, nFaces);
 
-        if (dwOptions & (1 << OPT_FLIPU))
+        if (dwOptions & (1u << OPT_FLIPU))
         {
             hr = inMesh->InvertUTexCoord();
             if (FAILED(hr))
@@ -576,7 +697,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
         }
 
-        if (dwOptions & (1 << OPT_FLIPV))
+        if (dwOptions & (1u << OPT_FLIPV))
         {
             hr = inMesh->InvertVTexCoord();
             if (FAILED(hr))
@@ -587,7 +708,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
         }
 
-        if (dwOptions & (1 << OPT_FLIPZ))
+        if (dwOptions & (1u << OPT_FLIPZ))
         {
             hr = inMesh->ReverseHandedness();
             if (FAILED(hr))
@@ -599,10 +720,10 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
 
         // Prepare mesh for processing
-        if (dwOptions & ((1 << OPT_OPTIMIZE) | (1 << OPT_CLEAN)))
+        if (dwOptions & ((1u << OPT_OPTIMIZE) | (1u << OPT_CLEAN)))
         {
             // Adjacency
-            const float epsilon = (dwOptions & (1 << OPT_GEOMETRIC_ADJ)) ? 1e-5f : 0.f;
+            const float epsilon = (dwOptions & (1u << OPT_GEOMETRIC_ADJ)) ? 1e-5f : 0.f;
 
             hr = inMesh->GenerateAdjacency(epsilon);
             if (FAILED(hr))
@@ -642,30 +763,30 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
         if (!inMesh->GetNormalBuffer())
         {
-            dwOptions |= 1 << OPT_NORMALS;
+            dwOptions |= 1u << OPT_NORMALS;
         }
 
-        if (!inMesh->GetTangentBuffer() && (dwOptions & (1 << OPT_CMO)))
+        if (!inMesh->GetTangentBuffer() && (fileType == CODEC_CMO))
         {
-            dwOptions |= 1 << OPT_TANGENTS;
+            dwOptions |= 1u << OPT_TANGENTS;
         }
 
         // Compute vertex normals from faces
-        if ((dwOptions & (1 << OPT_NORMALS))
-            || ((dwOptions & ((1 << OPT_TANGENTS) | (1 << OPT_CTF))) && !inMesh->GetNormalBuffer()))
+        if ((dwOptions & (1u << OPT_NORMALS))
+            || ((dwOptions & ((1u << OPT_TANGENTS) | (1u << OPT_CTF))) && !inMesh->GetNormalBuffer()))
         {
             CNORM_FLAGS flags = CNORM_DEFAULT;
 
-            if (dwOptions & (1 << OPT_WEIGHT_BY_EQUAL))
+            if (dwOptions & (1u << OPT_WEIGHT_BY_EQUAL))
             {
                 flags |= CNORM_WEIGHT_EQUAL;
             }
-            else if (dwOptions & (1 << OPT_WEIGHT_BY_AREA))
+            else if (dwOptions & (1u << OPT_WEIGHT_BY_AREA))
             {
                 flags |= CNORM_WEIGHT_BY_AREA;
             }
 
-            if (dwOptions & (1 << OPT_CLOCKWISE))
+            if (dwOptions & (1u << OPT_CLOCKWISE))
             {
                 flags |= CNORM_WIND_CW;
             }
@@ -680,7 +801,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
 
         // Compute tangents and bitangents
-        if (dwOptions & ((1 << OPT_TANGENTS) | (1 << OPT_CTF)))
+        if (dwOptions & ((1u << OPT_TANGENTS) | (1u << OPT_CTF)))
         {
             if (!inMesh->GetTexCoordBuffer())
             {
@@ -688,7 +809,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            hr = inMesh->ComputeTangentFrame((dwOptions & (1 << OPT_CTF)) ? true : false);
+            hr = inMesh->ComputeTangentFrame((dwOptions & (1u << OPT_CTF)) ? true : false);
             if (FAILED(hr))
             {
                 wprintf(L"\nERROR: Failed computing tangent frame (%08X%ls)\n",
@@ -698,7 +819,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
 
         // Perform attribute and vertex-cache optimization
-        if (dwOptions & (1 << OPT_OPTIMIZE))
+        if (dwOptions & (1u << OPT_OPTIMIZE))
         {
             assert(inMesh->GetAdjacencyBuffer() != nullptr);
 
@@ -707,7 +828,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
             wprintf(L" [ACMR %f, ATVR %f] ", acmr, atvr);
 
-            hr = inMesh->Optimize((dwOptions & (1 << OPT_OPTIMIZE_LRU)) ? true : false);
+            hr = inMesh->Optimize((dwOptions & (1u << OPT_OPTIMIZE_LRU)) ? true : false);
             if (FAILED(hr))
             {
                 wprintf(L"\nERROR: Failed vertex-cache optimization (%08X%ls)\n",
@@ -716,7 +837,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
         }
 
-        if (dwOptions & (1 << OPT_FLIP))
+        if (dwOptions & (1u << OPT_FLIP))
         {
             hr = inMesh->ReverseWinding();
             if (FAILED(hr))
@@ -730,7 +851,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         // Write results
         wprintf(L"\n\t->\n");
 
-        if (dwOptions & (1 << OPT_OPTIMIZE))
+        if (dwOptions & (1u << OPT_OPTIMIZE))
         {
             float acmr, atvr;
             ComputeVertexCacheMissRate(inMesh->GetIndexBuffer(), nFaces, nVerts, OPTFACES_V_DEFAULT, acmr, atvr);
@@ -746,33 +867,35 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else
         {
-            if (dwOptions & (1 << OPT_VBO))
+            switch(fileType)
             {
+            case CODEC_VBO:
                 wcscpy_s(outputExt, L".vbo");
-            }
-            else if (dwOptions & (1 << OPT_CMO))
-            {
+                break;
+
+            case CODEC_CMO:
                 wcscpy_s(outputExt, L".cmo");
-            }
-            else if (dwOptions & (1 << OPT_WAVEFRONT_OBJ))
-            {
+                break;
+
+            case CODEC_WAVEFRONT_OBJ:
                 wcscpy_s(outputExt, L".obj");
-            }
-            else
-            {
+                break;
+
+            default:
                 wcscpy_s(outputExt, L".sdkmesh");
+                break;
             }
 
             outputFile.assign(curpath.stem());
             outputFile.append(outputExt);
         }
 
-        if (dwOptions & (1 << OPT_TOLOWER))
+        if (dwOptions & (1u << OPT_TOLOWER))
         {
             std::transform(outputFile.begin(), outputFile.end(), outputFile.begin(), towlower);
         }
 
-        if (~dwOptions & (1 << OPT_OVERWRITE))
+        if (~dwOptions & (1u << OPT_OVERWRITE))
         {
             if (GetFileAttributesW(outputFile.c_str()) != INVALID_FILE_ATTRIBUTES)
             {
@@ -789,7 +912,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            if (!inMesh->Is16BitIndexBuffer() || (dwOptions & (1 << OPT_FORCE_32BIT_IB)))
+            if (!inMesh->Is16BitIndexBuffer() || (dwOptions & (1u << OPT_FORCE_32BIT_IB)))
             {
                 wprintf(L"\nERROR: VBO only supports 16-bit indices\n");
                 return 1;
@@ -802,8 +925,8 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             hr = inMesh->ExportToSDKMESH(
                 outputFile.c_str(),
                 inMaterial.size(), inMaterial.empty() ? nullptr : inMaterial.data(),
-                (dwOptions & (1 << OPT_FORCE_32BIT_IB)) ? true : false,
-                (dwOptions & (1 << OPT_SDKMESH_V2)) ? true : false,
+                (dwOptions & (1u << OPT_FORCE_32BIT_IB)) ? true : false,
+                (fileType == CODEC_SDKMESH_V2) ? true : false,
                 normalFormat,
                 uvFormat,
                 colorFormat);
@@ -816,7 +939,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 1;
             }
 
-            if (!inMesh->Is16BitIndexBuffer() || (dwOptions & (1 << OPT_FORCE_32BIT_IB)))
+            if (!inMesh->Is16BitIndexBuffer() || (dwOptions & (1u << OPT_FORCE_32BIT_IB)))
             {
                 wprintf(L"\nERROR: Visual Studio CMO only supports 16-bit indices\n");
                 return 1;
