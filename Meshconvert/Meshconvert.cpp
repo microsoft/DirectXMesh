@@ -145,7 +145,7 @@ namespace
         { nullptr,      0 }
     };
 
-    const SValue<uint64_t> g_pOptionsLong[] =
+    const SValue<uint32_t> g_pOptionsLong[] =
     {
         { L"clean",                     OPT_CLEAN },
         { L"clockwise",                 OPT_CLOCKWISE },
@@ -333,7 +333,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
         if (allowOpts && (('-' == pArg[0]) || ('/' == pArg[0])))
         {
-            uint64_t dwOption = 0;
+            uint32_t dwOption = 0;
             PWSTR pValue = nullptr;
 
             if (('-' == pArg[0]) && ('-' == pArg[1]))
