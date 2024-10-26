@@ -202,6 +202,14 @@
         "strategy": "external"
       }
     },
+    {
+      "name": "Fuzzing",
+      "cacheVariables": {
+        "BUILD_FUZZING": true,
+        "BUILD_TESTING": false
+      },
+      "hidden": true
+    },
 
     {
       "name": "Analyze",
@@ -307,7 +315,8 @@
 
     { "name": "x64-Analyze"       , "description": "MSVC for x64 (Debug) with DX12 using /analyze", "inherits": [ "base", "x64", "Debug", "MSVC", "Analyze" ] },
     { "name": "x64-Coverage"      , "description": "MSVC for x64 (Debug) with DX12 w/ Code Coverage", "inherits": [ "base", "x64", "Debug", "MSVC", "Coverage" ] },
-    { "name": "x64-Coverage-Clang", "description": "Clang/LLVM for x64 (Debug) with DX12 w/ Code Coverage", "inherits": [ "base", "x64", "Debug", "Clang", "Coverage" ] }
+    { "name": "x64-Coverage-Clang", "description": "Clang/LLVM for x64 (Debug) with DX12 w/ Code Coverage", "inherits": [ "base", "x64", "Debug", "Clang", "Coverage" ] },
+    { "name": "x64-Fuzzing"       , "description": "MSVC for x64 (Release) with ASan", "inherits": [ "base", "x64", "Release", "MSVC", "Fuzzing" ] }
   ],
   "testPresets": [
     { "name": "x64-Debug"      , "configurePreset": "x64-Debug" },
