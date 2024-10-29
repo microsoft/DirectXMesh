@@ -6,7 +6,7 @@ http://go.microsoft.com/fwlink/?LinkID=324981
 
 Copyright (c) Microsoft Corporation.
 
-**September 4, 2024**
+**October 28, 2024**
 
 This package contains DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.
 
@@ -26,6 +26,7 @@ These components are designed to work without requiring any content from the leg
 
   + This contains helper code related to mesh processing that is not general enough to be part of the DirectXMesh library.
     * ``WaveFrontReader.h``: Contains a simple C++ class for reading mesh data from a WaveFront OBJ file.
+    * ``FlexibleVertexFormat.h``: Contains helpers for working with Direct3D 9 style "FVF" codes.
 
 * ``Meshconvert\``
 
@@ -64,6 +65,19 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 * For ARM64/AArch64 development, the VS 2022 compiler is strongly recommended over the VS 2019 toolset. The Windows SDK (26100 or later) is not compatible with VS 2019 for Win32 on ARM64 development. *Note that the ARM32/AArch32 platform is [deprecated](https://learn.microsoft.com/windows/arm/arm32-to-arm64)*.
 
 * When using clang/LLVM for the ARM64/AArch64 platform, the Windows 11 SDK ([22000](https://walbourn.github.io/windows-sdk-for-windows-11/)) or later is required.
+
+* As of the October 2024 release, the command-line tool also supports GNU-style long options using ``--``. All existing switches continue to function, but some of the `-` options are now deprecated per this table:
+
+|Old switch|New switch|
+|---|---|
+|-sdkmesh|-ft sdkmesh<br />--file-type sdkmesh|
+|-sdkmesh2|-ft sdkmesh2<br />--file-type sdkmesh2|
+|-cmo|-ft cmo<br />--file-type cmo|
+|-vbo|-ft vbo<br />--file-type vbo|
+|-wf|-ft obj<br />--file-type obj|
+|-flipu|--flip-u|
+|-flipv|--flip-v|
+|-flipz|--flip-z|
 
 ## Support
 

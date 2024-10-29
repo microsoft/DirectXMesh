@@ -40,7 +40,7 @@
 #include <DirectXCollision.h>
 #include <DirectXPackedVector.h>
 
-#define DIRECTX_MESH_VERSION 166
+#define DIRECTX_MESH_VERSION 167
 
 
 namespace DirectX

@@ -6,6 +6,14 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### October 28, 2024
+* All enums now use ``uint32_t`` as the underlying type rather than ``unsigned long`` or ``int``.
+* WaveFrontReader utililty moved into ``DX`` namespace
+* meshconvert:
+  * Add "GNU-style" *--long-options* to the command-line tools (all existing switches are still supported)
+  * Refactored code to use shared header
+* CMake and MSBuild project updates
+
 ### September 4, 2024
 * CMake project updates including support for ARM64EC
 * Minor code review
