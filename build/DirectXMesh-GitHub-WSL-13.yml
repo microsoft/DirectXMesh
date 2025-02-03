@@ -23,7 +23,7 @@ pr:
     - CMake*
     - build/*.cmake
     - build/*.in
-    - build/DirectXMesh-GitHub-WSL-11.yml
+    - build/DirectXMesh-GitHub-WSL-13.yml
 
 resources:
   repositories:
@@ -45,7 +45,7 @@ resources:
 name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
 
 pool:
-    vmImage: ubuntu-22.04
+    vmImage: ubuntu-24.04
 
 variables:
   Codeql.Enabled: false
