@@ -674,7 +674,7 @@ namespace
                     return E_UNEXPECTED;
                 }
 
-                auto const primitive = primitiveIndices[m.PrimOffset + i];
+                const auto primitive = primitiveIndices[m.PrimOffset + i];
 
                 const XMVECTOR p0 = XMLoadFloat3(&vertices[primitive.i0]);
 
