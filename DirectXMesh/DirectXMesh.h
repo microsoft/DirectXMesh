@@ -109,8 +109,8 @@ namespace DirectX
         DIRECTX_MESH_API VBReader(VBReader&&) noexcept;
         DIRECTX_MESH_API VBReader& operator= (VBReader&&) noexcept;
 
-        DIRECTX_MESH_API VBReader(VBReader const&) = delete;
-        DIRECTX_MESH_API VBReader& operator= (VBReader const&) = delete;
+        VBReader(VBReader const&) = delete;
+        VBReader& operator= (VBReader const&) = delete;
 
         DIRECTX_MESH_API ~VBReader();
 
@@ -165,8 +165,8 @@ namespace DirectX
         DIRECTX_MESH_API VBWriter(VBWriter&&) noexcept;
         DIRECTX_MESH_API VBWriter& operator= (VBWriter&&) noexcept;
 
-        DIRECTX_MESH_API VBWriter(VBWriter const&) = delete;
-        DIRECTX_MESH_API VBWriter& operator= (VBWriter const&) = delete;
+        VBWriter(VBWriter const&) = delete;
+        VBWriter& operator= (VBWriter const&) = delete;
 
         DIRECTX_MESH_API ~VBWriter();
 
