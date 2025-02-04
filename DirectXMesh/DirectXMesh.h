@@ -102,53 +102,53 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Vertex Buffer Reader/Writer
 
-    class DIRECTX_MESH_API VBReader
+    class VBReader
     {
     public:
-        VBReader() noexcept(false);
-        VBReader(VBReader&&) noexcept;
-        VBReader& operator= (VBReader&&) noexcept;
+        DIRECTX_MESH_API VBReader() noexcept(false);
+        DIRECTX_MESH_API VBReader(VBReader&&) noexcept;
+        DIRECTX_MESH_API VBReader& operator= (VBReader&&) noexcept;
 
-        VBReader(VBReader const&) = delete;
-        VBReader& operator= (VBReader const&) = delete;
+        DIRECTX_MESH_API VBReader(VBReader const&) = delete;
+        DIRECTX_MESH_API VBReader& operator= (VBReader const&) = delete;
 
-        ~VBReader();
+        DIRECTX_MESH_API ~VBReader();
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-        HRESULT __cdecl Initialize(_In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl);
+        DIRECTX_MESH_API HRESULT __cdecl Initialize(_In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl);
             // Does not support VB decls with D3D11_INPUT_PER_INSTANCE_DATA
     #endif
 
     #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-        HRESULT __cdecl Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl);
+        DIRECTX_MESH_API HRESULT __cdecl Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl);
             // Does not support VB decls with D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA
     #endif
 
-        HRESULT __cdecl AddStream(_In_reads_bytes_(stride*nVerts) const void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0) noexcept;
+        DIRECTX_MESH_API HRESULT __cdecl AddStream(_In_reads_bytes_(stride*nVerts) const void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0) noexcept;
             // Add vertex buffer to reader
 
-        HRESULT __cdecl Read(_Out_writes_(count) XMVECTOR* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Read(_Out_writes_(count) XMVECTOR* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
             // Extracts data elements from vertex buffer
 
-        HRESULT __cdecl Read(_Out_writes_(count) float* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
-        HRESULT __cdecl Read(_Out_writes_(count) XMFLOAT2* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
-        HRESULT __cdecl Read(_Out_writes_(count) XMFLOAT3* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
-        HRESULT __cdecl Read(_Out_writes_(count) XMFLOAT4* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Read(_Out_writes_(count) float* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Read(_Out_writes_(count) XMFLOAT2* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Read(_Out_writes_(count) XMFLOAT3* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Read(_Out_writes_(count) XMFLOAT4* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
             // Helpers for data extraction
 
-        void __cdecl Release() noexcept;
+        DIRECTX_MESH_API void __cdecl Release() noexcept;
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-        const D3D11_INPUT_ELEMENT_DESC* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
+        DIRECTX_MESH_API const D3D11_INPUT_ELEMENT_DESC* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
         {
             return GetElement11(semanticName, semanticIndex);
         }
 
-        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
+        DIRECTX_MESH_API const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
     #endif
 
     #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-        const D3D12_INPUT_ELEMENT_DESC* __cdecl GetElement12(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
+        DIRECTX_MESH_API const D3D12_INPUT_ELEMENT_DESC* __cdecl GetElement12(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
     #endif
 
     private:
@@ -158,53 +158,53 @@ namespace DirectX
         std::unique_ptr<Impl> pImpl;
     };
 
-    class DIRECTX_MESH_API VBWriter
+    class VBWriter
     {
     public:
-        VBWriter() noexcept(false);
-        VBWriter(VBWriter&&) noexcept;
-        VBWriter& operator= (VBWriter&&) noexcept;
+        DIRECTX_MESH_API VBWriter() noexcept(false);
+        DIRECTX_MESH_API VBWriter(VBWriter&&) noexcept;
+        DIRECTX_MESH_API VBWriter& operator= (VBWriter&&) noexcept;
 
-        VBWriter(VBWriter const&) = delete;
-        VBWriter& operator= (VBWriter const&) = delete;
+        DIRECTX_MESH_API VBWriter(VBWriter const&) = delete;
+        DIRECTX_MESH_API VBWriter& operator= (VBWriter const&) = delete;
 
-        ~VBWriter();
+        DIRECTX_MESH_API ~VBWriter();
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-        HRESULT __cdecl Initialize(_In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl);
+        DIRECTX_MESH_API HRESULT __cdecl Initialize(_In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl);
             // Does not support VB decls with D3D11_INPUT_PER_INSTANCE_DATA
     #endif
 
     #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-        HRESULT __cdecl Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl);
+        DIRECTX_MESH_API HRESULT __cdecl Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl);
             // Does not support VB decls with D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA
     #endif
 
-        HRESULT __cdecl AddStream(_Out_writes_bytes_(stride*nVerts) void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0) noexcept;
+        DIRECTX_MESH_API HRESULT __cdecl AddStream(_Out_writes_bytes_(stride*nVerts) void* vb, _In_ size_t nVerts, _In_ size_t inputSlot, _In_ size_t stride = 0) noexcept;
             // Add vertex buffer to writer
 
-        HRESULT __cdecl Write(_In_reads_(count) const XMVECTOR* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Write(_In_reads_(count) const XMVECTOR* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
             // Inserts data elements into vertex buffer
 
-        HRESULT __cdecl Write(_In_reads_(count) const float* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
-        HRESULT __cdecl Write(_In_reads_(count) const XMFLOAT2* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
-        HRESULT __cdecl Write(_In_reads_(count) const XMFLOAT3* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
-        HRESULT __cdecl Write(_In_reads_(count) const XMFLOAT4* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Write(_In_reads_(count) const float* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Write(_In_reads_(count) const XMFLOAT2* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Write(_In_reads_(count) const XMFLOAT3* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
+        DIRECTX_MESH_API HRESULT __cdecl Write(_In_reads_(count) const XMFLOAT4* buffer, _In_z_ const char* semanticName, _In_ unsigned int semanticIndex, _In_ size_t count, bool x2bias = false) const;
             // Helpers for data insertion
 
-        void __cdecl Release() noexcept;
+        DIRECTX_MESH_API void __cdecl Release() noexcept;
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
+        DIRECTX_MESH_API const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
         {
             return GetElement11(semanticName, semanticIndex);
         }
 
-        const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
+        DIRECTX_MESH_API const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement11(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
     #endif
 
     #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-        const D3D12_INPUT_ELEMENT_DESC* __cdecl GetElement12(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
+        DIRECTX_MESH_API const D3D12_INPUT_ELEMENT_DESC* __cdecl GetElement12(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const;
     #endif
 
     private:
