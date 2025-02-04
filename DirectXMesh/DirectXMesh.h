@@ -42,29 +42,42 @@
 
 #define DIRECTX_MESH_VERSION 167
 
+#ifdef DIRECTX_MESH_EXPORT
+#define DIRECTX_MESH_API __declspec(dllexport)
+#elif DIRECTX_MESH_IMPORT
+#define DIRECTX_MESH_API __declspec(dllimport)
+#else
+#define DIRECTX_MESH_API
+#endif
+
 
 namespace DirectX
 {
     //---------------------------------------------------------------------------------
     // DXGI Format Utilities
-    bool __cdecl IsValidVB(_In_ DXGI_FORMAT fmt) noexcept;
-    constexpr bool __cdecl IsValidIB(_In_ DXGI_FORMAT fmt) noexcept;
-    size_t __cdecl BytesPerElement(_In_ DXGI_FORMAT fmt) noexcept;
+    DIRECTX_MESH_API bool __cdecl IsValidVB(_In_ DXGI_FORMAT fmt) noexcept;
+    DIRECTX_MESH_API constexpr bool __cdecl IsValidIB(_In_ DXGI_FORMAT fmt) noexcept;
+    DIRECTX_MESH_API size_t __cdecl BytesPerElement(_In_ DXGI_FORMAT fmt) noexcept;
 
 
     //---------------------------------------------------------------------------------
     // Input Layout Descriptor Utilities
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-    bool __cdecl IsValid(_In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl) noexcept;
-    void __cdecl ComputeInputLayout(
+    DIRECTX_MESH_API bool __cdecl IsValid(
+        _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl,
+        _In_ size_t nDecl) noexcept;
+
+    DIRECTX_MESH_API void __cdecl ComputeInputLayout(
         _In_reads_(nDecl) const D3D11_INPUT_ELEMENT_DESC* vbDecl, _In_ size_t nDecl,
         _Out_writes_opt_(nDecl) uint32_t* offsets,
         _Out_writes_opt_(D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT) uint32_t* strides) noexcept;
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-    bool __cdecl IsValid(const D3D12_INPUT_LAYOUT_DESC& vbDecl) noexcept;
-    void __cdecl ComputeInputLayout(
+    DIRECTX_MESH_API bool __cdecl IsValid(
+        const D3D12_INPUT_LAYOUT_DESC& vbDecl) noexcept;
+
+    DIRECTX_MESH_API void __cdecl ComputeInputLayout(
         const D3D12_INPUT_LAYOUT_DESC& vbDecl,
         _Out_writes_opt_(vbDecl.NumElements) uint32_t* offsets,
         _Out_writes_opt_(D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT) uint32_t* strides) noexcept;
@@ -72,15 +85,16 @@ namespace DirectX
 
     //---------------------------------------------------------------------------------
     // Attribute Utilities
-    std::vector<std::pair<size_t, size_t>> __cdecl ComputeSubsets(_In_reads_opt_(nFaces) const uint32_t* attributes, _In_ size_t nFaces);
+    DIRECTX_MESH_API std::vector<std::pair<size_t, size_t>> __cdecl ComputeSubsets(
+        _In_reads_opt_(nFaces) const uint32_t* attributes, _In_ size_t nFaces);
         // Returns a list of face offset,counts for attribute groups
 
     //---------------------------------------------------------------------------------
     // Mesh Optimization Utilities
-    void __cdecl ComputeVertexCacheMissRate(
+    DIRECTX_MESH_API void __cdecl ComputeVertexCacheMissRate(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_ size_t cacheSize, _Out_ float& acmr, _Out_ float& atvr);
-    void __cdecl ComputeVertexCacheMissRate(
+    DIRECTX_MESH_API void __cdecl ComputeVertexCacheMissRate(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_ size_t cacheSize, _Out_ float& acmr, _Out_ float& atvr);
         // Compute the average cache miss ratio and average triangle vertex reuse for the post-transform vertex cache
@@ -88,7 +102,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Vertex Buffer Reader/Writer
 
-    class VBReader
+    class DIRECTX_MESH_API VBReader
     {
     public:
         VBReader() noexcept(false);
@@ -144,7 +158,7 @@ namespace DirectX
         std::unique_ptr<Impl> pImpl;
     };
 
-    class VBWriter
+    class DIRECTX_MESH_API VBWriter
     {
     public:
         VBWriter() noexcept(false);
@@ -203,13 +217,13 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Adjacency Computation
 
-    HRESULT __cdecl GenerateAdjacencyAndPointReps(
+    DIRECTX_MESH_API HRESULT __cdecl GenerateAdjacencyAndPointReps(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_ float epsilon,
         _Out_writes_opt_(nVerts) uint32_t* pointRep,
         _Out_writes_opt_(nFaces * 3) uint32_t* adjacency);
-    HRESULT __cdecl GenerateAdjacencyAndPointReps(
+    DIRECTX_MESH_API HRESULT __cdecl GenerateAdjacencyAndPointReps(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_ float epsilon,
@@ -217,24 +231,24 @@ namespace DirectX
         _Out_writes_opt_(nFaces * 3) uint32_t* adjacency);
         // If pointRep is null, it still generates them internally as they are needed for the final adjacency computation
 
-    HRESULT __cdecl ConvertPointRepsToAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl ConvertPointRepsToAdjacency(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_opt_(nVerts) const uint32_t* pointRep,
         _Out_writes_(nFaces * 3) uint32_t* adjacency);
-    HRESULT __cdecl ConvertPointRepsToAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl ConvertPointRepsToAdjacency(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_opt_(nVerts) const uint32_t* pointRep,
         _Out_writes_(nFaces * 3) uint32_t* adjacency);
         // If pointRep is null, assumes an identity
 
-    HRESULT __cdecl GenerateGSAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl GenerateGSAdjacency(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const uint32_t* pointRep,
         _In_reads_(nFaces * 3) const uint32_t* adjacency, _In_ size_t nVerts,
         _Out_writes_(nFaces * 6) uint16_t* indicesAdj) noexcept;
-    HRESULT __cdecl GenerateGSAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl GenerateGSAdjacency(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const uint32_t* pointRep,
         _In_reads_(nFaces * 3) const uint32_t* adjacency, _In_ size_t nVerts,
@@ -259,53 +273,53 @@ namespace DirectX
         // Vertices are clock-wise (defaults to CCW)
     };
 
-    HRESULT __cdecl ComputeNormals(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeNormals(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_ CNORM_FLAGS flags,
         _Out_writes_(nVerts) XMFLOAT3* normals) noexcept;
-    HRESULT __cdecl ComputeNormals(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeNormals(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_ CNORM_FLAGS flags,
         _Out_writes_(nVerts) XMFLOAT3* normals) noexcept;
         // Computes vertex normals
 
-    HRESULT __cdecl ComputeTangentFrame(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeTangentFrame(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions,
         _In_reads_(nVerts) const XMFLOAT3* normals,
         _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts,
         _Out_writes_opt_(nVerts) XMFLOAT3* tangents,
         _Out_writes_opt_(nVerts) XMFLOAT3* bitangents) noexcept;
-    HRESULT __cdecl ComputeTangentFrame(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeTangentFrame(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions,
         _In_reads_(nVerts) const XMFLOAT3* normals,
         _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts,
         _Out_writes_opt_(nVerts) XMFLOAT3* tangents,
         _Out_writes_opt_(nVerts) XMFLOAT3* bitangents) noexcept;
-    HRESULT __cdecl ComputeTangentFrame(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeTangentFrame(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions,
         _In_reads_(nVerts) const XMFLOAT3* normals,
         _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts,
         _Out_writes_opt_(nVerts) XMFLOAT4* tangents,
         _Out_writes_opt_(nVerts) XMFLOAT3* bitangents) noexcept;
-    HRESULT __cdecl ComputeTangentFrame(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeTangentFrame(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions,
         _In_reads_(nVerts) const XMFLOAT3* normals,
         _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts,
         _Out_writes_opt_(nVerts) XMFLOAT4* tangents,
         _Out_writes_opt_(nVerts) XMFLOAT3* bitangents) noexcept;
-    HRESULT __cdecl ComputeTangentFrame(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeTangentFrame(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions,
         _In_reads_(nVerts) const XMFLOAT3* normals,
         _In_reads_(nVerts) const XMFLOAT2* texcoords, _In_ size_t nVerts,
         _Out_writes_(nVerts) XMFLOAT4* tangents) noexcept;
-    HRESULT __cdecl ComputeTangentFrame(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeTangentFrame(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions,
         _In_reads_(nVerts) const XMFLOAT3* normals,
@@ -336,22 +350,22 @@ namespace DirectX
         // Checks that neighbors are symmetric (requires adjacency)
     };
 
-    HRESULT __cdecl Validate(
+    DIRECTX_MESH_API HRESULT __cdecl Validate(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
         _In_ VALIDATE_FLAGS flags, _In_opt_ std::wstring* msgs = nullptr);
-    HRESULT __cdecl Validate(
+    DIRECTX_MESH_API HRESULT __cdecl Validate(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
         _In_ VALIDATE_FLAGS flags, _In_opt_ std::wstring* msgs = nullptr);
         // Checks the mesh for common problems, return 'S_OK' if no problems were found
 
-    HRESULT __cdecl Clean(
+    DIRECTX_MESH_API HRESULT __cdecl Clean(
         _Inout_updates_all_(nFaces * 3) uint16_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _Inout_updates_all_opt_(nFaces * 3) uint32_t* adjacency,
         _In_reads_opt_(nFaces) const uint32_t* attributes,
         _Inout_ std::vector<uint32_t>& dupVerts, _In_ bool breakBowties = false);
-    HRESULT __cdecl Clean(
+    DIRECTX_MESH_API HRESULT __cdecl Clean(
         _Inout_updates_all_(nFaces * 3) uint32_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _Inout_updates_all_opt_(nFaces * 3) uint32_t* adjacency,
         _In_reads_opt_(nFaces) const uint32_t* attributes,
@@ -361,19 +375,19 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh utilities
 
-    HRESULT __cdecl WeldVertices(
+    DIRECTX_MESH_API HRESULT __cdecl WeldVertices(
         _Inout_updates_all_(nFaces * 3) uint16_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
         _Out_writes_opt_(nVerts) uint32_t* vertexRemap,
         _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest);
-    HRESULT __cdecl WeldVertices(
+    DIRECTX_MESH_API HRESULT __cdecl WeldVertices(
         _Inout_updates_all_(nFaces * 3) uint32_t* indices, _In_ size_t nFaces,
         _In_ size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
         _Out_writes_opt_(nVerts) uint32_t* vertexRemap,
         _In_ std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest);
         // Welds vertices together based on a test function
 
-    HRESULT __cdecl ConcatenateMesh(
+    DIRECTX_MESH_API HRESULT __cdecl ConcatenateMesh(
         _In_ size_t nFaces,
         _In_ size_t nVerts,
         _Out_writes_(nFaces) uint32_t* faceDestMap,
@@ -385,7 +399,7 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Mesh Optimization
 
-    HRESULT __cdecl AttributeSort(
+    DIRECTX_MESH_API HRESULT __cdecl AttributeSort(
         _In_ size_t nFaces, _Inout_updates_all_(nFaces) uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap);
         // Reorders faces by attribute id
@@ -403,58 +417,58 @@ namespace DirectX
         // Indicates no vertex cache optimization, only reordering into strips
     };
 
-    HRESULT __cdecl OptimizeFaces(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFaces(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
-    HRESULT __cdecl OptimizeFaces(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFaces(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
-    HRESULT __cdecl OptimizeFacesLRU(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRU(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
-    HRESULT __cdecl OptimizeFacesLRU(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRU(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
         // Reorders faces to increase hit rate of vertex caches
 
-    HRESULT __cdecl OptimizeFacesEx(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesEx(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
-    HRESULT __cdecl OptimizeFacesEx(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesEx(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
-    HRESULT __cdecl OptimizeFacesLRUEx(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRUEx(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
-    HRESULT __cdecl OptimizeFacesLRUEx(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRUEx(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
         // Attribute group version of OptimizeFaces
 
-    HRESULT __cdecl OptimizeVertices(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeVertices(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_opt_ size_t* trailingUnused = nullptr) noexcept;
-    HRESULT __cdecl OptimizeVertices(
+    DIRECTX_MESH_API HRESULT __cdecl OptimizeVertices(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _Out_writes_(nVerts) uint32_t* vertexRemap, _Out_opt_ size_t* trailingUnused = nullptr) noexcept;
         // Reorders vertices in order of use
@@ -462,78 +476,78 @@ namespace DirectX
     //---------------------------------------------------------------------------------
     // Remap functions
 
-    HRESULT __cdecl ReorderIB(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIB(
         _In_reads_(nFaces * 3) const uint16_t* ibin, _In_ size_t nFaces,
         _In_reads_(nFaces) const uint32_t* faceRemap,
         _Out_writes_(nFaces * 3) uint16_t* ibout) noexcept;
-    HRESULT __cdecl ReorderIB(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIB(
         _Inout_updates_all_(nFaces * 3) uint16_t* ib, _In_ size_t nFaces,
         _In_reads_(nFaces) const uint32_t* faceRemap) noexcept;
-    HRESULT __cdecl ReorderIB(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIB(
         _In_reads_(nFaces * 3) const uint32_t* ibin, _In_ size_t nFaces,
         _In_reads_(nFaces) const uint32_t* faceRemap,
         _Out_writes_(nFaces * 3) uint32_t* ibout) noexcept;
-    HRESULT __cdecl ReorderIB(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIB(
         _Inout_updates_all_(nFaces * 3) uint32_t* ib, _In_ size_t nFaces,
         _In_reads_(nFaces) const uint32_t* faceRemap) noexcept;
         // Applies a face remap reordering to an index buffer
 
-    HRESULT __cdecl ReorderIBAndAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIBAndAdjacency(
         _In_reads_(nFaces * 3) const uint16_t* ibin, _In_ size_t nFaces, _In_reads_(nFaces * 3) const uint32_t* adjin,
         _In_reads_(nFaces) const uint32_t* faceRemap,
         _Out_writes_(nFaces * 3) uint16_t* ibout, _Out_writes_(nFaces * 3) uint32_t* adjout) noexcept;
-    HRESULT __cdecl ReorderIBAndAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIBAndAdjacency(
         _Inout_updates_all_(nFaces * 3) uint16_t* ib, _In_ size_t nFaces, _Inout_updates_all_(nFaces * 3) uint32_t* adj,
         _In_reads_(nFaces) const uint32_t* faceRemap) noexcept;
-    HRESULT __cdecl ReorderIBAndAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIBAndAdjacency(
         _In_reads_(nFaces * 3) const uint32_t* ibin, _In_ size_t nFaces, _In_reads_(nFaces * 3) const uint32_t* adjin,
         _In_reads_(nFaces) const uint32_t* faceRemap,
         _Out_writes_(nFaces * 3) uint32_t* ibout, _Out_writes_(nFaces * 3) uint32_t* adjout) noexcept;
-    HRESULT __cdecl ReorderIBAndAdjacency(
+    DIRECTX_MESH_API HRESULT __cdecl ReorderIBAndAdjacency(
         _Inout_updates_all_(nFaces * 3) uint32_t* ib, _In_ size_t nFaces, _Inout_updates_all_(nFaces * 3) uint32_t* adj,
         _In_reads_(nFaces) const uint32_t* faceRemap) noexcept;
         // Applies a face remap reordering to an index buffer and adjacency
 
-    HRESULT __cdecl FinalizeIB(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeIB(
         _In_reads_(nFaces * 3) const uint16_t* ibin, _In_ size_t nFaces,
         _In_reads_(nVerts) const uint32_t* vertexRemap, _In_ size_t nVerts,
         _Out_writes_(nFaces * 3) uint16_t* ibout) noexcept;
-    HRESULT __cdecl FinalizeIB(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeIB(
         _Inout_updates_all_(nFaces * 3) uint16_t* ib, _In_ size_t nFaces,
         _In_reads_(nVerts) const uint32_t* vertexRemap, _In_ size_t nVerts) noexcept;
-    HRESULT __cdecl FinalizeIB(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeIB(
         _In_reads_(nFaces * 3) const uint32_t* ibin, _In_ size_t nFaces,
         _In_reads_(nVerts) const uint32_t* vertexRemap, _In_ size_t nVerts,
         _Out_writes_(nFaces * 3) uint32_t* ibout) noexcept;
-    HRESULT __cdecl FinalizeIB(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeIB(
         _Inout_updates_all_(nFaces * 3) uint32_t* ib, _In_ size_t nFaces,
         _In_reads_(nVerts) const uint32_t* vertexRemap, _In_ size_t nVerts) noexcept;
         // Applies a vertex remap reordering to an index buffer
 
-    HRESULT __cdecl FinalizeVB(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeVB(
         _In_reads_bytes_(nVerts*stride) const void* vbin, _In_ size_t stride, _In_ size_t nVerts,
         _In_reads_opt_(nDupVerts) const uint32_t* dupVerts, _In_ size_t nDupVerts,
         _In_reads_opt_(nVerts + nDupVerts) const uint32_t* vertexRemap,
         _Out_writes_bytes_((nVerts + nDupVerts)*stride) void* vbout) noexcept;
-    HRESULT __cdecl FinalizeVB(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeVB(
         _Inout_updates_bytes_all_(nVerts*stride) void* vb, _In_ size_t stride, _In_ size_t nVerts,
         _In_reads_(nVerts) const uint32_t* vertexRemap) noexcept;
         // Applies a vertex remap and/or a vertex duplication set to a vertex buffer
 
-    HRESULT __cdecl FinalizeVBAndPointReps(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeVBAndPointReps(
         _In_reads_bytes_(nVerts*stride) const void* vbin, _In_ size_t stride, _In_ size_t nVerts,
         _In_reads_(nVerts) const uint32_t* prin,
         _In_reads_opt_(nDupVerts) const uint32_t* dupVerts, _In_ size_t nDupVerts,
         _In_reads_opt_(nVerts + nDupVerts) const uint32_t* vertexRemap,
         _Out_writes_bytes_((nVerts + nDupVerts)*stride) void* vbout,
         _Out_writes_(nVerts + nDupVerts) uint32_t* prout) noexcept;
-    HRESULT __cdecl FinalizeVBAndPointReps(
+    DIRECTX_MESH_API HRESULT __cdecl FinalizeVBAndPointReps(
         _Inout_updates_bytes_all_(nVerts*stride) void* vb, _In_ size_t stride, _In_ size_t nVerts,
         _Inout_updates_all_(nVerts) uint32_t* pointRep,
         _In_reads_(nVerts) const uint32_t* vertexRemap) noexcept;
         // Applies a vertex remap and/or a vertex duplication set to a vertex buffer and point representatives
 
-    HRESULT __cdecl CompactVB(
+    DIRECTX_MESH_API HRESULT __cdecl CompactVB(
         _In_reads_bytes_(nVerts*stride) const void* vbin, _In_ size_t stride, _In_ size_t nVerts,
         _In_ size_t trailingUnused,
         _In_reads_opt_(nVerts) const uint32_t* vertexRemap,
@@ -579,7 +593,7 @@ namespace DirectX
         float                               ApexOffset;     // apex = center - axis * offset
     };
 
-    HRESULT __cdecl ComputeMeshlets(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeMeshlets(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
@@ -587,7 +601,7 @@ namespace DirectX
         _Inout_ std::vector<uint8_t>& uniqueVertexIB,
         _Inout_ std::vector<MeshletTriangle>& primitiveIndices,
         _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
-    HRESULT __cdecl ComputeMeshlets(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeMeshlets(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
@@ -597,7 +611,7 @@ namespace DirectX
         _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
         // Generates meshlets for a single subset mesh
 
-    HRESULT __cdecl ComputeMeshlets(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeMeshlets(
         _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_(nSubsets) const std::pair<size_t, size_t>* subsets, _In_ size_t nSubsets,
@@ -607,7 +621,7 @@ namespace DirectX
         _Inout_ std::vector<MeshletTriangle>& primitiveIndices,
         _Out_writes_(nSubsets) std::pair<size_t, size_t>* meshletSubsets,
         _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
-    HRESULT __cdecl ComputeMeshlets(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeMeshlets(
         _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_(nSubsets) const std::pair<size_t, size_t>* subsets, _In_ size_t nSubsets,
@@ -619,14 +633,14 @@ namespace DirectX
         _In_ size_t maxVerts = MESHLET_DEFAULT_MAX_VERTS, _In_ size_t maxPrims = MESHLET_DEFAULT_MAX_PRIMS);
         // Generates meshlets for a mesh with several face subsets
 
-    HRESULT __cdecl ComputeCullData(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeCullData(
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_(nMeshlets) const Meshlet* meshlets, _In_ size_t nMeshlets,
         _In_reads_(nVertIndices) const uint16_t* uniqueVertexIndices, _In_ size_t nVertIndices,
         _In_reads_(nPrimIndices) const MeshletTriangle* primitiveIndices, _In_ size_t nPrimIndices,
         _Out_writes_(nMeshlets) CullData* cullData,
         _In_ MESHLET_FLAGS flags = MESHLET_DEFAULT) noexcept;
-    HRESULT __cdecl ComputeCullData(
+    DIRECTX_MESH_API HRESULT __cdecl ComputeCullData(
         _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
         _In_reads_(nMeshlets) const Meshlet* meshlets, _In_ size_t nMeshlets,
         _In_reads_(nVertIndices) const uint32_t* uniqueVertexIndices, _In_ size_t nVertIndices,
