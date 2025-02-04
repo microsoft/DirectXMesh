@@ -17,6 +17,8 @@ project(DirectXMesh
 
 option(BUILD_TOOLS "Build meshconvert" ON)
 
+option(BUILD_SHARED_LIBS "Build DirectXMesh as a shared library" OFF)
+
 # Includes the support for DirectX 12 input layouts
 option(BUILD_DX12 "Build with DirectX12 Runtime support" ON)
 
@@ -70,7 +72,20 @@ set(LIBRARY_SOURCES
     DirectXMesh/DirectXMeshVBWriter.cpp
     DirectXMesh/DirectXMeshWeldVertices.cpp)
 
-add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
+if(WIN32 AND BUILD_SHARED_LIBS)
+  message(STATUS "Build library as a DLL")
+
+  configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/build/DirectXMesh.rc.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.rc" @ONLY)
+
+  add_library(${PROJECT_NAME} SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS} "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.rc")
+
+  target_compile_definitions(${PROJECT_NAME} PRIVATE DIRECTX_MESH_EXPORT)
+  target_compile_definitions(${PROJECT_NAME} INTERFACE DIRECTX_MESH_IMPORT)
+else()
+  add_library(${PROJECT_NAME} ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
+endif()
 
 source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
