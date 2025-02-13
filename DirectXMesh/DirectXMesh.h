@@ -44,7 +44,7 @@
 
 #ifdef DIRECTX_MESH_EXPORT
 #define DIRECTX_MESH_API __declspec(dllexport)
-#elif DIRECTX_MESH_IMPORT
+#elif defined(DIRECTX_MESH_IMPORT)
 #define DIRECTX_MESH_API __declspec(dllimport)
 #else
 #define DIRECTX_MESH_API
