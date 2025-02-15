@@ -139,7 +139,7 @@ namespace DirectX
         DIRECTX_MESH_API void __cdecl Release() noexcept;
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-        DIRECTX_MESH_API const D3D11_INPUT_ELEMENT_DESC* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
+        DIRECTX_MESH_API inline const D3D11_INPUT_ELEMENT_DESC* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
         {
             return GetElement11(semanticName, semanticIndex);
         }
@@ -195,7 +195,7 @@ namespace DirectX
         DIRECTX_MESH_API void __cdecl Release() noexcept;
 
     #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-        DIRECTX_MESH_API const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
+        DIRECTX_MESH_API inline const D3D11_INPUT_ELEMENT_DESC* __cdecl GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
         {
             return GetElement11(semanticName, semanticIndex);
         }
