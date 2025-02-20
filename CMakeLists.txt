@@ -15,6 +15,10 @@ project(DirectXMesh
   HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkID=324981"
   LANGUAGES CXX)
 
+if(DEFINED XBOX_CONSOLE_TARGET)
+  set(CMAKE_CXX_STANDARD_LIBRARIES "")
+endif()
+
 option(BUILD_TOOLS "Build meshconvert" ON)
 
 option(BUILD_SHARED_LIBS "Build DirectXMesh as a shared library" OFF)
