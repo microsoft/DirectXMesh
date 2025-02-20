@@ -15,6 +15,10 @@ project(DirectXMesh
   HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkID=324981"
   LANGUAGES CXX)
 
+if(DEFINED XBOX_CONSOLE_TARGET)
+  set(CMAKE_CXX_STANDARD_LIBRARIES "")
+endif()
+
 option(BUILD_TOOLS "Build meshconvert" ON)
 
 option(BUILD_SHARED_LIBS "Build DirectXMesh as a shared library" OFF)
@@ -83,6 +87,10 @@ if(WIN32 AND BUILD_SHARED_LIBS)
 
   target_compile_definitions(${PROJECT_NAME} PRIVATE DIRECTX_MESH_EXPORT)
   target_compile_definitions(${PROJECT_NAME} INTERFACE DIRECTX_MESH_IMPORT)
+
+  if(XBOX_CONSOLE_TARGET MATCHES "scarlett|xboxone")
+    target_link_libraries(${PROJECT_NAME} PRIVATE xgameplatform.lib)
+  endif()
 else()
   add_library(${PROJECT_NAME} ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
 endif()
