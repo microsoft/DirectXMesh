@@ -5,10 +5,6 @@ cmake_minimum_required (VERSION 3.20)
 
 set(DIRECTXMESH_VERSION 1.6.7)
 
-if(WINDOWS_STORE OR (DEFINED XBOX_CONSOLE_TARGET))
-  set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-endif()
-
 project(DirectXMesh
   VERSION ${DIRECTXMESH_VERSION}
   DESCRIPTION "DirectXMesh geometry Library"
