@@ -6,7 +6,7 @@ http://go.microsoft.com/fwlink/?LinkID=324981
 
 Copyright (c) Microsoft Corporation.
 
-**October 28, 2024**
+**March 24, 2025**
 
 This package contains DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.
 
@@ -53,6 +53,8 @@ For the latest version of DirectXMesh, bug reports, etc. please visit the projec
 FOR SECURITY ADVISORIES, see [GitHub](https://github.com/microsoft/DirectXMesh/security/advisories).
 
 For a full change history, see [CHANGELOG.md](https://github.com/microsoft/DirectXMesh/blob/main/CHANGELOG.md).
+
+* Starting with the March 2025 release, Windows 7 and Windows 8.0 support has been retired.
 
 * Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the _C++ Standard_ section *17.5.2.1.3 Bitmask types*. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have *breaking change* impacts to client code:
 

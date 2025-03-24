@@ -40,7 +40,7 @@
 #include <DirectXCollision.h>
 #include <DirectXPackedVector.h>
 
-#define DIRECTX_MESH_VERSION 167
+#define DIRECTX_MESH_VERSION 168
 
 #ifdef DIRECTX_MESH_EXPORT
 #define DIRECTX_MESH_API __declspec(dllexport)
