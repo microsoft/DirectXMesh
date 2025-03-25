@@ -6,6 +6,10 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### March 24, 2025
+* Retired support for Windows 7 and Windows 8.0
+* CMake project updates including support for BUILD_SHARED_LIBS (i.e. DLL vs. static library)
+
 ### October 28, 2024
 * All enums now use ``uint32_t`` as the underlying type rather than ``unsigned long`` or ``int``.
 * WaveFrontReader utililty moved into ``DX`` namespace
