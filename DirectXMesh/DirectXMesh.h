@@ -42,10 +42,18 @@
 
 #define DIRECTX_MESH_VERSION 168
 
-#ifdef DIRECTX_MESH_EXPORT
+#if defined(_WIN32) && defined(DIRECTX_MESH_EXPORT)
+#ifdef __GNUC__
+#define DIRECTX_MESH_API __attribute__ ((dllexport))
+#else
 #define DIRECTX_MESH_API __declspec(dllexport)
-#elif defined(DIRECTX_MESH_IMPORT)
+#endif
+#elif defined(_WIN32) && defined(DIRECTX_MESH_IMPORT)
+#ifdef __GNUC__
+#define DIRECTX_MESH_API __attribute__ ((dllimport))
+#else
 #define DIRECTX_MESH_API __declspec(dllimport)
+#endif
 #else
 #define DIRECTX_MESH_API
 #endif
