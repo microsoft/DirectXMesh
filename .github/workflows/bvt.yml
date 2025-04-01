@@ -19,7 +19,6 @@ on:
       - build/*.props
       - build/*.ps1
       - build/*.targets
-      - build/*.yml
       - build/*.xvd
 
 permissions:
