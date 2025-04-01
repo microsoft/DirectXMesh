@@ -20,8 +20,8 @@ pr:
     - main
   paths:
     include:
+    - '.azuredevops/pipelines/DirectXMesh-GitHub-GDK-Dev17.yml'
     - CMakeList.txt
-    - build/DirectXMesh-GitHub-GDK-Dev17.yml
     - build/*.in
     - build/*.cmake
     - build/SetupBWOI.*

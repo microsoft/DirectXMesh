@@ -20,7 +20,7 @@ pr:
     - main
   paths:
     include:
-    - build/DirectXMesh-GitHub.yml
+    - '.azuredevops/pipelines/DirectXMesh-GitHub.yml'
 
 resources:
   repositories:
