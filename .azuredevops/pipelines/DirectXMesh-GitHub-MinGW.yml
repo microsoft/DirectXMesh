@@ -26,6 +26,7 @@ trigger:
     - build/*.props
     - build/*.ps1
     - build/*.targets
+    - build/*.xvd
 
 pr:
   branches:
@@ -41,6 +42,7 @@ pr:
     - build/*.props
     - build/*.ps1
     - build/*.targets
+    - build/*.xvd
   drafts: false
 
 resources:

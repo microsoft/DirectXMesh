@@ -12,25 +12,44 @@ schedules:
     include:
     - main
 
-trigger: none
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    exclude:
+    - '*.md'
+    - LICENSE
+    - '.github/*'
+    - '.nuget/*'
+    - build/*.cmd
+    - build/*.props
+    - build/*.ps1
+    - build/*.targets
+    - build/*.xvd
 
 pr:
   branches:
     include:
     - main
   paths:
-    include:
-    - CMake*
-    - build/*.cmake
-    - build/*.in
-    - build/DirectXMesh-GitHub-WSL-11.yml
+    exclude:
+    - '*.md'
+    - LICENSE
+    - '.github/*'
+    - '.nuget/*'
+    - build/*.cmd
+    - build/*.props
+    - build/*.ps1
+    - build/*.targets
+    - build/*.xvd
+  drafts: false
 
 resources:
   repositories:
   - repository: self
     type: git
     ref: refs/heads/main
-    trigger: none
   - repository: dxHeadersRepo
     name: Microsoft/DirectX-Headers
     type: github
@@ -45,7 +64,7 @@ resources:
 name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
 
 pool:
-    vmImage: ubuntu-22.04
+    vmImage: ubuntu-20.04
 
 variables:
   Codeql.Enabled: false
