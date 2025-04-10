@@ -84,27 +84,14 @@ jobs:
     inputs:
       targetType: inline
       script: |
-        $seedfiles = "AlphaEdge.dds",
-            "cubea8r8g8b8.dds",
-            "default_texture_nm.dds",
-            "dx5_logo.dds",
-            "hdrtest.dds",
-            "normalmap.dds",
-            "grad4d.hdr",
-            "grad4dunc.hdr",
-            "BigTree.hdr",
-            "CBW8.TGA",
-            "ccm8.tga",
-            "CTC16.TGA",
-            "CTC24.TGA",
-            "CTC32.TGA",
-            "UTC16.TGA",
-            "UTC24.TGA",
-            "UTC32.TGA",
-            "UBW8.TGA",
-            "ucm8.tga",
-            "testimg.ppm",
-            "grad4d.pfm";
+        $seedfiles = "cube._obj",
+            "cup.mtl",
+            "cup._obj",
+            "player_ship_a.mtl",
+            "player_ship_a._obj",
+            "shuttle._obj",
+            "teapot._obj",
+            "vp.mtl";
 
         New-Item -ItemType Directory -Force -Path .drop\seeds\
 
