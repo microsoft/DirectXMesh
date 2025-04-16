@@ -67,6 +67,7 @@ pool:
   vmImage: windows-2022
 
 variables:
+  group: dxmesh-shared-variables
   Codeql.Enabled: false
   VCPKG_ROOT: $(Build.SourcesDirectory)/vcpkg
   VCPKG_CMAKE_DIR: $(Build.SourcesDirectory)/vcpkg/scripts/buildsystems/vcpkg.cmake

@@ -59,9 +59,9 @@ pool:
   vmImage: windows-2019
 
 variables:
+  group: dxmesh-shared-variables
   Codeql.Enabled: false
   EXTRACTED_FOLDER: $(ExtractedFolder)
-  GDK_EDITION: $(GDKEditionNumber)
   GDKEnableBWOI: true
   URL_FEED: $(ADOFeedURL)
   skipNugetSecurityAnalysis: true # We explicitly call this task so we don't need it to be auto-injected

@@ -39,9 +39,9 @@ pool:
   vmImage: windows-2022
 
 variables:
+  group: dxmesh-shared-variables
   Codeql.Enabled: false
   EXTRACTED_FOLDER: $(ExtractedFolder)
-  GDK_EDITION: $(GDKEditionNumber)
   GDKEnableBWOI: true
   URL_FEED: $(ADOFeedURL)
   VC_PATH: 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC'
