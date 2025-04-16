@@ -129,6 +129,7 @@ jobs:
       solution: build/SetupBWOI.targets
       msbuildVersion: 16.0
       msbuildArchitecture: x64
+      msbuildArguments: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2019 pcdbg
     inputs:
@@ -137,6 +138,7 @@ jobs:
       platform: Gaming.Desktop.x64
       configuration: Debug
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2019 pcrel
     inputs:
@@ -145,6 +147,7 @@ jobs:
       platform: Gaming.Desktop.x64
       configuration: Release
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2019 xbdbg
     inputs:
@@ -153,6 +156,7 @@ jobs:
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Debug
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2019 xbrel
     inputs:
@@ -161,6 +165,7 @@ jobs:
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Release
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2019 scardbg
     inputs:
@@ -169,6 +174,7 @@ jobs:
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Debug
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2019 scarrel
     inputs:
@@ -177,3 +183,4 @@ jobs:
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Release
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)

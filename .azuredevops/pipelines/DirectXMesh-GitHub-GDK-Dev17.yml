@@ -111,6 +111,7 @@ jobs:
       solution: build/SetupBWOI.targets
       msbuildVersion: 17.0
       msbuildArchitecture: x64
+      msbuildArguments: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2022 pcdbg
     continueOnError: True
@@ -120,6 +121,7 @@ jobs:
       platform: Gaming.Desktop.x64
       configuration: Debug
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2022 pcrel
     continueOnError: True
@@ -129,6 +131,7 @@ jobs:
       platform: Gaming.Desktop.x64
       configuration: Release
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2022 xbdbg
     continueOnError: True
@@ -138,6 +141,7 @@ jobs:
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Debug
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2022 xbrel
     continueOnError: True
@@ -147,6 +151,7 @@ jobs:
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Release
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2022 scardbg
     continueOnError: True
@@ -156,6 +161,7 @@ jobs:
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Debug
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDK_2022 scarrel
     continueOnError: True
@@ -165,6 +171,7 @@ jobs:
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Release
       msbuildArchitecture: x64
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
 
 - job: BUILD_GDK_CMAKE_SCAR
   displayName: 'Microsoft Game Development Kit (GDK) using CMake (Scarlett)'
