@@ -87,6 +87,8 @@ jobs:
         $seedfiles = "cube._obj",
             "cup.mtl",
             "cup._obj",
+            "cylinder.vbo",
+            "torus.vbo",
             "player_ship_a.mtl",
             "player_ship_a._obj",
             "shuttle._obj",
