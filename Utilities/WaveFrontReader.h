@@ -74,7 +74,7 @@ namespace DX
 
         WaveFrontReader() noexcept : hasNormals(false), hasTexcoords(false) {}
 
-        HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true)
+        HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true, bool loadmtl = true)
         {
             Clear();
 
@@ -392,7 +392,7 @@ namespace DX
             BoundingBox::CreateFromPoints(bounds, positions.size(), positions.data(), sizeof(XMFLOAT3));
 
             // If an associated material file was found, read that in as well.
-            if (*strMaterialFilename)
+            if (*strMaterialFilename && loadmtl)
             {
     #ifdef _WIN32
                 wchar_t ext[_MAX_EXT] = {};
