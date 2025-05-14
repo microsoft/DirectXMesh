@@ -45,6 +45,7 @@
 #endif
 
 #include <algorithm>
+#include <cctype>
 #include <cstdint>
 #include <fstream>
 #include <locale>
@@ -122,7 +123,11 @@ namespace DX
                 if (!InFile)
                     break;
 
-                if (*strCommand.c_str() == L'#')
+                if (strCommand.empty() || *strCommand.c_str() == 0)
+                {
+                    continue;
+                }
+                else if (*strCommand.c_str() == L'#')
                 {
                     // Comment
                 }
@@ -372,6 +377,11 @@ namespace DX
                         materials.emplace_back(mat);
                     }
                 }
+                else if (!std::isprint(*strCommand.c_str()))
+                {
+                    // non-printable characters outside of comments mean this is not a text file
+                    return E_FAIL;
+                }
                 else
                 {
     #ifdef _DEBUG
@@ -444,6 +454,9 @@ namespace DX
                 InFile >> strCommand;
                 if (!InFile)
                     break;
+
+                if (strCommand.empty() || *strCommand.c_str() == 0)
+                    continue;
 
                 if (0 == wcscmp(strCommand.c_str(), L"newmtl"))
                 {
@@ -559,6 +572,11 @@ namespace DX
                 {
                     // RMA texture
                     LoadTexturePath(InFile, curMaterial->strRMATexture, MAX_PATH);
+                }
+                else if (!std::isprint(*strCommand.c_str()))
+                {
+                    // non-printable characters outside of comments mean this is not a text file
+                    return E_FAIL;
                 }
                 else
                 {
