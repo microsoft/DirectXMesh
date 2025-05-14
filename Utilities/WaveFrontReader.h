@@ -447,6 +447,7 @@ namespace DX
             InFile.imbue(std::locale::classic());
 
             auto curMaterial = materials.end();
+            bool foundmat = false;
 
             for (;; )
             {
@@ -458,8 +459,16 @@ namespace DX
                 if (strCommand.empty() || *strCommand.c_str() == 0)
                     continue;
 
-                if (0 == wcscmp(strCommand.c_str(), L"newmtl"))
+                if (*strCommand.c_str() == L'#')
                 {
+                    // Comment
+                    InFile.ignore(1000, L'\n');
+                    continue;
+                }
+                else if (0 == wcscmp(strCommand.c_str(), L"newmtl"))
+                {
+                    foundmat = true;
+
                     // Switching active materials
                     wchar_t strName[MAX_PATH] = {};
                     InFile.width(MAX_PATH);
@@ -475,16 +484,17 @@ namespace DX
                         }
                     }
                 }
+                else if (!std::isprint(*strCommand.c_str()))
+                {
+                    // non-printable characters outside of comments mean this is not a text file
+                    return E_FAIL;
+                }
 
                 // The rest of the commands rely on an active material
                 if (curMaterial == materials.end())
                     continue;
 
-                if (0 == wcscmp(strCommand.c_str(), L"#"))
-                {
-                    // Comment
-                }
-                else if (0 == wcscmp(strCommand.c_str(), L"Ka"))
+                if (0 == wcscmp(strCommand.c_str(), L"Ka"))
                 {
                     // Ambient color
                     float r, g, b;
@@ -573,11 +583,6 @@ namespace DX
                     // RMA texture
                     LoadTexturePath(InFile, curMaterial->strRMATexture, MAX_PATH);
                 }
-                else if (!std::isprint(*strCommand.c_str()))
-                {
-                    // non-printable characters outside of comments mean this is not a text file
-                    return E_FAIL;
-                }
                 else
                 {
                     // Unimplemented or unrecognized command
@@ -588,7 +593,7 @@ namespace DX
 
             InFile.close();
 
-            return S_OK;
+            return (foundmat) ? S_OK : E_FAIL;
         }
 
         void Clear()
