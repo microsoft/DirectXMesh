@@ -1,0 +1,74 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# http://go.microsoft.com/fwlink/?LinkId=248926
+
+# Template used by GitHub-GDK-* pipelines
+
+parameters:
+- name: msVersion
+  type: string
+  values:
+    - '16.0'
+    - '17.0'
+- name: vsYear
+  type: number
+  values:
+    - 2019
+    - 2022
+
+steps:
+- task: VSBuild@1
+  displayName: Build solution DirectXMesh_GDK_{{ parameters.vsYear }} pcdbg
+  inputs:
+    solution: DirectXMesh_GDK_{{ parameters.vsYear }}.sln
+    vsVersion: ${{ parameters.msVersion }}
+    platform: Gaming.Desktop.x64
+    configuration: Debug
+    msbuildArchitecture: x64
+    msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
+- task: VSBuild@1
+  displayName: Build solution DirectXMesh_GDK_{{ parameters.vsYear }} pcrel
+  inputs:
+    solution: DirectXMesh_GDK_{{ parameters.vsYear }}.sln
+    vsVersion: ${{ parameters.msVersion }}
+    platform: Gaming.Desktop.x64
+    configuration: Release
+    msbuildArchitecture: x64
+    msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
+- task: VSBuild@1
+  displayName: Build solution DirectXMesh_GDK_{{ parameters.vsYear }} xbdbg
+  inputs:
+    solution: DirectXMesh_GDK_{{ parameters.vsYear }}.sln
+    vsVersion: ${{ parameters.msVersion }}
+    platform: Gaming.Xbox.XboxOne.x64
+    configuration: Debug
+    msbuildArchitecture: x64
+    msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
+- task: VSBuild@1
+  displayName: Build solution DirectXMesh_GDK_{{ parameters.vsYear }} xbrel
+  inputs:
+    solution: DirectXMesh_GDK_{{ parameters.vsYear }}.sln
+    vsVersion: ${{ parameters.msVersion }}
+    platform: Gaming.Xbox.XboxOne.x64
+    configuration: Release
+    msbuildArchitecture: x64
+    msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
+- task: VSBuild@1
+  displayName: Build solution DirectXMesh_GDK_{{ parameters.vsYear }} scardbg
+  inputs:
+    solution: DirectXMesh_GDK_{{ parameters.vsYear }}.sln
+    vsVersion: ${{ parameters.msVersion }}
+    platform: Gaming.Xbox.Scarlett.x64
+    configuration: Debug
+    msbuildArchitecture: x64
+    msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
+- task: VSBuild@1
+  displayName: Build solution DirectXMesh_GDK_{{ parameters.vsYear }} scarrel
+  inputs:
+    solution: DirectXMesh_GDK_{{ parameters.vsYear }}.sln
+    vsVersion: ${{ parameters.msVersion }}
+    platform: Gaming.Xbox.Scarlett.x64
+    configuration: Release
+    msbuildArchitecture: x64
+    msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
