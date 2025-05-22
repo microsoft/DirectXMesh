@@ -23,7 +23,7 @@ trigger:
     - '*.md'
     - LICENSE
     - CMake*
-    - '.github/*'
+    - '.github/**'
     - '.nuget/*'
     - build/*.cmake
     - build/*.cmd
