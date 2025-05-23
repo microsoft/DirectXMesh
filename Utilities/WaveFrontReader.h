@@ -497,6 +497,7 @@ namespace DX
                 if (0 == wcscmp(strCommand.c_str(), L"Ka"))
                 {
                     // Ambient color
+                    // TODO: check for 'spectral' or 'xyz'
                     float r, g, b;
                     InFile >> r >> g >> b;
                     curMaterial->vAmbient = XMFLOAT3(r, g, b);
@@ -504,6 +505,7 @@ namespace DX
                 else if (0 == wcscmp(strCommand.c_str(), L"Kd"))
                 {
                     // Diffuse color
+                    // TODO: check for 'spectral' or 'xyz'
                     float r, g, b;
                     InFile >> r >> g >> b;
                     curMaterial->vDiffuse = XMFLOAT3(r, g, b);
@@ -511,6 +513,7 @@ namespace DX
                 else if (0 == wcscmp(strCommand.c_str(), L"Ks"))
                 {
                     // Specular color
+                    // TODO: check for 'spectral' or 'xyz'
                     float r, g, b;
                     InFile >> r >> g >> b;
                     curMaterial->vSpecular = XMFLOAT3(r, g, b);
@@ -518,6 +521,7 @@ namespace DX
                 else if (0 == wcscmp(strCommand.c_str(), L"Ke"))
                 {
                     // Emissive color
+                    // TODO: check for 'spectral' or 'xyz'
                     float r, g, b;
                     InFile >> r >> g >> b;
                     curMaterial->vEmissive = XMFLOAT3(r, g, b);
@@ -529,6 +533,7 @@ namespace DX
                 else if (0 == wcscmp(strCommand.c_str(), L"d"))
                 {
                     // Alpha
+                    // TODO: check for '-halo'
                     float alpha;
                     InFile >> alpha;
                     curMaterial->fAlpha = std::min(1.f, std::max(0.f, alpha));
@@ -551,29 +556,33 @@ namespace DX
                 {
                     // Specular on/off
                     int illumination;
-                    InFile >> illumination;
+                    InFile >> illumination; // Illumination model value should be between 0 and 10
                     curMaterial->bSpecular = (illumination == 2);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"map_Kd"))
                 {
                     // Diffuse texture
+                    // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strTexture, MAX_PATH);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"map_Ks"))
                 {
                     // Specular texture
+                    // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strSpecularTexture, MAX_PATH);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"map_Kn")
                         || 0 == wcscmp(strCommand.c_str(), L"norm"))
                 {
                     // Normal texture
+                    // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strNormalTexture, MAX_PATH);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"map_Ke")
                         || 0 == wcscmp(strCommand.c_str(), L"map_emissive"))
                 {
                     // Emissive texture
+                    // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strEmissiveTexture, MAX_PATH);
                     curMaterial->bEmissive = true;
                 }
@@ -581,11 +590,17 @@ namespace DX
                     || 0 == wcscmp(strCommand.c_str(), L"map_ORM"))
                 {
                     // RMA texture
+                    // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strRMATexture, MAX_PATH);
                 }
                 else
                 {
                     // Unimplemented or unrecognized command
+
+                    // bump, decal, disp, map_d, map_Ka, map_Ns
+                    // map_aat
+                    // Ni, sharpness, Tf
+                    // refl
                 }
 
                 InFile.ignore(1000, L'\n');
