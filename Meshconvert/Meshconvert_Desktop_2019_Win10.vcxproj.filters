@@ -8,6 +8,9 @@
     <Filter Include="Wavefront OBJ">
       <UniqueIdentifier>{a500efbf-87f7-4c3b-b7c4-a3505a25d342}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RuntimeFormats">
+      <UniqueIdentifier>{55d98cd5-56f5-47f0-92b5-d0bd37b58095}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Meshconvert.cpp" />
@@ -21,8 +24,16 @@
     <ClInclude Include="..\Utilities\WaveFrontReader.h">
       <Filter>Wavefront OBJ</Filter>
     </ClInclude>
-    <ClInclude Include="SDKMesh.h" />
     <ClInclude Include="CmdLineHelpers.h" />
+    <ClInclude Include="SDKMesh.h">
+      <Filter>RuntimeFormats</Filter>
+    </ClInclude>
+    <ClInclude Include="CMO.h">
+      <Filter>RuntimeFormats</Filter>
+    </ClInclude>
+    <ClInclude Include="vbo.h">
+      <Filter>RuntimeFormats</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Meshconvert.rc">
