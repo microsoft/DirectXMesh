@@ -1222,7 +1222,6 @@ _Use_decl_annotations_
 HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const noexcept
 {
     using namespace VSD3DStarter;
-    using Vertex = VertexPositionNormalTangentColorTexture;
 
     if (!szFileName)
         return E_INVALIDARG;
