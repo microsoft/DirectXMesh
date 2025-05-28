@@ -510,7 +510,7 @@ HRESULT Mesh::Clean() noexcept
 
         if (texcoord)
         {
-            texcoord.get()[j] = mTexCoords[*it];
+            texcoord[j] = mTexCoords[*it];
         }
 
         if (colors)
