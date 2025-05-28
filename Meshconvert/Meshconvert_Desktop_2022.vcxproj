@@ -296,8 +296,10 @@
     <ClCompile Include="MeshOBJ.cpp" />
     <ClInclude Include="..\Utilities\WaveFrontReader.h" />
     <ClInclude Include="CmdLineHelpers.h" />
+    <ClInclude Include="CMO.h" />
     <CLInclude Include="Mesh.h" />
     <ClInclude Include="SDKMesh.h" />
+    <ClInclude Include="vbo.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Meshconvert.rc" />
