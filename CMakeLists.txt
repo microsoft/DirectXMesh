@@ -228,7 +228,9 @@ if(BUILD_TOOLS AND WIN32)
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
-    Meshconvert/SDKMesh.h)
+    Meshconvert/CMO.h
+    Meshconvert/SDKMesh.h
+    Meshconvert/vbo.h)
   target_compile_features(meshconvert PRIVATE cxx_std_17)
   target_include_directories(meshconvert PRIVATE MeshConvert Utilities)
   target_link_libraries(meshconvert PRIVATE ${PROJECT_NAME} version.lib)
