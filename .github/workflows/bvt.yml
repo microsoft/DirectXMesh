@@ -43,7 +43,7 @@ jobs:
       fail-fast: false
 
       matrix:
-        toolver: [16.0, 17.0]
+        toolver: ['14.29', '']
         build_type: [x64-Debug, x64-Release]
         arch: [amd64]
 
