@@ -43,9 +43,16 @@ jobs:
       fail-fast: false
 
       matrix:
-        toolver: ['14.29', '']
+        toolver: ['14.29', '14']
         build_type: [x64-Debug, x64-Release]
         arch: [amd64]
+        include:
+          - toolver: '14.29'
+            build_type: x86-Debug
+            arch: amd64_x86
+          - toolver: '14'
+            build_type: x86-Debug
+            arch: amd64_x86
 
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
