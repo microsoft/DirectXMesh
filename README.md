@@ -6,7 +6,7 @@ http://go.microsoft.com/fwlink/?LinkID=324981
 
 Copyright (c) Microsoft Corporation.
 
-**March 24, 2025**
+# March 24, 2025
 
 This package contains DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.
 
@@ -18,25 +18,25 @@ These components are designed to work without requiring any content from the leg
 
 * ``DirectXMesh\``
 
-   + This contains the DirectXMesh library.
+   * This contains the DirectXMesh library.
 
 > The majority of the header files here are intended for  implementation the library only (``DirectXMeshP.h``, ``scoped.h``, etc.). Only ``DirectXMesh.h`` and ``DirectXMesh.inl`` are meant as a 'public' headers for the library.
 
 * ``Utilities\``
 
-  + This contains helper code related to mesh processing that is not general enough to be part of the DirectXMesh library.
+  * This contains helper code related to mesh processing that is not general enough to be part of the DirectXMesh library.
     * ``WaveFrontReader.h``: Contains a simple C++ class for reading mesh data from a WaveFront OBJ file.
     * ``FlexibleVertexFormat.h``: Contains helpers for working with Direct3D 9 style "FVF" codes.
 
 * ``Meshconvert\``
 
-  + This DirectXMesh sample is an implementation of the ``meshconvert`` command-line texture utility from the legacy DirectX SDK utilizing DirectXMesh rather than D3DX.
+  * This DirectXMesh sample is an implementation of the ``meshconvert`` command-line texture utility from the legacy DirectX SDK utilizing DirectXMesh rather than D3DX.
 
 > This tool does not support legacy ``.X`` files, but can export ``CMO``, ``SDKMESH``, and ``VBO`` files.
 
 * ``build\``
 
-  + Contains miscellaneous build files and scripts.
+  * Contains miscellaneous build files and scripts.
 
 ## Documentation
 
