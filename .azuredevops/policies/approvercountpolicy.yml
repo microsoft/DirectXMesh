@@ -1,7 +1,7 @@
 name: approver_count
 description: Approver count policy for mscodehub/DirectXMesh/DirectXMesh repository
 resource: repository
-where: 
+where:
 configuration:
   approverCountPolicySettings:
     isBlocking: true
