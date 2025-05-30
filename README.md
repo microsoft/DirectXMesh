@@ -18,7 +18,7 @@ These components are designed to work without requiring any content from the leg
 
 * ``DirectXMesh\``
 
-   * This contains the DirectXMesh library.
+  * This contains the DirectXMesh library.
 
 > The majority of the header files here are intended for  implementation the library only (``DirectXMeshP.h``, ``scoped.h``, etc.). Only ``DirectXMesh.h`` and ``DirectXMesh.inl`` are meant as a 'public' headers for the library.
 
@@ -56,7 +56,7 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 
 * Starting with the March 2025 release, Windows 7 and Windows 8.0 support has been retired.
 
-* Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the _C++ Standard_ section *17.5.2.1.3 Bitmask types*. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have *breaking change* impacts to client code:
+* Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the _C++ Standard_ section _17.5.2.1.3 Bitmask types_. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have _breaking change_ impacts to client code:
 
   * You cannot pass the ``0`` literal as your flags value. Instead you must make use of the appropriate default enum value: ``CNORM_DEFAULT``, ``VALIDATE_DEFAULT``, or ``MESHLET_DEFAULT``.
 
@@ -64,7 +64,7 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 
 * The UWP projects and the Win10 classic desktop project include configurations for the ARM64 platform. Building these requires installing the ARM64 toolset.
 
-* For ARM64/AArch64 development, the VS 2022 compiler is strongly recommended over the VS 2019 toolset. The Windows SDK (26100 or later) is not compatible with VS 2019 for Win32 on ARM64 development. *Note that the ARM32/AArch32 platform is [deprecated](https://learn.microsoft.com/windows/arm/arm32-to-arm64)*.
+* For ARM64/AArch64 development, the VS 2022 compiler is strongly recommended over the VS 2019 toolset. The Windows SDK (26100 or later) is not compatible with VS 2019 for Win32 on ARM64 development. _Note that the ARM32/AArch32 platform is [deprecated](https://learn.microsoft.com/windows/arm/arm32-to-arm64)_.
 
 * When using clang/LLVM for the ARM64/AArch64 platform, the Windows 11 SDK ([22000](https://walbourn.github.io/windows-sdk-for-windows-11/)) or later is required.
 
@@ -83,7 +83,7 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 
 ## Support
 
-For questions, consider using [Stack Overflow](https://stackoverflow.com/questions/tagged/directxtk) with the *directxtk* tag, or the [DirectX Discord Server](https://discord.gg/directx) in the *dx12-developers* or *dx9-dx11-developers* channel.
+For questions, consider using [Stack Overflow](https://stackoverflow.com/questions/tagged/directxtk) with the _directxtk_ tag, or the [DirectX Discord Server](https://discord.gg/directx) in the _dx12-developers_ or _dx9-dx11-developers_ channel.
 
 For bug reports and feature requests, please use GitHub [issues](https://github.com/microsoft/DirectXMesh/issues) for this project.
 
