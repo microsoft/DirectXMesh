@@ -43,32 +43,32 @@ jobs:
         toolver: ['14.29', '14']
         build_type: [x64-Debug-VCPKG]
         arch: [amd64]
-        shared: [OFF]
+        shared: ['OFF']
         include:
           - toolver: '14'
             build_type: x64-Debug-Clang-VCPKG
             arch: amd64
-            shared: OFF
+            shared: 'OFF'
           - toolver: '14'
             build_type: x86-Debug-VCPKG
             arch: amd64_x86
-            shared: OFF
+            shared: 'OFF'
           - toolver: '14'
             build_type: arm64-Debug-VCPKG
             arch: amd64_arm64
-            shared: OFF
+            shared: 'OFF'
           - toolver: '14'
             build_type: arm64ec-Debug-VCPKG
             arch: amd64_arm64
-            shared: OFF
+            shared: 'OFF'
           - toolver: '14'
             build_type: x64-Debug-MinGW
             arch: amd64
-            shared: OFF
+            shared: 'OFF'
           - toolver: '14'
             build_type: x64-Release-MinGW
             arch: amd64
-            shared: OFF
+            shared: 'OFF'
           - toolver: '14'
             build_type: x64-Debug-MinGW
             arch: amd64
