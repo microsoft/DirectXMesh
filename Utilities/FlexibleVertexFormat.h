@@ -200,7 +200,7 @@ namespace FVF
     }
 
     _Success_(return)
-    inline bool CreateDeclFromFVF(uint32_t fvfCode, std::vector<D3DVERTEXELEMENT9>& decl)
+        inline bool CreateDeclFromFVF(uint32_t fvfCode, std::vector<D3DVERTEXELEMENT9>& decl)
     {
         static constexpr size_t s_texCoordSizes[] =
         {
@@ -399,7 +399,7 @@ namespace FVF
             il.emplace_back(
                 D3D11_INPUT_ELEMENT_DESC{ "SV_Position", 0, DXGI_FORMAT_R32G32B32_FLOAT,
                     0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-                );
+            );
             break;
         }
 

@@ -65,7 +65,8 @@ public:
         mBuffers{},
         mVerts{},
         mDefaultStrides{},
-        mTempSize(0) {}
+        mTempSize(0)
+    {}
 
     Impl(const Impl&) = delete;
     Impl& operator=(const Impl&) = delete;
@@ -657,8 +658,7 @@ HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigne
 // Public constructor.
 VBReader::VBReader() noexcept(false)
     : pImpl(std::make_unique<Impl>())
-{
-}
+{}
 
 VBReader::VBReader(VBReader&&) noexcept = default;
 VBReader& VBReader::operator= (VBReader&&) noexcept = default;
