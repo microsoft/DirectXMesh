@@ -207,8 +207,7 @@ namespace DirectX
             m_nFaces(nFaces),
             m_clockWise(false),
             m_stopOnBoundary(false)
-        {
-        }
+        {}
 
         void initialize(uint32_t face, uint32_t point, WalkType wtype) noexcept
         {

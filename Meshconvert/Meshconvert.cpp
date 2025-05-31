@@ -377,7 +377,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 }
             }
 
-            switch(dwOption)
+            switch (dwOption)
             {
             case 0:
                 wprintf(L"ERROR: Unknown option: `%ls`\n\nUse %ls --help\n", pArg, g_ToolName);
@@ -873,7 +873,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else
         {
-            switch(fileType)
+            switch (fileType)
             {
             case CODEC_VBO:
                 wcscpy_s(outputExt, L".vbo");

@@ -14,10 +14,19 @@
 //=====================================================================================
 // Bitmask flags enumerator operators
 //=====================================================================================
-DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS)
-DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS)
-DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS)
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-dynamic-exception-spec"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#endif
 
+DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS);
+DEFINE_ENUM_FLAG_OPERATORS(VALIDATE_FLAGS);
+DEFINE_ENUM_FLAG_OPERATORS(MESHLET_FLAGS);
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 //=====================================================================================
 // DXGI Format Utilities

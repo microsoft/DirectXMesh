@@ -108,8 +108,7 @@ public:
             diffuseColor{},
             specularColor{},
             emissiveColor{}
-        {
-        }
+        {}
 
         Material(
             const wchar_t* iname,
@@ -130,8 +129,7 @@ public:
             specularColor(specular),
             emissiveColor(emissive),
             texture(txtname)
-        {
-        }
+        {}
     };
 
     HRESULT ExportToOBJ(const wchar_t* szFileName, _In_ size_t nMaterials, _In_reads_opt_(nMaterials) const Material* materials) const;
