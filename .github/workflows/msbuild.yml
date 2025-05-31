@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-${{ matrix.vs }}
+    runs-on: windows-2022
 
     strategy:
       fail-fast: false
@@ -49,20 +49,20 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: >
           msbuild /m /p:Configuration=${{ matrix.build_type }} /p:Platform=${{ matrix.platform }}
-          ./DirectXMesh_Desktop_${{ matrix.vs }}.sln
+          DirectXMesh_Desktop_${{ matrix.vs }}.sln
 
       - name: 'Build (Windows 10)'
         working-directory: ${{ github.workspace }}
         run: >
           msbuild /m /p:Configuration=${{ matrix.build_type }} /p:Platform=${{ matrix.platform }}
-          ./DirectXMesh_Desktop_${{ matrix.vs }}_Win10.sln
+          DirectXMesh_Desktop_${{ matrix.vs }}_Win10.sln
 
       - if: matrix.vs == '2022'
         name: 'Build (UWP)'
         working-directory: ${{ github.workspace }}
         run: >
           msbuild /m /p:Configuration=${{ matrix.build_type }} /p:Platform=${{ matrix.platform }}
-          ./DirectXMesh_Windows10_2022.sln
+          DirectXMesh_Windows10_2022.sln
 
       - if: matrix.platform != 'ARM64'
         name: 'Build (Spectre)'
@@ -70,7 +70,7 @@ jobs:
         run: >
           msbuild /m /p:Configuration=${{ matrix.build_type }} /p:Platform=${{ matrix.platform }}
           /p:SpectreMitigation=Spectre
-          ./DirectXMesh_Desktop_${{ matrix.vs }}.sln
+          DirectXMesh_Desktop_${{ matrix.vs }}.sln
 
       - if: matrix.platform != 'ARM64'
         name: 'Build (Spectre Windows 10)'
@@ -78,4 +78,4 @@ jobs:
         run: >
           msbuild /m /p:Configuration=${{ matrix.build_type }} /p:Platform=${{ matrix.platform }}
           /p:SpectreMitigation=Spectre
-          ./DirectXMesh_Desktop_${{ matrix.vs }}_Win10.sln
+          DirectXMesh_Desktop_${{ matrix.vs }}_Win10.sln
