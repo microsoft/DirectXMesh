@@ -377,7 +377,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 }
             }
 
-            switch(dwOption)
+            switch (dwOption)
             {
             case 0:
                 wprintf(L"ERROR: Unknown option: `%ls`\n\nUse %ls --help\n", pArg, g_ToolName);
@@ -437,6 +437,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                     iArg++;
                     pValue = argv[iArg];
                 }
+                break;
+
+            default:
                 break;
             }
 
@@ -543,7 +546,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_VERT_NORMAL_FORMAT:
-                normalFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexNormalFormats));
+                normalFormat = LookupByName(pValue, g_vertexNormalFormats);
                 if (!normalFormat)
                 {
                     wprintf(L"Invalid value specified with -fn (%ls)\n\n", pValue);
@@ -553,7 +556,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_VERT_UV_FORMAT:
-                uvFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexUVFormats));
+                uvFormat = LookupByName(pValue, g_vertexUVFormats);
                 if (!uvFormat)
                 {
                     wprintf(L"Invalid value specified with -fuv (%ls)\n\n", pValue);
@@ -563,7 +566,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 break;
 
             case OPT_VERT_COLOR_FORMAT:
-                colorFormat = static_cast<DXGI_FORMAT>(LookupByName(pValue, g_vertexColorFormats));
+                colorFormat = LookupByName(pValue, g_vertexColorFormats);
                 if (!colorFormat)
                 {
                     wprintf(L"Invalid value specified with -fc (%ls)\n\n", pValue);
@@ -586,6 +589,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
 
                     ProcessFileList(inFile, conversion);
                 }
+                break;
+
+            default:
                 break;
             }
         }
@@ -801,7 +807,9 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             if (FAILED(hr))
             {
                 wprintf(L"\nERROR: Failed computing normals (flags:%X, %08X%ls)\n",
-                    flags, static_cast<unsigned int>(hr), GetErrorDesc(hr));
+                    static_cast<unsigned int>(flags),
+                    static_cast<unsigned int>(hr),
+                    GetErrorDesc(hr));
                 return 1;
             }
         }
@@ -873,7 +881,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else
         {
-            switch(fileType)
+            switch (fileType)
             {
             case CODEC_VBO:
                 wcscpy_s(outputExt, L".vbo");

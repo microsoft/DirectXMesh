@@ -7,7 +7,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: "main"
     paths-ignore:
       - '*.md'
       - LICENSE
@@ -19,7 +19,7 @@ on:
       - build/*.targets
       - build/*.xvd
   pull_request:
-    branches: [ "main" ]
+    branches: "main"
     paths-ignore:
       - '*.md'
       - LICENSE
@@ -48,29 +48,29 @@ jobs:
       packages: read
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - name: 'Install Ninja'
-      run: choco install ninja
+      - name: 'Install Ninja'
+        run: choco install ninja
 
-    - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@ff0a06e83cb2de871e5a09832bc6a81e7276941f # v3.28.18
-      with:
-        languages: c-cpp
-        build-mode: manual
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@ff0a06e83cb2de871e5a09832bc6a81e7276941f # v3.28.18
+        with:
+          languages: c-cpp
+          build-mode: manual
 
-    - name: 'Configure CMake'
-      working-directory: ${{ github.workspace }}
-      run: cmake --preset=x64-Debug
+      - name: 'Configure CMake'
+        working-directory: ${{ github.workspace }}
+        run: cmake --preset=x64-Debug
 
-    - name: 'Build'
-      working-directory: ${{ github.workspace }}
-      run: cmake --build out\build\x64-Debug
+      - name: 'Build'
+        working-directory: ${{ github.workspace }}
+        run: cmake --build out\build\x64-Debug
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@ff0a06e83cb2de871e5a09832bc6a81e7276941f # v3.28.18
-      with:
-        category: "/language:c-cpp"
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@ff0a06e83cb2de871e5a09832bc6a81e7276941f # v3.28.18
+        with:
+          category: "/language:c-cpp"

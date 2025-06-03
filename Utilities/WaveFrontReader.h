@@ -92,14 +92,14 @@ namespace DX
 
             InFile.imbue(std::locale::classic());
 
-    #ifdef _WIN32
+        #ifdef _WIN32
             wchar_t fname[_MAX_FNAME] = {};
             _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
             name = fname;
-    #else
+        #else
             auto path = std::filesystem::path(szFileName);
             name = path.filename().c_str();
-    #endif
+        #endif
 
             std::vector<XMFLOAT3>   positions;
             std::vector<XMFLOAT3>   normals;
@@ -384,10 +384,10 @@ namespace DX
                 }
                 else
                 {
-    #ifdef _DEBUG
+                #ifdef _DEBUG
                     // Unimplemented or unrecognized command
                     OutputDebugStringW(strCommand.c_str());
-    #endif
+                #endif
                 }
 
                 InFile.ignore(1000, L'\n');
@@ -404,7 +404,7 @@ namespace DX
             // If an associated material file was found, read that in as well.
             if (*strMaterialFilename && loadmtl)
             {
-    #ifdef _WIN32
+            #ifdef _WIN32
                 wchar_t ext[_MAX_EXT] = {};
                 _wsplitpath_s(strMaterialFilename, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
 
@@ -417,7 +417,7 @@ namespace DX
                 HRESULT hr = LoadMTL(szPath);
                 if (FAILED(hr))
                     return hr;
-    #else
+            #else
                 auto path = std::filesystem::path(szFileName);
                 auto mtlpath = std::filesystem::path(strMaterialFilename);
                 path.replace_filename(mtlpath.filename());
@@ -426,7 +426,7 @@ namespace DX
                 HRESULT hr = LoadMTL(path.c_str());
                 if (FAILED(hr))
                     return hr;
-    #endif
+            #endif
             }
 
             return S_OK;
@@ -572,14 +572,14 @@ namespace DX
                     LoadTexturePath(InFile, curMaterial->strSpecularTexture, MAX_PATH);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"map_Kn")
-                        || 0 == wcscmp(strCommand.c_str(), L"norm"))
+                    || 0 == wcscmp(strCommand.c_str(), L"norm"))
                 {
                     // Normal texture
                     // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strNormalTexture, MAX_PATH);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"map_Ke")
-                        || 0 == wcscmp(strCommand.c_str(), L"map_emissive"))
+                    || 0 == wcscmp(strCommand.c_str(), L"map_emissive"))
                 {
                     // Emissive texture
                     // TODO: check for '-options args'
@@ -634,14 +634,14 @@ namespace DX
 
             using namespace DirectX;
 
-    #ifdef _WIN32
+        #ifdef _WIN32
             wchar_t fname[_MAX_FNAME] = {};
             _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
             name = fname;
-    #else
+        #else
             auto path = std::filesystem::path(szFileName);
             name = path.filename().c_str();
-    #endif
+        #endif
 
             Material defmat;
             wcscpy_s(defmat.strName, L"default");
@@ -667,12 +667,12 @@ namespace DX
             vertices.resize(numVertices);
             vboFile.read(reinterpret_cast<char*>(vertices.data()), sizeof(Vertex) * numVertices);
 
-    #if (__cplusplus >= 201703L)
+        #if (__cplusplus >= 201703L)
             if constexpr (sizeof(index_t) == 2)
-    #else
-    #pragma warning( suppress : 4127 )
+            #else
+        #pragma warning( suppress : 4127 )
             if (sizeof(index_t) == 2)
-    #endif
+            #endif
             {
                 indices.resize(numIndices);
                 vboFile.read(reinterpret_cast<char*>(indices.data()), sizeof(uint16_t) * numIndices);
@@ -717,7 +717,7 @@ namespace DX
             wchar_t strRMATexture[MAX_PATH];
 
             Material() noexcept :
-            vAmbient(0.2f, 0.2f, 0.2f),
+                vAmbient(0.2f, 0.2f, 0.2f),
                 vDiffuse(0.8f, 0.8f, 0.8f),
                 vSpecular(1.0f, 1.0f, 1.0f),
                 vEmissive(0.f, 0.f, 0.f),
@@ -731,8 +731,7 @@ namespace DX
                 strSpecularTexture{},
                 strEmissiveTexture{},
                 strRMATexture{}
-            {
-            }
+            {}
         };
 
         std::vector<Vertex>     vertices;
@@ -802,11 +801,11 @@ namespace DX
 
             if (!path.empty())
             {
-    #ifdef _WIN32
+            #ifdef _WIN32
                 wcscpy_s(texture, maxChar, path.c_str());
-    #else
+            #else
                 wcscpy(texture, path.c_str());
-    #endif
+            #endif
             }
         }
     };

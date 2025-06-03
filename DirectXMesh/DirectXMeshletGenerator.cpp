@@ -27,7 +27,7 @@ namespace
     public:
         StaticVector() noexcept
             : m_data{}, m_size(0)
-        { }
+        {}
         ~StaticVector() = default;
 
         StaticVector(StaticVector&&) = default;

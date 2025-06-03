@@ -28,8 +28,7 @@ namespace
             mFaceCount(0),
             mMaxSubset(0),
             mTotalFaces(0)
-        {
-        }
+        {}
 
         HRESULT initialize(
             _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,

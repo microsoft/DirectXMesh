@@ -126,7 +126,7 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 ### June 1, 2020
 * New functions **ComputeMeshlets** and **ComputeCullData** for use with Direct3D 12 Mesh Shaders
 * Converted to typed enum bitmask flags (see release notes for details on this potential *breaking change*)
-  + **ComputeNormals**, **Validate**
+  * **ComputeNormals**, **Validate**
 * Minor fix for degenerate cases in point-reps generation
 * CMake project updates
 
@@ -200,7 +200,7 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 * New functions: **WeldVertices**, **CompactVB**, **OptimizeFacesLRU**
 * Added new optional parameter to **OptimizeVertices**
 * Fixed bug in remap functions which were applying vertex remaps backwards
-  + **FinalizeIB**, **FinalizeVB**, and **FinalizeVBAndPointReps**
+  * **FinalizeIB**, **FinalizeVB**, and **FinalizeVBAndPointReps**
 * meshconvert: added ``-oplru`` switch
 * WaveFrontReader utility header made more robust
 * Minor code cleanup

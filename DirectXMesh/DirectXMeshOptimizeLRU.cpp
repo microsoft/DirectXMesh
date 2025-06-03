@@ -285,11 +285,11 @@ namespace
                 vertexData.activeFaceListSize = 0;
             }
 
-#ifndef NDEBUG
+        #ifndef NDEBUG
             assert(curActiveFaceListPos == (indexCount - unused));
-#else
+        #else
             std::ignore = unused;
-#endif
+        #endif
         }
 
         // sort unprocessed faces by highest score
