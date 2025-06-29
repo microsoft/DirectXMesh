@@ -230,12 +230,14 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename,
     std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial,
     bool ccw, bool dds);
 
-HRESULT LoadFrom_glTF(const wchar_t* szFilename,
-    std::unique_ptr<Mesh>& inMesh,
-    std::vector<Mesh::Material>& inMaterial);
-HRESULT LoadFrom_glTFBinary(const wchar_t* szFilename,
-    std::unique_ptr<Mesh>& inMesh,
-    std::vector<Mesh::Material>& inMaterial);
+#ifdef USING_GLTF
+    HRESULT LoadFrom_glTF(const wchar_t* szFilename,
+        std::unique_ptr<Mesh>& inMesh,
+        std::vector<Mesh::Material>& inMaterial);
+    HRESULT LoadFrom_glTFBinary(const wchar_t* szFilename,
+        std::unique_ptr<Mesh>& inMesh,
+        std::vector<Mesh::Material>& inMaterial);
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -250,7 +252,11 @@ namespace
         static const wchar_t* const s_usage =
             L"Usage: meshconvert <options> [--] <files>\n"
             L"\n"
+        #ifdef USING_GLTF
+            L"   Input file type must be Wavefront Object (.obj) or glTF\n"
+        #else
             L"   Input file type must be Wavefront Object (.obj)\n"
+        #endif
             L"\n"
             L"   -ft <filetype>, --file-type <filetype>  output file type\n"
             L"       sdkmesh:  DirectX SDK .sdkmesh format (default)\n"
@@ -679,14 +685,21 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             wprintf(L"\nERROR: Autodesk FBX files not supported\n");
             return 1;
         }
-        else if (_wcsicmp(ext, L".gltf") == 0)
+    #ifdef USING_GLTF
+        else if (_wcsicmp(ext.c_str(), L".gltf") == 0)
         {
-            hr = LoadFrom_glTF(pConv->szSrc, inMesh, inMaterial);
+            hr = LoadFrom_glTF(curpath.c_str(), inMesh, inMaterial);
         }
-        else if (_wcsicmp(ext, L".glb") == 0)
+        else if (_wcsicmp(ext.c_str(), L".glb") == 0)
         {
-            hr = LoadFrom_glTFBinary(pConv->szSrc, inMesh, inMaterial);
+            hr = LoadFrom_glTFBinary(curpath.c_str(), inMesh, inMaterial);
         }
+    #else
+        else if (_wcsicmp(ext.c_str(), L".gltf") == 0 || _wcsicmp(ext.c_str(), L".glb") == 0)
+        {
+            wprintf(L"\nERROR: glTF is not supported\n");
+        }
+    #endif
         else
         {
             hr = LoadFromOBJ(curpath.c_str(), inMesh, inMaterial,

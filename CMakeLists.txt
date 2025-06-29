@@ -220,7 +220,7 @@ install(FILES
 if(BUILD_TOOLS AND WIN32)
   set(TOOL_EXES meshconvert)
 
-  add_executable(meshconvert
+  set(MESHCONVERT_SOURCES
     Meshconvert/Meshconvert.cpp
     Meshconvert/Meshconvert.rc
     Meshconvert/settings.manifest
@@ -228,10 +228,17 @@ if(BUILD_TOOLS AND WIN32)
     Meshconvert/MeshOBJ.cpp
     Meshconvert/Mesh.h
     Meshconvert/Mesh.cpp
-    Meshconvert/Mesh_glTF.cpp
     Meshconvert/CMO.h
     Meshconvert/SDKMesh.h
     Meshconvert/vbo.h)
+
+  find_package(nlohmann_json CONFIG QUIET)
+  if(nlohmann_json_FOUND)
+    message(STATUS "Building glTF support")
+    list(APPEND MESHCONVERT_SOURCES Meshconvert/Mesh_glTF.cpp)
+  endif()
+
+  add_executable(meshconvert ${MESHCONVERT_SOURCES})
   target_compile_features(meshconvert PRIVATE cxx_std_17)
   target_include_directories(meshconvert PRIVATE MeshConvert Utilities)
   target_link_libraries(meshconvert PRIVATE ${PROJECT_NAME} version.lib)
@@ -239,6 +246,11 @@ if(BUILD_TOOLS AND WIN32)
 
   if(directxmath_FOUND)
     target_link_libraries(meshconvert PRIVATE Microsoft::DirectXMath)
+  endif()
+
+  if(nlohmann_json_FOUND)
+    target_compile_definitions(meshconvert PRIVATE USING_GLTF)
+    target_link_libraries(meshconvert PRIVATE nlohmann_json::nlohmann_json)
   endif()
 endif()
 
