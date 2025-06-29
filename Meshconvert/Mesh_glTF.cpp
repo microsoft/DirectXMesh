@@ -26,6 +26,7 @@
 #include "nlohmann/json.hpp"
 
 #include <fstream>
+#include <string>
 #include <vector>
 
 using namespace DirectX;
@@ -57,23 +58,11 @@ namespace
         {
             auto meta = json::parse(str.cbegin(), str.cend());
 
-            auto asset = meta.find("asset");
-            if (asset == meta.end())
-                return E_FAIL;
-
-            // TODO - Check asset.version == 2.0
-
-            auto meshes = meta.find("meshes");
-            if (meshes == meta.end())
-                return E_FAIL;
-
-            auto materials = meta.find("materials");
-            if (materials == meta.end())
-                return E_FAIL;
-
-            auto buffers = meta.find("buffers");
-            if (buffers == meta.end())
-                return E_FAIL;
+            auto version = meta[ "asset" ][ "version" ];
+            std::string value;
+            version.get_to(value);
+            if (strcmp(value.c_str(), "2.0") != 0)
+                return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
 
             // TODO - parse the JSON data
         }
@@ -113,7 +102,7 @@ HRESULT LoadFrom_glTF(
             return E_FAIL;
 
         inFile.read(const_cast<char*>(jsonData.data()), len);
-        if (!inFile)
+        if (inFile.bad())
             return E_FAIL;
 
         inFile.close();
@@ -153,7 +142,7 @@ HRESULT LoadFrom_glTFBinary(
         if (!inFile)
             return E_FAIL;
 
-        if (header.magic != 0x46546C67
+        if (header.magic != 0x46546C67 // "glTF"
             || header.version != 2)
             return E_FAIL;
 
