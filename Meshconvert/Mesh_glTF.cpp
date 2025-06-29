@@ -22,7 +22,8 @@
 #pragma warning(pop)
 
 #include "Mesh.h"
-#include "json.hpp"
+
+#include "nlohmann/json.hpp"
 
 #include <fstream>
 #include <vector>
@@ -121,7 +122,7 @@ HRESULT LoadFrom_glTF(
     HRESULT hr = ParseJSON(jsonData);
 
     // TODO - .bin file
-    
+
     return hr;
 }
 
