@@ -250,7 +250,7 @@ if(BUILD_TOOLS AND WIN32)
 
   if(nlohmann_json_FOUND)
     target_compile_definitions(meshconvert PRIVATE USING_GLTF)
-    target_link_libraries(meshconvert PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(meshconvert PRIVATE nlohmann_json::nlohmann_json crypt32.lib)
   endif()
 endif()
 
