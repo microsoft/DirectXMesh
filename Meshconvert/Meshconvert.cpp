@@ -233,10 +233,12 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename,
 #ifdef USING_GLTF
     HRESULT LoadFrom_glTF(const wchar_t* szFilename,
         std::unique_ptr<Mesh>& inMesh,
-        std::vector<Mesh::Material>& inMaterial);
+        std::vector<Mesh::Material>& inMaterial,
+        const wchar_t* path);
     HRESULT LoadFrom_glTFBinary(const wchar_t* szFilename,
         std::unique_ptr<Mesh>& inMesh,
-        std::vector<Mesh::Material>& inMaterial);
+        std::vector<Mesh::Material>& inMaterial,
+        const wchar_t* path);
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -688,11 +690,11 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     #ifdef USING_GLTF
         else if (_wcsicmp(ext.c_str(), L".gltf") == 0)
         {
-            hr = LoadFrom_glTF(curpath.c_str(), inMesh, inMaterial);
+            hr = LoadFrom_glTF(curpath.c_str(), inMesh, inMaterial, curpath.parent_path().c_str());
         }
         else if (_wcsicmp(ext.c_str(), L".glb") == 0)
         {
-            hr = LoadFrom_glTFBinary(curpath.c_str(), inMesh, inMaterial);
+            hr = LoadFrom_glTFBinary(curpath.c_str(), inMesh, inMaterial, curpath.parent_path().c_str());
         }
     #else
         else if (_wcsicmp(ext.c_str(), L".gltf") == 0 || _wcsicmp(ext.c_str(), L".glb") == 0)

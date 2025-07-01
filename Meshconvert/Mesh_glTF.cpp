@@ -25,9 +25,12 @@
 
 #include "nlohmann/json.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
+
+#include <wincrypt.h>
 
 using namespace DirectX;
 
@@ -50,7 +53,22 @@ namespace
 
 #pragma pack(pop)
 
-    HRESULT ParseJSON(const std::string& str)
+    using BinDataEntryType = std::vector<uint8_t>;
+    using BinDataType = std::vector<BinDataEntryType>;
+
+    using AccessorEntryType = std::pair<const uint8_t*, size_t>;
+    using AccessorType = std::vector<AccessorEntryType>;
+
+    const char c_mimeApplicationOS[] = "data:application/octet-stream;";
+    const char c_mimeApplicationHASH64[] = "data:application/octet-stream;base64,";
+
+
+    HRESULT ParseJSON(
+        const std::string& str,
+        BinDataType& binData,
+        AccessorType& accessorData,
+        const wchar_t* gltfPath,
+        bool isGLB)
     {
         using json = nlohmann::json;
 
@@ -63,6 +81,106 @@ namespace
             version.get_to(value);
             if (strcmp(value.c_str(), "2.0") != 0)
                 return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+
+            auto exts = meta[ "extensionsRequired" ];
+            if (!exts.empty())
+            {
+                // TODO: allow KHR_materials_unlit, KHR_mesh_quantization
+                return HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+            }
+
+            // Load all data buffers
+            auto buffers = meta[ "buffers" ];
+            if (!buffers.is_array() || buffers.empty())
+                return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+            size_t bufferCount = 0;
+            for(auto it = buffers.begin(); it != buffers.end(); ++it)
+            {
+                ++bufferCount;
+
+                size_t length = it->value("byteLength", 0);
+                if (!length)
+                    return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                std::string uri;
+                if (it->contains("uri"))
+                {
+                    uri = it->value("uri", "");
+                }
+
+                if (uri.empty())
+                {
+                    if (!isGLB)
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                    if (binData.size() > bufferCount)
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                    if (binData[bufferCount - 1].size() != length)
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+                }
+                else if (isGLB && strcmp(uri.c_str(), "buffer.bin") == 0)
+                {
+                    // Optional placeholder name for data in the .glb bin chunk
+                    if (binData.size() > bufferCount)
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+                }
+                else if (strncmp(uri.c_str(), c_mimeApplicationOS, sizeof(c_mimeApplicationOS) - 1) == 0)
+                {
+                    if (!strncmp(uri.c_str(), c_mimeApplicationHASH64, sizeof(c_mimeApplicationHASH64) - 1) == 0)
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                    BinDataEntryType data;
+                    data.resize(length);
+                        // HASH64 encoded data is always longer than the original binary, so this is safe.
+                    auto len  = static_cast<DWORD>(length);
+                    if (!CryptStringToBinaryA(
+                        &uri.c_str()[sizeof(c_mimeApplicationHASH64) - 1],
+                        0,
+                        CRYPT_STRING_BASE64,
+                        data.data(),
+                        &len,
+                        nullptr,
+                        nullptr))
+                    {
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+                    }
+
+                    if (length != len)
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                    if (binData.size() != (bufferCount - 1))
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                    data.resize(length);
+                    binData.emplace_back(std::move(data));
+                }
+                else
+                {
+                    std::filesystem::path npath(gltfPath);
+                    npath.append(uri);
+
+                    std::ifstream inFile(npath.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+                    if (!inFile)
+                        return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+
+                    std::streampos len = inFile.tellg();
+
+                    if (len != length)
+                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
+
+                    inFile.seekg(0, std::ios::beg);
+                    if (!inFile)
+                        return E_FAIL;
+
+                    BinDataEntryType data;
+                    data.resize(length);
+
+                    inFile.read(reinterpret_cast<char*>(data.data()), len);
+                    binData.emplace_back(std::move(data));
+                }
+            }
 
             // TODO - parse the JSON data
         }
@@ -85,7 +203,8 @@ namespace
 HRESULT LoadFrom_glTF(
     const wchar_t* szFilename,
     std::unique_ptr<Mesh>& inMesh,
-    std::vector<Mesh::Material>& inMaterial)
+    std::vector<Mesh::Material>& inMaterial,
+    const wchar_t* path)
 {
     std::string jsonData;
 
@@ -108,9 +227,11 @@ HRESULT LoadFrom_glTF(
         inFile.close();
     }
 
-    HRESULT hr = ParseJSON(jsonData);
+    BinDataType binData;
+    AccessorType accessorData;
+    HRESULT hr = ParseJSON(jsonData, binData, accessorData, path, false);
 
-    // TODO - .bin file
+    // TODO -
 
     return hr;
 }
@@ -118,10 +239,11 @@ HRESULT LoadFrom_glTF(
 HRESULT LoadFrom_glTFBinary(
     const wchar_t* szFilename,
     std::unique_ptr<Mesh>& inMesh,
-    std::vector<Mesh::Material>& inMaterial)
+    std::vector<Mesh::Material>& inMaterial,
+    const wchar_t* path)
 {
     std::string jsonData;
-    std::vector<uint8_t> binData;
+    BinDataType binData;
 
     {
         std::ifstream inFile(szFilename, std::ios::in | std::ios::binary | std::ios::ate);
@@ -173,10 +295,14 @@ HRESULT LoadFrom_glTFBinary(
                 break;
 
             case 0x004E4942: // .bin
-                binData.resize(chunk.chunkLength);
-                inFile.read(reinterpret_cast<char*>(binData.data()), chunk.chunkLength);
-                if (!inFile)
-                    return E_FAIL;
+                {
+                    BinDataEntryType data;
+                    data.resize(chunk.chunkLength);
+                    inFile.read(reinterpret_cast<char*>(data.data()), chunk.chunkLength);
+                    if (!inFile)
+                        return E_FAIL;
+                    binData.emplace_back(std::move(data));
+                }
                 break;
 
             default:
@@ -193,12 +319,13 @@ HRESULT LoadFrom_glTFBinary(
         inFile.close();
     }
 
-    if (jsonData.empty())
+    if (jsonData.empty() || binData.empty())
         return E_FAIL;
 
-    HRESULT hr = ParseJSON(jsonData);
+    AccessorType accessorData;
+    HRESULT hr = ParseJSON(jsonData, binData, accessorData, path, true);
 
-    // TODO - .glb contains both JSON and chunks together
+    // TODO
 
     return hr;
 }
