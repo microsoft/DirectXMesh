@@ -37,6 +37,7 @@ steps:
   # Windows on ARM 32-bit is deprecated. https://learn.microsoft.com/windows/arm/arm32-to-arm64
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_Windows10_2022.sln arm64dbg
+    timeoutInMinutes: 30
     inputs:
       solution: DirectXMesh_Windows10_2022.sln
       msbuildArgs: /p:PreferredToolArchitecture=x64
@@ -44,6 +45,7 @@ steps:
       configuration: Debug
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_Windows10_2022.sln arm64rel
+    timeoutInMinutes: 30
     inputs:
       solution: DirectXMesh_Windows10_2022.sln
       msbuildArgs: /p:PreferredToolArchitecture=x64
