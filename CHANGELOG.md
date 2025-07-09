@@ -6,6 +6,12 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### July 9, 2025
+* Reformat source using updated .editorconfig settings and general lint cleanup
+* WaveFrontReader non-text data file error handling
+* Minor code review
+* CMake project updates
+
 ### March 24, 2025
 * Retired support for Windows 7 and Windows 8.0
 * CMake project updates including support for BUILD_SHARED_LIBS (i.e. DLL vs. static library)
