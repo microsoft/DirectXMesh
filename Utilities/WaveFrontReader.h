@@ -45,8 +45,8 @@
 #endif
 
 #include <algorithm>
-#include <cctype>
 #include <cstdint>
+#include <cwctype>
 #include <fstream>
 #include <locale>
 #include <string>
@@ -377,7 +377,7 @@ namespace DX
                         materials.emplace_back(mat);
                     }
                 }
-                else if (!std::isprint(*strCommand.c_str()))
+                else if (!std::iswprint(*strCommand.c_str()))
                 {
                     // non-printable characters outside of comments mean this is not a text file
                     return E_FAIL;
@@ -484,7 +484,7 @@ namespace DX
                         }
                     }
                 }
-                else if (!std::isprint(*strCommand.c_str()))
+                else if (!std::iswprint(*strCommand.c_str()))
                 {
                     // non-printable characters outside of comments mean this is not a text file
                     return E_FAIL;
