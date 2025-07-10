@@ -355,7 +355,7 @@ namespace
                         continue;
 
                     // Primitive is outside the subset
-                    if (adj[i] < subset.first || adj[i] > endIndex)
+                    if (adj[i] < subset.first || adj[i] >= endIndex)
                         continue;
 
                     // Already processed triangle
