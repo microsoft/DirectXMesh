@@ -3,7 +3,7 @@
 #
 # https://go.microsoft.com/fwlink/?LinkID=324981
 
-name: 'CTest (BVTs on ARM64)'
+name: 'BVTs (arm64)'
 
 on:
   push:
