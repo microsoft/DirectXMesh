@@ -111,19 +111,13 @@ namespace
 
                 if (uri.empty())
                 {
-                    if (!isGLB)
+                    if (!isGLB || (bufferCount != 1))
                         return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
-                    if (binData.size() > bufferCount)
+                    if (binData.empty())
                         return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 
-                    if (binData[bufferCount - 1].size() != length)
-                        return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-                }
-                else if (isGLB && strcmp(uri.c_str(), "buffer.bin") == 0)
-                {
-                    // Optional placeholder name for data in the .glb bin chunk
-                    if (binData.size() > bufferCount)
+                    if (binData[0].size() < length)
                         return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
                 }
                 else if (strncmp(uri.c_str(), c_mimeApplicationOS, sizeof(c_mimeApplicationOS) - 1) == 0)
@@ -288,13 +282,22 @@ HRESULT LoadFrom_glTFBinary(
             switch (chunk.chunkType)
             {
             case 0x4E4F534A: // .gltf
-                jsonData.resize(chunk.chunkLength);
-                inFile.read(const_cast<char*>(jsonData.data()), chunk.chunkLength);
-                if (!inFile)
+                if (jsonData.empty())
+                {
+                    jsonData.resize(chunk.chunkLength);
+                    inFile.read(const_cast<char*>(jsonData.data()), chunk.chunkLength);
+                    if (!inFile)
+                        return E_FAIL;
+                }
+                else
+                {
+                    // Only one json chunk is valid.
                     return E_FAIL;
+                }
                 break;
 
             case 0x004E4942: // .bin
+                if (binData.empty())
                 {
                     BinDataEntryType data;
                     data.resize(chunk.chunkLength);
@@ -302,6 +305,11 @@ HRESULT LoadFrom_glTFBinary(
                     if (!inFile)
                         return E_FAIL;
                     binData.emplace_back(std::move(data));
+                }
+                else
+                {
+                    // Only one bin chunk is valid.
+                    return E_FAIL;
                 }
                 break;
 
