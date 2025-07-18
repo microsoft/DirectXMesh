@@ -84,7 +84,6 @@ jobs:
         displayName: Build solution DirectXMesh_Tests_Desktop_2022.sln
         inputs:
           solution: Tests/DirectXMesh_Tests_Desktop_2022.sln
-          vsVersion: 17.0
           msbuildArgs: /p:PreferredToolArchitecture=x64
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
@@ -94,7 +93,6 @@ jobs:
         displayName: Build solution DirectXMesh_Tests_Desktop_2022_Win10.sln
         inputs:
           solution: Tests/DirectXMesh_Tests_Desktop_2022_Win10.sln
-          vsVersion: 17.0
           msbuildArgs: /p:PreferredToolArchitecture=x64
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
