@@ -33,6 +33,7 @@ These instructions define how GitHub Copilot should assist with this project. Th
 ```txt
 .azuredevops/ # Azure DevOps pipeline configuration and policy files.
 .github/      # GitHub Actions workflow files and linter configuration files.
+.nuget/       # NuGet package configuration files.
 build/        # Miscellaneous build files and scripts.
 DirectXMesh/  # DirectXMesh implementation files.
 Utilities/    # Utility headers such as a WaveFront .obj file loader and a FVF converter.
