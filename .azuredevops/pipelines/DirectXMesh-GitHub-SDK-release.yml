@@ -155,3 +155,10 @@ jobs:
           Contents: 'Directory.Build.props'
           TargetFolder: $(Build.SourcesDirectory)
       - template: '/.azuredevops/templates/DirectXMesh-build-uwp.yml'
+      - task: PublishPipelineArtifact@1
+        displayName: Publish Build Logs
+        condition: succeededOrFailed()
+        inputs:
+          targetPath: 'DirectXMesh\Bin\Windows10_2022\ARM64\Debug\DirectXMesh.tlog\'
+          artifact: UWP.ARM64_Debug_Logs
+          publishLocation: 'pipeline'

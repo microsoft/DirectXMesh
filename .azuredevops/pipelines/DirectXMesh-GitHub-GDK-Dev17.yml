@@ -44,6 +44,8 @@ variables:
     value: false
   - name: EXTRACTED_FOLDER
     value: '$(ExtractedFolder)'
+  - name: GDK_EDITION
+    value: $(GDKEditionNumber)
   - name: GDKEnableBWOI
     value: true
   - name: URL_FEED
@@ -89,16 +91,13 @@ jobs:
         displayName: 'Secure Supply Chain Analysis'
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Auth'
-      - task: NuGetCommand@2
-        displayName: NuGet install PGDK
+      - task: PowerShell@2
+        displayName: 'NuGet Install GDK'
         inputs:
-          command: custom
-          arguments: install -prerelease Microsoft.GDK.PC.$(GDK_EDITION) -ExcludeVersion -OutputDirectory $(EXTRACTED_FOLDER)
-      - task: NuGetCommand@2
-        displayName: NuGet install GDKX
-        inputs:
-          command: custom
-          arguments: install -prerelease Microsoft.GDK.Xbox.$(GDK_EDITION) -ExcludeVersion -OutputDirectory $(EXTRACTED_FOLDER)
+          targetType: filePath
+          filePath: ./build/RestoreGDK.ps1
+          arguments: -GDKEditionNumber $(GDK_EDITION) -OutputDirectory $(EXTRACTED_FOLDER)
+          failOnStderr: true
       - task: CopyFiles@2
         displayName: Set up Directory.Build.props
         inputs:
@@ -109,7 +108,6 @@ jobs:
         displayName: Setup BWOI VCTargets
         inputs:
           solution: build/SetupBWOI.targets
-          msbuildVersion: 17.0
           msbuildArchitecture: x64
           msbuildArguments: /p:GDKEditionNumber=$(GDK_EDITION)
       - template: '/.azuredevops/templates/DirectXMesh-build-gdk.yml'
@@ -152,16 +150,13 @@ jobs:
         displayName: 'Secure Supply Chain Analysis'
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Auth'
-      - task: NuGetCommand@2
-        displayName: NuGet install PGDK
+      - task: PowerShell@2
+        displayName: 'NuGet Install GDK'
         inputs:
-          command: custom
-          arguments: install -prerelease Microsoft.GDK.PC.$(GDK_EDITION) -ExcludeVersion -OutputDirectory $(EXTRACTED_FOLDER)
-      - task: NuGetCommand@2
-        displayName: NuGet install GDKX
-        inputs:
-          command: custom
-          arguments: install -prerelease Microsoft.GDK.Xbox.$(GDK_EDITION) -ExcludeVersion -OutputDirectory $(EXTRACTED_FOLDER)
+          targetType: filePath
+          filePath: ./build/RestoreGDK.ps1
+          arguments: -GDKEditionNumber $(GDK_EDITION) -OutputDirectory $(EXTRACTED_FOLDER)
+          failOnStderr: true
       - task: CmdLine@2
         displayName: Setup BWOI for GDK command-line
         inputs:
@@ -271,16 +266,13 @@ jobs:
         displayName: 'Secure Supply Chain Analysis'
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Auth'
-      - task: NuGetCommand@2
-        displayName: NuGet install PGDK
+      - task: PowerShell@2
+        displayName: 'NuGet Install GDK'
         inputs:
-          command: custom
-          arguments: install -prerelease Microsoft.GDK.PC.$(GDK_EDITION) -ExcludeVersion -OutputDirectory $(EXTRACTED_FOLDER)
-      - task: NuGetCommand@2
-        displayName: NuGet install GDKX
-        inputs:
-          command: custom
-          arguments: install -prerelease Microsoft.GDK.Xbox.$(GDK_EDITION) -ExcludeVersion -OutputDirectory $(EXTRACTED_FOLDER)
+          targetType: filePath
+          filePath: ./build/RestoreGDK.ps1
+          arguments: -GDKEditionNumber $(GDK_EDITION) -OutputDirectory $(EXTRACTED_FOLDER)
+          failOnStderr: true
       - task: CmdLine@2
         displayName: Setup BWOI for GDK command-line
         inputs:
