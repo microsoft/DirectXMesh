@@ -111,17 +111,17 @@ When creating documentation:
 
 When reviewing code, focus on the following aspects:
 
-  - Adherence to coding standards defined in `.editorconfig` and on the [wiki](https://github.com/microsoft/DirectXTK/wiki/Implementation).
-  - Make coding recommendations based on the *C++ Core Guidelines*.
-  - Proper use of RAII and smart pointers.
-  - Correct error handling practices and C++ Exception safety.
-  - Clarity and maintainability of the code.
-  - Adequate comments where necessary.
-  - Public interfaces located in `DirectXMesh.h` should be clearly defined and documented on the GitHub wiki.
-  - Compliance with the project's architecture and design patterns.
-  - Ensure that all public functions and classes are covered by unit tests located on [GitHub](https://github.com/walbourn/directxmeshtest.git) where applicable. Report any gaps in test coverage.
-  - Check for performance implications, especially in geometry processing algorithms.
-  - Provide brutally honest feedback on code quality, design, and potential improvements as needed.
+- Adherence to coding standards defined in `.editorconfig` and on the [wiki](https://github.com/microsoft/DirectXTK/wiki/Implementation).
+- Make coding recommendations based on the *C++ Core Guidelines*.
+- Proper use of RAII and smart pointers.
+- Correct error handling practices and C++ Exception safety.
+- Clarity and maintainability of the code.
+- Adequate comments where necessary.
+- Public interfaces located in `DirectXMesh.h` should be clearly defined and documented on the GitHub wiki.
+- Compliance with the project's architecture and design patterns.
+- Ensure that all public functions and classes are covered by unit tests located on [GitHub](https://github.com/walbourn/directxmeshtest.git) where applicable. Report any gaps in test coverage.
+- Check for performance implications, especially in geometry processing algorithms.
+- Provide brutally honest feedback on code quality, design, and potential improvements as needed.
 
 ## Documentation Review Instructions
 
