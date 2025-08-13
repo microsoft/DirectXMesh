@@ -23,7 +23,7 @@ These instructions define how GitHub Copilot should assist with this project. Th
 - **Documentation**: The project provides documentation in the form of wiki pages available at [Documentation](https://github.com/microsoft/DirectXMesh/wiki/).
 - **Error Handling**: Use C++ exceptions for error handling and uses RAII smart pointers to ensure resources are properly managed. For some functions that return HRESULT error codes, they are marked `noexcept`, use `std::nothrow` for memory allocation, and should not throw exceptions.
 - **Testing**: Unit tests for this project are implemented in this repository [Test Suite](https://github.com/walbourn/directxmeshtest/) and can be run using CTest per the instructions at [Test Documentation](https://github.com/walbourn/directxmeshtest/wiki).
-- **Security**: This project uses secure coding practices from the Microsoft Secure Coding Guidelines, and is subject to the `SECURITY.md` file in the root of the repository. Functions that read input from geometry files are subject to OneFuzz testing to ensure they are secure against malformed files.
+- **Security**: This project uses secure coding practices from the Microsoft Secure Coding Guidelines, and is subject to the `SECURITY.md` file in the root of the repository. Functions that read input from geometry files are subject to OneFuzz fuzz testing to ensure they are secure against malformed files.
 - **Dependencies**: The project uses CMake and VCPKG for managing dependencies, making optional use of DirectXMath and DirectX-Headers. The project can be built without these dependencies, relying on the Windows SDK for core functionality.
 - **Continuous Integration**: This project implements GitHub Actions for continuous integration, ensuring that all code changes are tested and validated before merging. This includes building the project for a number of configurations and toolsets, running a subset of unit tests, and static code analysis including GitHub super-linter, CodeQL, and MSVC Code Analysis.
 - **Code of Conduct**: The project adheres to the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). All contributors are expected to follow this code of conduct in all interactions related to the project.
@@ -61,11 +61,13 @@ Tests/        # Tests are designed to be cloned from a separate repository at th
 
 ## References
 
+- [Source git repository on GitHub](https://github.com/microsoft/DirectXMesh.git)
+- [DirectXMesh documentation git repository on GitHub](https://github.com/microsoft/DirectXMesh.wiki.git)
+- [DirectXMesh test suite git repository on GitHub](https://github.com/walbourn/directxmeshtest.wiki.git).
 - [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 - [Microsoft Secure Coding Guidelines](https://learn.microsoft.com/en-us/security/develop/secure-coding-guidelines)
 - [CMake Documentation](https://cmake.org/documentation/)
 - [VCPK Documentation](https://learn.microsoft.com/vcpkg/)
-- [DirectXMesh Wiki](https://github.com/microsoft/DirectXMesh/wiki/)
 - [Games for Windows and the DirectX SDK blog - June 2014](https://walbourn.github.io/directxmesh/)
 - [Games for Windows and the DirectX SDK blog - April 2025](https://walbourn.github.io/github-project-updates-2025/)
 
@@ -96,3 +98,36 @@ When creating documentation:
 - Review each documented item against source code whenever related to the task.
 - Remove any speculative content.
 - Ensure all documentation is verifiable against the current state of the codebase.
+
+## Cross-platform Support Notes
+
+- The code supports building for Windows and Linux.
+- Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux.
+- `HRESULT_E_ARITHMETIC_OVERFLOW` is not a custom error code, but an alias for `HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW)`.
+- `HRESULT_E_NOT_SUPPORTED` is not a custom error code, but an alias for `HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)`.
+- `HRESULT_E_INVALID_NAME` is not a custom error code, but an alias for `HRESULT_FROM_WIN32(ERROR_INVALID_NAME)`.
+
+## Code Review Instructions
+
+When reviewing code, focus on the following aspects:
+
+  - Adherence to coding standards defined in `.editorconfig` and on the [wiki](https://github.com/microsoft/DirectXTK/wiki/Implementation).
+  - Make coding recommendations based on the *C++ Core Guidelines*.
+  - Proper use of RAII and smart pointers.
+  - Correct error handling practices and C++ Exception safety.
+  - Clarity and maintainability of the code.
+  - Adequate comments where necessary.
+  - Public interfaces located in `DirectXMesh.h` should be clearly defined and documented on the GitHub wiki.
+  - Compliance with the project's architecture and design patterns.
+  - Ensure that all public functions and classes are covered by unit tests located on [GitHub](https://github.com/walbourn/directxmeshtest.git) where applicable. Report any gaps in test coverage.
+  - Check for performance implications, especially in geometry processing algorithms.
+  - Provide brutally honest feedback on code quality, design, and potential improvements as needed.
+
+## Documentation Review Instructions
+
+When reviewing documentation, do the following:
+
+- Read the code located in [this git repository](https://github.com/microsoft/DirectXMesh.git) in the main branch.
+- Review the public interface defined in `DirectXMesh.h`, as well as the headers in the `Utilities` folder.
+- Read the documentation on the wiki located in [this git repository](https://github.com/microsoft/DirectXMesh.wiki.git).
+- Report any specific gaps in the documentation compared to the public interface.
