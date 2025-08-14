@@ -88,7 +88,7 @@ When creating documentation:
 - List open questions that need to be addressed.
 
 ### Source Material
-
+W
 - Always cite the specific source file and line numbers for documented features.
 - Link directly to relevant source code when possible.
 - Indicate when information comes from requirements vs. implementation.
@@ -103,9 +103,14 @@ When creating documentation:
 
 - The code supports building for Windows and Linux.
 - Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux.
-- `HRESULT_E_ARITHMETIC_OVERFLOW` is not a custom error code, but an alias for `HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW)`.
-- `HRESULT_E_NOT_SUPPORTED` is not a custom error code, but an alias for `HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)`.
-- `HRESULT_E_INVALID_NAME` is not a custom error code, but an alias for `HRESULT_FROM_WIN32(ERROR_INVALID_NAME)`.
+
+The following symbols are not custom error codes, but aliases for `HRESULT_FROM_WIN32` error values.
+
+| Symbol | Standard Win32 HRESULT |
+|--------|-------------|
+| `HRESULT_E_ARITHMETIC_OVERFLOW` | `HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW)` |
+| `HRESULT_E_NOT_SUPPORTED` | `HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)` |
+| `HRESULT_E_INVALID_NAME` | `HRESULT_FROM_WIN32(ERROR_INVALID_NAME)` |
 
 ## Code Review Instructions
 
