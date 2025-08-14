@@ -67,7 +67,7 @@ Tests/        # Tests are designed to be cloned from a separate repository at th
 - [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 - [Microsoft Secure Coding Guidelines](https://learn.microsoft.com/en-us/security/develop/secure-coding-guidelines)
 - [CMake Documentation](https://cmake.org/documentation/)
-- [VCPK Documentation](https://learn.microsoft.com/vcpkg/)
+- [VCPKG Documentation](https://learn.microsoft.com/vcpkg/)
 - [Games for Windows and the DirectX SDK blog - June 2014](https://walbourn.github.io/directxmesh/)
 - [Games for Windows and the DirectX SDK blog - April 2025](https://walbourn.github.io/github-project-updates-2025/)
 
