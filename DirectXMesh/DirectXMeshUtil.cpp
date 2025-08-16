@@ -270,6 +270,9 @@ void DirectX::ComputeInputLayout(
 {
     assert(IsValid(vbDecl, nDecl));
 
+    if (!vbDecl || !nDecl)
+        return;
+
     if (offsets)
         memset(offsets, 0, sizeof(uint32_t) * nDecl);
 
@@ -333,6 +336,9 @@ void DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl,
     uint32_t* offsets, uint32_t* strides) noexcept
 {
     assert(IsValid(vbDecl));
+
+    if (!vbDecl.pInputElementDescs || !vbDecl.NumElements)
+        return;
 
     if (offsets)
         memset(offsets, 0, sizeof(uint32_t) * vbDecl.NumElements);
