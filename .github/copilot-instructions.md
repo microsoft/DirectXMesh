@@ -88,7 +88,7 @@ When creating documentation:
 - List open questions that need to be addressed.
 
 ### Source Material
-W
+
 - Always cite the specific source file and line numbers for documented features.
 - Link directly to relevant source code when possible.
 - Indicate when information comes from requirements vs. implementation.
