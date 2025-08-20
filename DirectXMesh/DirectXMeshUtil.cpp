@@ -270,14 +270,14 @@ void DirectX::ComputeInputLayout(
 {
     assert(IsValid(vbDecl, nDecl));
 
-    if (!vbDecl || !nDecl)
-        return;
-
     if (offsets)
         memset(offsets, 0, sizeof(uint32_t) * nDecl);
 
     if (strides)
         memset(strides, 0, sizeof(uint32_t) * D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT);
+
+    if (!vbDecl || !nDecl)
+        return;
 
     uint32_t prevABO[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
     memset(prevABO, 0, sizeof(uint32_t) * D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT);
@@ -337,14 +337,14 @@ void DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl,
 {
     assert(IsValid(vbDecl));
 
-    if (!vbDecl.pInputElementDescs || !vbDecl.NumElements)
-        return;
-
     if (offsets)
         memset(offsets, 0, sizeof(uint32_t) * vbDecl.NumElements);
 
     if (strides)
         memset(strides, 0, sizeof(uint32_t) * D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT);
+
+    if (!vbDecl.pInputElementDescs || !vbDecl.NumElements)
+        return;
 
     uint32_t prevABO[D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT] = {};
 
