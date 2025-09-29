@@ -249,7 +249,7 @@ namespace
         std::vector<InlineMeshlet<T>>& meshlets)
     {
         if (!indices || !positions || !adjacency)
-            return E_INVALIDARG;
+            return E_POINTER;
 
         if (subset.first + subset.second > nFaces)
             return E_UNEXPECTED;
