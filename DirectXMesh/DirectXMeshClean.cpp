@@ -24,7 +24,7 @@ namespace
         _Inout_ std::vector<uint32_t>& dupVerts, bool breakBowties)
     {
         if (!adjacency && !attributes)
-            return E_INVALIDARG;
+            return E_POINTER;
 
         if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
             return HRESULT_E_ARITHMETIC_OVERFLOW;

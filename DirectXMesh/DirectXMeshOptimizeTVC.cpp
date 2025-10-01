@@ -35,8 +35,8 @@ namespace
             _In_reads_(nFaces * 3) const uint32_t* adjacency,
             const std::vector<std::pair<size_t, size_t>>& subsets)
         {
-            if (!indices || !nFaces || !adjacency || subsets.empty())
-                return E_INVALIDARG;
+            if (!indices || !adjacency)
+                return E_POINTER;
 
             // Convert adjacency to 'physical' adjacency
             mPhysicalNeighbors.reset(new (std::nothrow) neighborInfo[nFaces]);
@@ -163,14 +163,11 @@ namespace
             _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
             size_t faceOffset, size_t faceCount) noexcept
         {
-            if (!faceCount || !indices || !nFaces)
-                return E_INVALIDARG;
-
-            if (faceCount > mMaxSubset)
-                return E_UNEXPECTED;
-
-            if (!mListElements)
+            if (!indices || !mListElements)
                 return E_POINTER;
+
+            if (!faceCount || faceCount > mMaxSubset)
+                return E_UNEXPECTED;
 
             if ((uint64_t(faceOffset) + uint64_t(faceCount)) >= UINT32_MAX)
                 return HRESULT_E_ARITHMETIC_OVERFLOW;
@@ -457,7 +454,7 @@ namespace
         HRESULT initialize(uint32_t cacheSize) noexcept
         {
             if (!cacheSize)
-                return E_INVALIDARG;
+                return E_UNEXPECTED;
 
             mFIFO.reset(new (std::nothrow) uint32_t[cacheSize]);
             if (!mFIFO)
@@ -514,8 +511,8 @@ namespace
         _Out_writes_(nFaces) uint32_t* faceRemap)
     {
         auto subsets = ComputeSubsets(attributes, nFaces);
-
-        assert(!subsets.empty());
+        if (subsets.empty())
+            return E_UNEXPECTED;
 
         mesh_status<index_t> status;
         HRESULT hr = status.initialize(indices, nFaces, adjacency, subsets);
@@ -592,8 +589,8 @@ namespace
         uint32_t vertexCache, uint32_t restart)
     {
         auto subsets = ComputeSubsets(attributes, nFaces);
-
-        assert(!subsets.empty());
+        if (subsets.empty())
+            return E_UNEXPECTED;
 
         mesh_status<index_t> status;
         HRESULT hr = status.initialize(indices, nFaces, adjacency, subsets);
