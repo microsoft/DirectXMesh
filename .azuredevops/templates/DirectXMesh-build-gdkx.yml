@@ -24,7 +24,7 @@ steps:
       platform: x64
       configuration: Debug
       msbuildArchitecture: x64
-      msbuildArgs: /p:GDKEditionNumber=$(GDKX_EDITION)
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} pcrel
     inputs:
@@ -33,7 +33,7 @@ steps:
       platform: x64
       configuration: Release
       msbuildArchitecture: x64
-      msbuildArgs: /p:GDKEditionNumber=$(GDKX_EDITION)
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} xbdbg
     inputs:
@@ -42,7 +42,7 @@ steps:
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Debug
       msbuildArchitecture: x64
-      msbuildArgs: /p:GDKEditionNumber=$(GDKX_EDITION)
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} xbrel
     inputs:
@@ -51,7 +51,7 @@ steps:
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Release
       msbuildArchitecture: x64
-      msbuildArgs: /p:GDKEditionNumber=$(GDKX_EDITION)
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} scardbg
     inputs:
@@ -60,7 +60,7 @@ steps:
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Debug
       msbuildArchitecture: x64
-      msbuildArgs: /p:GDKEditionNumber=$(GDKX_EDITION)
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} scarrel
     inputs:
@@ -69,4 +69,4 @@ steps:
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Release
       msbuildArchitecture: x64
-      msbuildArgs: /p:GDKEditionNumber=$(GDKX_EDITION)
+      msbuildArgs: /p:GDKEditionNumber=$(GDK_EDITION)
