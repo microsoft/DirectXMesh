@@ -128,6 +128,12 @@ jobs:
           solution: build/SetupBWOI.targets
           msbuildArchitecture: x64
           msbuildArguments: /p:GDKEditionNumber=$(GDK_EDITION)
+      - task: MSBuild@1
+        displayName: Log Information
+        inputs:
+          solution: build/LogInfo.targets
+          msbuildArchitecture: x64
+          msbuildArguments: /p:GDKEditionNumber=$(GDK_EDITION)
       - template: '/.azuredevops/templates/DirectXMesh-build-gdk.yml'
         parameters:
           msVersion: '17.0'

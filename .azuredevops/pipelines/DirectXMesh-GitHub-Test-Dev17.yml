@@ -80,6 +80,12 @@ jobs:
         fetchTags: false
         fetchDepth: 1
         path: 's/Tests'
+      - task: MSBuild@1
+        displayName: Log Information
+        inputs:
+          solution: build/LogInfo.targets
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
       - task: VSBuild@1
         displayName: Build solution DirectXMesh_Tests_Desktop_2022.sln
         inputs:
