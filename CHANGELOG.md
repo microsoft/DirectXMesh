@@ -6,6 +6,12 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### October 27, 2025
+* Bug fixes for Meshlet generation reported by customers
+* Minor code review
+* Added October 2025 GDK projects for VS 2022
+* CMake project update to use 3.21 minimum
+
 ### July 9, 2025
 * Reformat source using updated .editorconfig settings and general lint cleanup
 * WaveFrontReader non-text data file error handling
