@@ -22,7 +22,7 @@ pr:
     include:
       - '.azuredevops/pipelines/DirectXMesh-GitHub-GDK-Dev17.yml'
       - '.azuredevops/templates/DirectXMesh-build-gdk.yml'
-      - '.azuredevops/templates/DirectXMesh-build-gdkx.yml
+      - '.azuredevops/templates/DirectXMesh-build-gdkx.yml'
       - '.azuredevops/templates/DirectXMesh-setup-gdk-auto.yml'
       - CMakeList.txt
       - build/*.in
