@@ -163,7 +163,7 @@ jobs:
         displayName: 'Secure Supply Chain Analysis'
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Auth'
-      - template: '/.azuredevops/templates/DirectXTex-setup-gdk-auto.yml'
+      - template: '/.azuredevops/templates/DirectXMesh-setup-gdk-auto.yml'
         parameters:
           windows: true
           scarlett: true
@@ -226,7 +226,7 @@ jobs:
         displayName: 'Secure Supply Chain Analysis'
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Auth'
-      - template: '/.azuredevops/templates/DirectXTex-setup-gdk-auto.yml'
+      - template: '/.azuredevops/templates/DirectXMesh-setup-gdk-auto.yml'
         parameters:
           windows: true
           scarlett: false
@@ -289,7 +289,7 @@ jobs:
         displayName: 'Secure Supply Chain Analysis'
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Auth'
-      - template: '/.azuredevops/templates/DirectXTex-setup-gdk-auto.yml'
+      - template: '/.azuredevops/templates/DirectXMesh-setup-gdk-auto.yml'
         parameters:
           windows: false
           scarlett: true
@@ -405,7 +405,7 @@ jobs:
         displayName: 'Secure Supply Chain Analysis'
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Auth'
-      - template: '/.azuredevops/templates/DirectXTex-setup-gdk-auto.yml'
+      - template: '/.azuredevops/templates/DirectXMesh-setup-gdk-auto.yml'
         parameters:
           windows: false
           scarlett: false
