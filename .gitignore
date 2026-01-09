@@ -30,3 +30,4 @@ x64
 /out
 /CMakeUserPresets.json
 /build/vcpkg_installed
+/build/*.exe
