@@ -30,6 +30,7 @@ on:
       - build/*.ps1
       - build/*.targets
       - build/*.yml
+  workflow_dispatch: {}
 
 permissions:
   contents: read
