@@ -76,24 +76,6 @@ jobs:
           - toolver: '14'
             build_type: x64-Release-Win8
             arch: amd64
-          - toolver: '14'
-            build_type: x64-Debug-Clang
-            arch: amd64
-          - toolver: '14'
-            build_type: x64-Release-Clang
-            arch: amd64
-          - toolver: '14'
-            build_type: x86-Debug-Clang
-            arch: amd64_x86
-          - toolver: '14'
-            build_type: x86-Release-Clang
-            arch: amd64_x86
-          - toolver: '14'
-            build_type: arm64-Debug-Clang
-            arch: amd64_arm64
-          - toolver: '14'
-            build_type: arm64-Release-Clang
-            arch: amd64_arm64
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -173,7 +155,6 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
         with:
           arch: ${{ matrix.arch }}
-          toolset: ${{ matrix.toolver }}
 
       - name: 'Configure CMake'
         working-directory: ${{ github.workspace }}
