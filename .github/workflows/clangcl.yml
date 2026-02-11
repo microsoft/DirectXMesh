@@ -31,6 +31,9 @@ on:
       - build/*.targets
       - build/*.xvd
 
+env:
+  DIRECTXMESH_MEDIA_PATH: ${{ github.workspace }}/Media
+
 permissions:
   contents: read
 
@@ -57,6 +60,13 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Clone test repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: walbourn/directxmeshtest
+          path: Tests
+          ref: main
+
       - name: 'Install Ninja'
         run: choco install ninja
 
@@ -66,7 +76,7 @@ jobs:
 
       - name: 'Configure CMake'
         working-directory: ${{ github.workspace }}
-        run: cmake --preset=${{ matrix.build_type }}
+        run: cmake --preset=${{ matrix.build_type }} -DBUILD_TESTING=ON
 
       - name: 'Build'
         working-directory: ${{ github.workspace }}
@@ -78,7 +88,7 @@ jobs:
 
       - name: 'Configure CMake (DLL)'
         working-directory: ${{ github.workspace }}
-        run: cmake --preset=${{ matrix.build_type }} -DBUILD_SHARED_LIBS=ON
+        run: cmake --preset=${{ matrix.build_type }} -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=ON
 
       - name: 'Build (DLL)'
         working-directory: ${{ github.workspace }}
