@@ -10,6 +10,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="DirectXMesh/DirectXMesh_Desktop_2026_Win10.vcxproj" />
-  <Project Path="Meshconvert/Meshconvert_Desktop_2026_Win10.vcxproj" />
+  <Project Path="DirectXMesh/DirectXMesh_Desktop_2026.vcxproj" />
+  <Project Path="Meshconvert/Meshconvert_Desktop_2026.vcxproj" />
 </Solution>
