@@ -104,4 +104,3 @@ jobs:
         run: >
           msbuild /m /p:Configuration=${{ matrix.build_type }} /p:Platform=${{ matrix.platform }}
           DirectXMesh_Desktop_2026_Win10.slnx
-

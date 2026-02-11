@@ -145,7 +145,6 @@ jobs:
           - build_type: arm64-Release
             arch: amd64_arm64
           - build_type: arm64ec-Debug
-            build_type: arm64ec-Debug
             arch: amd64_arm64
           - build_type: arm64ec-Release
             arch: amd64_arm64
