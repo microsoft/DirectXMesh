@@ -3,6 +3,10 @@
 
 cmake_minimum_required (VERSION 3.21)
 
+if(POLICY CMP0162)
+   cmake_policy(SET CMP0162 NEW)
+endif()
+
 set(DIRECTXMESH_VERSION 1.7.0)
 
 project(DirectXMesh
@@ -76,6 +80,10 @@ set(LIBRARY_SOURCES
     DirectXMesh/DirectXMeshVBWriter.cpp
     DirectXMesh/DirectXMeshWeldVertices.cpp)
 
+add_library(${PROJECT_NAME})
+
+target_sources(${PROJECT_NAME} PRIVATE ${LIBRARY_HEADERS} ${LIBRARY_SOURCES})
+
 if(WIN32 AND BUILD_SHARED_LIBS)
   message(STATUS "Build library as a DLL")
 
@@ -83,7 +91,7 @@ if(WIN32 AND BUILD_SHARED_LIBS)
       "${CMAKE_CURRENT_SOURCE_DIR}/build/DirectXMesh.rc.in"
       "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.rc" @ONLY)
 
-  add_library(${PROJECT_NAME} SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS} "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.rc")
+  target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/DirectXMesh.rc")
 
   target_compile_definitions(${PROJECT_NAME} PRIVATE DIRECTX_MESH_EXPORT)
   target_compile_definitions(${PROJECT_NAME} INTERFACE DIRECTX_MESH_IMPORT)
@@ -91,8 +99,6 @@ if(WIN32 AND BUILD_SHARED_LIBS)
   if(XBOX_CONSOLE_TARGET MATCHES "scarlett|xboxone")
     target_link_libraries(${PROJECT_NAME} PRIVATE xgameplatform.lib)
   endif()
-else()
-  add_library(${PROJECT_NAME} ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
 endif()
 
 source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
@@ -332,10 +338,8 @@ if(WIN32)
     if(BUILD_DX12 OR (${DIRECTX_ARCH} MATCHES "^arm64"))
         message(STATUS "Building with DirectX 12 Runtime support")
         set(WINVER 0x0A00)
-    elseif(${DIRECTX_ARCH} MATCHES "^arm")
-        set(WINVER 0x0602)
     else()
-        message(STATUS "Building with Windows 8.1 compatibility")
+        message(STATUS "Building for Windows 8.1")
         set(WINVER 0x0603)
     endif()
 
