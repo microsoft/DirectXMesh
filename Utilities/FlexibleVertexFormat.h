@@ -42,7 +42,7 @@ namespace FVF
 
     static_assert(std::size(g_declTypeSizes) == D3DDECLTYPE_UNUSED, "Mismatch of array size");
 
-    inline size_t ComputeVertexSize(uint32_t fvfCode) noexcept
+    constexpr size_t ComputeVertexSize(const uint32_t fvfCode) noexcept
     {
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
             return 0;
@@ -109,7 +109,7 @@ namespace FVF
         return vertexSize;
     }
 
-    inline size_t ComputeVertexSize(const D3DVERTEXELEMENT9* pDecl, uint32_t stream) noexcept
+    constexpr size_t ComputeVertexSize(const D3DVERTEXELEMENT9* pDecl, const uint32_t stream) noexcept
     {
         if (!pDecl || stream >= 16u /*D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT*/)
             return 0;
@@ -144,8 +144,8 @@ namespace FVF
     }
 
     // More secure version
-    inline size_t ComputeVertexSize(
-        _In_reads_(maxDeclLength) const D3DVERTEXELEMENT9* pDecl, size_t maxDeclLength, uint32_t stream) noexcept
+    constexpr size_t ComputeVertexSize(
+        _In_reads_(maxDeclLength) const D3DVERTEXELEMENT9* pDecl, const size_t maxDeclLength, const uint32_t stream) noexcept
     {
         if (!pDecl || stream >= 16u /*D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT*/)
             return 0;
@@ -182,7 +182,7 @@ namespace FVF
         return currentSize;
     }
 
-    inline size_t GetDeclLength(const D3DVERTEXELEMENT9* pDecl) noexcept
+    constexpr size_t GetDeclLength(const D3DVERTEXELEMENT9* pDecl) noexcept
     {
         if (!pDecl)
             return 0;
