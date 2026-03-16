@@ -40,6 +40,7 @@ DirectXMesh/  # DirectXMesh implementation files.
 Utilities/    # Utility headers such as a WaveFront .obj file loader and a FVF converter.
 Meshconvert/  # CLI tool for importing WaveFront .obj files and converting to CMO, SDKMESH, or VBO formats.
 Tests/        # Tests are designed to be cloned from a separate repository at this location.
+wiki/         # Local clone of the GitHub wiki documentation repository.
 ```
 
 ## Patterns
@@ -66,12 +67,18 @@ Common annotations:
 | Annotation | Meaning |
 | --- | --- |
 | `_In_` | Input parameter |
-| `_Out_` | Output parameter |
-| `_Inout_` | Bidirectional parameter |
-| `_In_reads_bytes_(n)` | Input buffer with byte count |
-| `_In_reads_(n)` | Input array with element count |
+| `_In_opt_` | Optional input pointer |
 | `_In_z_` | Null-terminated input string |
-| `_Out_opt_` | Optional output parameter |
+| `_In_reads_(n)` | Input array with element count |
+| `_In_reads_bytes_(n)` | Input buffer with byte count |
+| `_In_reads_opt_(n)` | Optional input array with element count |
+| `_Out_` | Output parameter |
+| `_Out_opt_` | Optional output pointer |
+| `_Out_writes_(n)` | Output array with element count |
+| `_Out_writes_opt_(n)` | Optional output array with element count |
+| `_Out_writes_bytes_(n)` | Output buffer with byte count |
+| `_Inout_` | Bidirectional parameter |
+| `_Inout_updates_all_(n)` | In-place update of entire array |
 
 Example:
 
@@ -98,7 +105,7 @@ HRESULT DirectX::ComputeNormals(
 #### Calling Convention and DLL Export
 
 - All public functions use `__cdecl` explicitly for ABI stability.
-- All public function declarations are prefixed with `DIRECTX_MESH_API`, which wraps `__declspec(dllexport)` / `__declspec(dllimport)` or the GCC `__attribute__` equivalent when using `BUILD_SHARED_LIBS` in CMake.
+- All public function declarations are prefixed with `DIRECTX_MESH_API`, which wraps `__declspec(dllexport)` / `__declspec(dllimport)` (or the MinGW `__attribute__` equivalent) when the `DIRECTX_MESH_EXPORT` or `DIRECTX_MESH_IMPORT` preprocessor symbols are defined. CMake sets these automatically when `BUILD_SHARED_LIBS=ON`.
 
 #### `noexcept` Rules
 
@@ -215,7 +222,7 @@ When creating documentation:
 ## Cross-platform Support Notes
 
 - The code supports building for Windows and Linux.
-- Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux.
+- Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux compilers.
 
 ### Platform and Compiler `#ifdef` Guards
 
@@ -226,16 +233,19 @@ Use these established guards — do not invent new ones:
 | `_WIN32` | Windows platform (desktop, UWP, Xbox) |
 | `_GAMING_XBOX` | Xbox One or Xbox Series X\|S |
 | `_GAMING_XBOX_SCARLETT` | Xbox Series X\|S |
-| `_XBOX_ONE && _TITLE` | Xbox One XDK (legacy) |
+| `_XBOX_ONE && _TITLE` | Legacy Xbox One XDK — **no longer supported**; triggers a `#error` at compile time |
 | `_MSC_VER` | MSVC-specific (and MSVC-like clang-cl) pragmas and warning suppression |
 | `__clang__` | Clang/LLVM diagnostic suppressions |
 | `__MINGW32__` | MinGW compatibility headers |
 | `__GNUC__` | MinGW/GCC DLL attribute equivalents |
 | `_M_ARM64` / `_M_X64` / `_M_IX86` | Architecture-specific code paths for MSVC (`#ifdef`) |
+| `_M_ARM64EC` | ARM64EC ABI (ARM64 code with x64 interop) for MSVC |
 | `__aarch64__` / `__x86_64__` / `__i386__` | Additional architecture-specific symbols for MinGW/GNUC (`#if`) |
 | `USING_DIRECTX_HEADERS` | External DirectX-Headers package in use |
 
-> Non-Windows builds (Linux/WSL) omit WIC entirely and use `<directx/dxgiformat.h>` and `<wsl/winadapter.h>` from the DirectX-Headers package instead of the Windows SDK.
+> `_M_ARM`/ `__arm__` is legacy 32-bit ARM which is deprecated.
+
+Non-Windows builds (Linux/WSL) omit WIC entirely and use `<directx/dxgiformat.h>` and `<wsl/winadapter.h>` from the DirectX-Headers package instead of the Windows SDK.
 
 ### Error Codes
 
