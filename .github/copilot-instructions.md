@@ -149,7 +149,7 @@ See [this blog post](https://walbourn.github.io/modern-c++-bitmask-types/) for m
 
 | Element | Convention | Example |
 | --- | --- | --- |
-| Classes / structs | PascalCase | `Meshlet `, `MeshletTriangle` |
+| Classes / structs | PascalCase | `Meshlet`, `MeshletTriangle` |
 | Public functions | PascalCase + `__cdecl` | `ComputeInputLayout` |
 | Private data members | `m_` prefix | `m_count` |
 | Enum type names | UPPER_SNAKE_CASE | `CNORM_FLAGS` |
