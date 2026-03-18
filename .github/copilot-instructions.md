@@ -19,7 +19,8 @@ These instructions define how GitHub Copilot should assist with this project. Th
 
 ## General Guidelines
 
-- **Code Style**: The project uses an .editorconfig file to enforce coding standards. Follow the rules defined in `.editorconfig` for indentation, line endings, and other formatting. Additional information can be found on the wiki at [Implementation](https://github.com/microsoft/DirectXTK/wiki/Implementation). The code requires C++11/C++14 features.
+- **Code Style**: The project uses an .editorconfig file to enforce coding standards. Follow the rules defined in `.editorconfig` for indentation, line endings, and other formatting. Additional information can be found on the wiki at [Implementation](https://github.com/microsoft/DirectXTK/wiki/Implementation). The library implementation is written to be compatible with C++14 features, but C++17 is required to build the project for the command-line tools which utilize C++17 filesystem for long file path support.
+> Notable `.editorconfig` rules: C/C++ files use 4-space indentation, `crlf` line endings, and `latin1` charset — avoid non-ASCII characters in source files. HLSL files have separate indent/spacing rules defined in `.editorconfig`.
 - **Documentation**: The project provides documentation in the form of wiki pages available at [Documentation](https://github.com/microsoft/DirectXMesh/wiki/).
 - **Error Handling**: Use C++ exceptions for error handling and uses RAII smart pointers to ensure resources are properly managed. For some functions that return HRESULT error codes, they are marked `noexcept`, use `std::nothrow` for memory allocation, and should not throw exceptions.
 - **Testing**: Unit tests for this project are implemented in this repository [Test Suite](https://github.com/walbourn/directxmeshtest/) and can be run using CTest per the instructions at [Test Documentation](https://github.com/walbourn/directxmeshtest/wiki).
@@ -39,6 +40,7 @@ DirectXMesh/  # DirectXMesh implementation files.
 Utilities/    # Utility headers such as a WaveFront .obj file loader and a FVF converter.
 Meshconvert/  # CLI tool for importing WaveFront .obj files and converting to CMO, SDKMESH, or VBO formats.
 Tests/        # Tests are designed to be cloned from a separate repository at this location.
+wiki/         # Local clone of the GitHub wiki documentation repository.
 ```
 
 ## Patterns
@@ -51,6 +53,90 @@ Tests/        # Tests are designed to be cloned from a separate repository at th
 - Use `Microsoft::WRL::ComPtr` for COM object management.
 - Make use of anonymous namespaces to limit scope of functions and variables.
 - Make use of `assert` for debugging checks, but be sure to validate input parameters in release builds.
+- Explicitly `= delete` copy constructors and copy-assignment operators on all classes that use the pImpl idiom.
+- Explicitly utilize `= default` or `=delete` for copy constructors, assignment operators, move constructors and move-assignment operators where appropriate.
+- Use 16-byte alignment (`_aligned_malloc` / `_aligned_free`) to support SIMD operations in the implementation, but do not expose this requirement in public APIs.
+> For non-Windows support, the implementation uses C++17 `aligned_alloc` instead of `_aligned_malloc`.
+
+#### SAL Annotations
+
+All public API functions must use SAL annotations on every parameter. Use `_Use_decl_annotations_` at the top of each implementation that has SAL in the header declaration — never repeat the annotations in the `.cpp` or `.inl` file.
+
+Common annotations:
+
+| Annotation | Meaning |
+| --- | --- |
+| `_In_` | Input parameter |
+| `_In_opt_` | Optional input pointer |
+| `_In_z_` | Null-terminated input string |
+| `_In_reads_(n)` | Input array with element count |
+| `_In_reads_bytes_(n)` | Input buffer with byte count |
+| `_In_reads_opt_(n)` | Optional input array with element count |
+| `_Out_` | Output parameter |
+| `_Out_opt_` | Optional output pointer |
+| `_Out_writes_(n)` | Output array with element count |
+| `_Out_writes_opt_(n)` | Optional output array with element count |
+| `_Out_writes_bytes_(n)` | Output buffer with byte count |
+| `_Inout_` | Bidirectional parameter |
+| `_Inout_updates_all_(n)` | In-place update of entire array |
+
+Example:
+
+```cpp
+// Header (DirectXMesh.h)
+DIRECTX_MESH_API HRESULT __cdecl ComputeNormals(
+    _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+    _In_reads_(nVerts) const XMFLOAT3* positions, _In_ size_t nVerts,
+    _In_ CNORM_FLAGS flags,
+    _Out_writes_(nVerts) XMFLOAT3* normals) noexcept;
+
+// Implementation (.cpp)
+_Use_decl_annotations_
+HRESULT DirectX::ComputeNormals(
+    const uint16_t* indices,
+    size_t nFaces,
+    const XMFLOAT3* positions,
+    size_t nVerts,
+    CNORM_FLAGS flags,
+    XMFLOAT3* normals) noexcept
+{ ... }
+```
+
+#### Calling Convention and DLL Export
+
+- All public functions use `__cdecl` explicitly for ABI stability.
+- All public function declarations are prefixed with `DIRECTX_MESH_API`, which wraps `__declspec(dllexport)` / `__declspec(dllimport)` (or the MinGW `__attribute__` equivalent) when the `DIRECTX_MESH_EXPORT` or `DIRECTX_MESH_IMPORT` preprocessor symbols are defined. CMake sets these automatically when `BUILD_SHARED_LIBS=ON`.
+
+#### `noexcept` Rules
+
+- All query and utility functions that cannot fail (e.g., `IsValidVB`, `IsValidIB`) are marked `noexcept`.
+- All HRESULT-returning I/O and processing functions are also `noexcept` — errors are communicated via return code, never via exceptions.
+- Constructors and functions that perform heap allocation or utilize Standard C++ containers that may throw are marked `noexcept(false)`.
+
+#### Enum Flags Pattern
+
+Flags enums follow this pattern — a `uint32_t`-based unscoped enum with a `_NONE = 0x0` base case, followed by a call to `DEFINE_ENUM_FLAG_OPERATORS` (defined in `DirectXMesh.inl`) to enable `|`, `&`, and `~` operators:
+
+```cpp
+enum CNORM_FLAGS : uint32_t
+{
+    CNORM_DEFAULT = 0x0,
+    // Default is to compute normals using weight-by-angle
+
+    CNORM_WEIGHT_BY_AREA = 0x1,
+    // Computes normals using weight-by-area
+
+    CNORM_WEIGHT_EQUAL = 0x2,
+    // Compute normals with equal weights
+
+    CNORM_WIND_CW = 0x4,
+    // Vertices are clock-wise (defaults to CCW)
+};
+
+DEFINE_ENUM_FLAG_OPERATORS(CNORM_FLAGS);
+```
+
+See [this blog post](https://walbourn.github.io/modern-c++-bitmask-types/) for more information on this pattern.
 
 ### Patterns to Avoid
 
@@ -58,6 +144,40 @@ Tests/        # Tests are designed to be cloned from a separate repository at th
 - Avoid macros for constants—prefer `constexpr` or `inline` `const`.
 - Don’t put implementation logic in header files unless using templates, although the SimpleMath library does use an .inl file for performance.
 - Avoid using `using namespace` in header files to prevent polluting the global namespace.
+
+## Naming Conventions
+
+| Element | Convention | Example |
+| --- | --- | --- |
+| Classes / structs | PascalCase | `Meshlet`, `MeshletTriangle` |
+| Public functions | PascalCase + `__cdecl` | `ComputeInputLayout` |
+| Private data members | `m_` prefix | `m_count` |
+| Enum type names | UPPER_SNAKE_CASE | `CNORM_FLAGS` |
+| Enum values | UPPER_SNAKE_CASE | `CNORM_DEFAULT` |
+| Files | PascalCase | `DirectXMesh.h` |
+
+## File Header Convention
+
+Every source file (`.cpp`, `.h`, etc.) must begin with this block:
+
+```cpp
+//-------------------------------------------------------------------------------------
+// {FileName}
+//
+// {One-line description}
+//
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+//
+// http://go.microsoft.com/fwlink/?LinkID=324981
+//-------------------------------------------------------------------------------------
+```
+
+Section separators within files use:
+- Major sections: `//-------------------------------------------------------------------------------------`
+- Subsections:   `//---------------------------------------------------------------------------------`
+
+The project does **not** use Doxygen. API documentation is maintained exclusively on the GitHub wiki.
 
 ## References
 
@@ -102,7 +222,32 @@ When creating documentation:
 ## Cross-platform Support Notes
 
 - The code supports building for Windows and Linux.
-- Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux.
+- Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux compilers.
+
+### Platform and Compiler `#ifdef` Guards
+
+Use these established guards — do not invent new ones:
+
+| Guard | Purpose |
+| --- | --- |
+| `_WIN32` | Windows platform (desktop, UWP, Xbox) |
+| `_GAMING_XBOX` | Xbox One or Xbox Series X\|S |
+| `_GAMING_XBOX_SCARLETT` | Xbox Series X\|S |
+| `_XBOX_ONE && _TITLE` | Legacy Xbox One XDK — **no longer supported**; triggers a `#error` at compile time |
+| `_MSC_VER` | MSVC-specific (and MSVC-like clang-cl) pragmas and warning suppression |
+| `__clang__` | Clang/LLVM diagnostic suppressions |
+| `__MINGW32__` | MinGW compatibility headers |
+| `__GNUC__` | MinGW/GCC DLL attribute equivalents |
+| `_M_ARM64` / `_M_X64` / `_M_IX86` | Architecture-specific code paths for MSVC (`#ifdef`) |
+| `_M_ARM64EC` | ARM64EC ABI (ARM64 code with x64 interop) for MSVC |
+| `__aarch64__` / `__x86_64__` / `__i386__` | Additional architecture-specific symbols for MinGW/GNUC (`#if`) |
+| `USING_DIRECTX_HEADERS` | External DirectX-Headers package in use |
+
+> `_M_ARM`/ `__arm__` is legacy 32-bit ARM which is deprecated.
+
+Non-Windows builds (Linux/WSL) omit WIC entirely and use `<directx/dxgiformat.h>` and `<wsl/winadapter.h>` from the DirectX-Headers package instead of the Windows SDK.
+
+### Error Codes
 
 The following symbols are not custom error codes, but aliases for `HRESULT_FROM_WIN32` error values.
 
