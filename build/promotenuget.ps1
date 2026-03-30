@@ -64,7 +64,7 @@ $bodyRelease = @{
     }
 } | ConvertTo-Json
 
-$packages = @('directxmesh_desktop_2019', 'directxmesh_desktop_win10', 'directxmesh_uwp')
+$packages = @('directxmesh_desktop_win10', 'directxmesh_uwp')
 
 # Check if all packages exist
 $allPackagesSucceeded = $true
