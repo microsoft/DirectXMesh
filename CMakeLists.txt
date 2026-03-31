@@ -7,7 +7,7 @@ if(POLICY CMP0162)
    cmake_policy(SET CMP0162 NEW)
 endif()
 
-set(DIRECTXMESH_VERSION 1.7.0)
+set(DIRECTXMESH_VERSION 1.7.1)
 
 project(DirectXMesh
   VERSION ${DIRECTXMESH_VERSION}

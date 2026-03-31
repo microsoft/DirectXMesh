@@ -6,6 +6,13 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### March 31, 2026
+* Minor code review
+* VS 2026 support
+* Retire VS 2019 projects
+* CMake project updates
+* meshconvert: updated to support feedback
+
 ### October 27, 2025
 * Bug fixes for Meshlet generation reported by customers
 * Minor code review
