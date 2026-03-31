@@ -239,7 +239,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename,
 
 namespace
 {
-    void PrintUsage(bool full = false)
+    void PrintUsage(bool full = false) noexcept
     {
         PrintLogo(false, g_ToolName, g_Description);
 
