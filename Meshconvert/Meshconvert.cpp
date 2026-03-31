@@ -48,6 +48,8 @@
 
 #include "Mesh.h"
 
+#include <shellapi.h>
+
 #define TOOL_VERSION DIRECTX_MESH_VERSION
 #include "CmdLineHelpers.h"
 
@@ -58,6 +60,7 @@ namespace
 {
     const wchar_t* g_ToolName = L"meshconvert";
     const wchar_t* g_Description = L"Microsoft (R) MeshConvert Command-line Tool [DirectXMesh]";
+    const wchar_t* g_FeedbackURL = L"https://github.com/microsoft/DirectXMesh/issues";
 
     enum OPTIONS : uint32_t
     {
@@ -236,13 +239,14 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename,
 
 namespace
 {
-    void PrintUsage()
+    void PrintUsage(bool full = false) noexcept
     {
         PrintLogo(false, g_ToolName, g_Description);
 
         static const wchar_t* const s_usage =
-            L"Usage: meshconvert <options> [--] <files>\n"
-            L"\n"
+            L"Usage: meshconvert <options> [--] <files>\n\n";
+
+        static const wchar_t* const s_fullUsage =
             L"   Input file type must be Wavefront Object (.obj)\n"
             L"\n"
             L"   -ft <filetype>, --file-type <filetype>  output file type\n"
@@ -291,6 +295,11 @@ namespace
 
         wprintf(L"%ls", s_usage);
 
+        if (!full)
+            return;
+
+        wprintf(L"%ls", s_fullUsage);
+
         wprintf(L"\n   <normal-format>: ");
         PrintList(13, g_vertexNormalFormats);
 
@@ -323,6 +332,24 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     std::locale::global(std::locale(""));
 
     // Process command line
+    if (argc < 2)
+    {
+        PrintUsage();
+        return 0;
+    }
+
+    // check for these first
+    if (!_wcsicmp(argv[1], L"help") || !_wcsicmp(argv[1], L"/?"))
+    {
+        PrintUsage(true);
+        return 0;
+    }
+    else if (!_wcsicmp(argv[1], L"feedback"))
+    {
+        std::ignore = ShellExecuteW(nullptr, L"open", g_FeedbackURL, nullptr, nullptr, SW_SHOW);
+        return 0;
+    }
+
     uint32_t dwOptions = 0;
     std::list<SConversion> conversion;
     bool allowOpts = true;
@@ -402,7 +429,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
                 return 0;
 
             case OPT_HELP:
-                PrintUsage();
+                PrintUsage(true);
                 return 0;
 
             default:
