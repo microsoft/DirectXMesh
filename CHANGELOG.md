@@ -1,6 +1,6 @@
 # DirectXMesh geometry processing library
 
-http://go.microsoft.com/fwlink/?LinkID=324981
+https://go.microsoft.com/fwlink/?LinkID=324981
 
 Releases available for download on [GitHub](https://github.com/microsoft/DirectXMesh/releases)
 
