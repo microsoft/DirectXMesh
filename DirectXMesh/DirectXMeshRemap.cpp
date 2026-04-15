@@ -66,7 +66,7 @@ namespace
                 }
             }
             else
-                return E_FAIL;
+                return E_UNEXPECTED;
         }
 
         return S_OK;
@@ -667,7 +667,7 @@ HRESULT DirectX::FinalizeVB(
         }
         else if (src >= newVerts)
         {
-            return E_FAIL;
+            return E_UNEXPECTED;
         }
         else if (src < nVerts)
         {
@@ -768,7 +768,7 @@ HRESULT DirectX::FinalizeVBAndPointReps(
             if (vertexRemap[j] != UNUSED32)
             {
                 if (vertexRemap[j] >= newVerts)
-                    return E_INVALIDARG;
+                    return E_UNEXPECTED;
 
                 vertexRemapInverse[vertexRemap[j]] = j;
             }
@@ -790,7 +790,11 @@ HRESULT DirectX::FinalizeVBAndPointReps(
 
     for (size_t i = 0; i < nDupVerts; ++i)
     {
-        pointRep[i + nVerts] = prin[dupVerts[i]];
+        uint32_t pr = dupVerts[i];
+        if (pr >= nDupVerts)
+            return E_UNEXPECTED;
+
+        pointRep[i + nVerts] = prin[pr];
     }
 
     for (size_t j = 0; j < newVerts; ++j)
@@ -800,10 +804,6 @@ HRESULT DirectX::FinalizeVBAndPointReps(
         if (src == UNUSED32)
         {
             // remap entry is unused
-        }
-        else if (src >= newVerts)
-        {
-            return E_FAIL;
         }
         else if (src < nVerts)
         {
