@@ -478,6 +478,9 @@ namespace
             if (indices[j] == index_t(-1))
                 continue;
 
+            if (indices[j] >= nVerts)
+                return;
+
             bool found = false;
 
             for (size_t ptr = 0; ptr < cacheSize; ++ptr)

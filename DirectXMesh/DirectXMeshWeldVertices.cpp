@@ -120,6 +120,9 @@ namespace
             if (i == index_t(-1))
                 continue;
 
+            if (i >= nVerts)
+                return E_UNEXPECTED;
+
             indices[j] = index_t(vertexRemapInverse[i]);
         }
 

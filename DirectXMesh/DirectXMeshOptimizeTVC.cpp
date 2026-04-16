@@ -112,6 +112,9 @@ namespace
 
                             if (neighbor != UNUSED32)
                             {
+                                if (neighbor >= nFaces)
+                                    return E_UNEXPECTED;
+
                                 if ((neighbor < faceOffset) || (neighbor >= faceMax)
                                     || (neighbor == adjacency[face * 3 + ((n + 1) % 3)])
                                     || (neighbor == adjacency[face * 3 + ((n + 2) % 3)]))

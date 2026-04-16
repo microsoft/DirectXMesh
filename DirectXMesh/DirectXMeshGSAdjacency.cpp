@@ -64,6 +64,10 @@ namespace
                 {
                     indicesAdj[outputi] = indices[face * 3 + ((point + 2) % 3)];
                 }
+                else if (a >= nFaces)
+                {
+                    return E_UNEXPECTED;
+                }
                 else
                 {
                     uint32_t v1 = indices[face * 3 + point];
@@ -81,6 +85,10 @@ namespace
 
                         v1 = pointRep[v1];
                         v2 = pointRep[v2];
+
+                        if (((v1 != UNUSED32) && (v1 >= nVerts))
+                            || ((v2 != UNUSED32) && (v2 >= nVerts)))
+                            return E_UNEXPECTED;
 
                         uint32_t vOther = UNUSED32;
 

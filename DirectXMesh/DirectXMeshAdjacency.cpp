@@ -374,6 +374,11 @@ namespace
             const uint32_t v2 = pointRep[i1];
             const uint32_t v3 = pointRep[i2];
 
+            if (v1 >= nVerts
+                || v2 >= nVerts
+                || v3 >= nVerts)
+                return E_UNEXPECTED;
+
             // filter out degenerate triangles
             if (v1 == v2 || v1 == v3 || v2 == v3)
                 continue;
