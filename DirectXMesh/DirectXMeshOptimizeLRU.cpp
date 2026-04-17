@@ -246,7 +246,7 @@ namespace
                 }
 
                 if (indexList[idx] >= nVerts)
-                    return E_INVALIDARG;
+                    return E_UNEXPECTED;
 
                 if (!i || first || sortFunc(indexSorted[i - 1], idx))
                 {
