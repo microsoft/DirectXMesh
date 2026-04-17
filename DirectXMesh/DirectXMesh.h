@@ -426,48 +426,48 @@ namespace DirectX
     };
 
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFaces(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFaces(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRU(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRU(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
         // Reorders faces to increase hit rate of vertex caches
 
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesEx(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesEx(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRUEx(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRUEx(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
