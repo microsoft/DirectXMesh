@@ -14,12 +14,12 @@ These instructions define how GitHub Copilot should assist with this project. Th
 
 - See the tutorial at [Getting Started](https://github.com/microsoft/DirectXMesh/wiki/Getting-Started).
 - The recommended way to integrate *DirectXMesh* into your project is by using the *vcpkg* Package Manager.
-- You can make use of the nuget.org packages **directxmesh_desktop_2019**, **directxmesh_desktop_win10**, or **directxmesh_uwp**.
+- You can make use of the nuget.org packages **directxmesh_desktop_win10** or **directxmesh_uwp**.
 - You can also use the library source code directly in your project or as a git submodule.
 
 ## General Guidelines
 
-- **Code Style**: The project uses an .editorconfig file to enforce coding standards. Follow the rules defined in `.editorconfig` for indentation, line endings, and other formatting. Additional information can be found on the wiki at [Implementation](https://github.com/microsoft/DirectXTK/wiki/Implementation). The library implementation is written to be compatible with C++14 features, but C++17 is required to build the project for the command-line tools which utilize C++17 filesystem for long file path support.
+- **Code Style**: The project uses an .editorconfig file to enforce coding standards. Follow the rules defined in `.editorconfig` for indentation, line endings, and other formatting. Additional information can be found on the wiki at [Implementation](https://github.com/microsoft/DirectXTK/wiki/Implementation). The library's public API requires C++11, and the project builds with C++17 (`CMAKE_CXX_STANDARD 17`). The command-line tools utilize C++17 filesystem for long file path support.
 > Notable `.editorconfig` rules: C/C++ files use 4-space indentation, `crlf` line endings, and `latin1` charset — avoid non-ASCII characters in source files. HLSL files have separate indent/spacing rules defined in `.editorconfig`.
 - **Documentation**: The project provides documentation in the form of wiki pages available at [Documentation](https://github.com/microsoft/DirectXMesh/wiki/).
 - **Error Handling**: Use C++ exceptions for error handling and uses RAII smart pointers to ensure resources are properly managed. For some functions that return HRESULT error codes, they are marked `noexcept`, use `std::nothrow` for memory allocation, and should not throw exceptions.
@@ -110,12 +110,13 @@ HRESULT DirectX::ComputeNormals(
 #### `noexcept` Rules
 
 - All query and utility functions that cannot fail (e.g., `IsValidVB`, `IsValidIB`) are marked `noexcept`.
-- All HRESULT-returning I/O and processing functions are also `noexcept` — errors are communicated via return code, never via exceptions.
+- HRESULT-returning functions that do not perform heap allocation or use Standard C++ containers are `noexcept` — errors are communicated via return code, never via exceptions (e.g., `ComputeNormals`, `ReorderIB`, `FinalizeIB`, `FinalizeVB`, `CompactVB`, `OptimizeVertices`, `ComputeCullData`).
+- HRESULT-returning functions that use `std::vector`, `std::function`, or other potentially throwing types are *not* marked `noexcept` — they may throw on allocation failure (e.g., `GenerateAdjacencyAndPointReps`, `Validate`, `Clean`, `WeldVertices`, `ComputeMeshlets`, `OptimizeFaces`).
 - Constructors and functions that perform heap allocation or utilize Standard C++ containers that may throw are marked `noexcept(false)`.
 
 #### Enum Flags Pattern
 
-Flags enums follow this pattern — a `uint32_t`-based unscoped enum with a `_NONE = 0x0` base case, followed by a call to `DEFINE_ENUM_FLAG_OPERATORS` (defined in `DirectXMesh.inl`) to enable `|`, `&`, and `~` operators:
+Flags enums follow this pattern — a `uint32_t`-based unscoped enum with a `_DEFAULT = 0x0` base case, followed by a call to `DEFINE_ENUM_FLAG_OPERATORS` (defined in `DirectXMesh.inl`) to enable `|`, `&`, and `~` operators:
 
 ```cpp
 enum CNORM_FLAGS : uint32_t
@@ -223,6 +224,7 @@ When creating documentation:
 
 - The code supports building for Windows and Linux.
 - Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux compilers.
+- The project ships MSBuild projects for Visual Studio 2022 (`.sln` / `.vcxproj`) and Visual Studio 2026 (`.slnx` / `.vcxproj`). VS 2019 projects have been retired.
 
 ### Platform and Compiler `#ifdef` Guards
 
@@ -235,6 +237,7 @@ Use these established guards — do not invent new ones:
 | `_GAMING_XBOX_SCARLETT` | Xbox Series X\|S |
 | `_XBOX_ONE && _TITLE` | Legacy Xbox One XDK — **no longer supported**; triggers a `#error` at compile time |
 | `_MSC_VER` | MSVC-specific (and MSVC-like clang-cl) pragmas and warning suppression |
+| `__INTEL_COMPILER` | Intel C++ Compiler classic warning suppression |
 | `__clang__` | Clang/LLVM diagnostic suppressions |
 | `__MINGW32__` | MinGW compatibility headers |
 | `__GNUC__` | MinGW/GCC DLL attribute equivalents |
@@ -256,6 +259,7 @@ The following symbols are not custom error codes, but aliases for `HRESULT_FROM_
 | `HRESULT_E_ARITHMETIC_OVERFLOW` | `HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW)` |
 | `HRESULT_E_NOT_SUPPORTED` | `HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)` |
 | `HRESULT_E_INVALID_NAME` | `HRESULT_FROM_WIN32(ERROR_INVALID_NAME)` |
+| `E_BOUNDS` | `0x8000000BL` (conditionally defined if not already present) |
 
 ## Code Review Instructions
 
