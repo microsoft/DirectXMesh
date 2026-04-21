@@ -143,7 +143,7 @@ See [this blog post](https://walbourn.github.io/modern-c++-bitmask-types/) for m
 
 - Don’t use raw pointers for ownership.
 - Avoid macros for constants—prefer `constexpr` or `inline` `const`.
-- Don’t put implementation logic in header files unless using templates, although the DirectXMesh library does use an .inl file for performance for a few specific utility functions that are called in tight loops (e.g., `IsValidIB`, `IsValidVB`).
+- Don't put implementation logic in header files unless using templates, although the DirectXMesh library does use an .inl file for performance for a few specific utility functions that are called in tight loops (e.g., `IsValidIB`, `IsValidVB`).
 - Avoid using `using namespace` in header files to prevent polluting the global namespace.
 
 ## Naming Conventions
@@ -253,7 +253,7 @@ Non-Windows builds (Linux/WSL) use `<directx/dxgiformat.h>` and `<wsl/winadapter
 
 ### Error Codes
 
-The following symbols are not custom error codes, but aliases for `HRESULT_FROM_WIN32` error values.
+The following symbols are not custom error codes, but aliases for `HRESULT_FROM_WIN32` error codes.
 
 | Symbol | Standard Win32 HRESULT |
 | -------- | ------------- |
