@@ -268,7 +268,7 @@ namespace DirectX
 
     enum CNORM_FLAGS : uint32_t
     {
-        CNORM_DEFAULT = 0x0,
+        CNORM_DEFAULT = 0,
         // Default is to compute normals using weight-by-angle
 
         CNORM_WEIGHT_BY_AREA = 0x1,
@@ -340,7 +340,7 @@ namespace DirectX
 
     enum VALIDATE_FLAGS : uint32_t
     {
-        VALIDATE_DEFAULT = 0x0,
+        VALIDATE_DEFAULT = 0,
 
         VALIDATE_BACKFACING = 0x1,
         // Check for duplicate neighbor from triangle (requires adjacency)
@@ -573,7 +573,7 @@ namespace DirectX
 
     enum MESHLET_FLAGS : uint32_t
     {
-        MESHLET_DEFAULT = 0x0,
+        MESHLET_DEFAULT = 0,
 
         MESHLET_WIND_CW = 0x1,
         // Vertices are clock-wise (defaults to CCW)

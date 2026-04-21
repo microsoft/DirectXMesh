@@ -19,11 +19,11 @@ These instructions define how GitHub Copilot should assist with this project. Th
 
 ## General Guidelines
 
-- **Code Style**: The project uses an .editorconfig file to enforce coding standards. Follow the rules defined in `.editorconfig` for indentation, line endings, and other formatting. Additional information can be found on the wiki at [Implementation](https://github.com/microsoft/DirectXTK/wiki/Implementation). The library's public API requires C++11, and the project builds with C++17 (`CMAKE_CXX_STANDARD 17`). The command-line tools utilize C++17 filesystem for long file path support.
-> Notable `.editorconfig` rules: C/C++ files use 4-space indentation, `crlf` line endings, and `latin1` charset — avoid non-ASCII characters in source files. HLSL files have separate indent/spacing rules defined in `.editorconfig`.
+- **Code Style**: The project uses an .editorconfig file to enforce coding standards. Follow the rules defined in `.editorconfig` for indentation, line endings, and other formatting. Additional information can be found on the wiki at [Implementation](https://github.com/microsoft/DirectXTK/wiki/Implementation). The library's public API requires C++11, and the project builds with C++17 (`CMAKE_CXX_STANDARD 17`). The command-line tools also use C++17, including `<filesystem>` for long file path support. This code is designed to build with Visual Studio 2022, Visual Studio 2026, clang for Windows v12 or later, or MinGW 12.2.
+> Notable `.editorconfig` rules: C/C++ files use 4-space indentation, `crlf` line endings, and `latin1` charset — avoid non-ASCII characters in source files.
 - **Documentation**: The project provides documentation in the form of wiki pages available at [Documentation](https://github.com/microsoft/DirectXMesh/wiki/).
 - **Error Handling**: Use C++ exceptions for error handling and uses RAII smart pointers to ensure resources are properly managed. For some functions that return HRESULT error codes, they are marked `noexcept`, use `std::nothrow` for memory allocation, and should not throw exceptions.
-- **Testing**: Unit tests for this project are implemented in this repository [Test Suite](https://github.com/walbourn/directxmeshtest/) and can be run using CTest per the instructions at [Test Documentation](https://github.com/walbourn/directxmeshtest/wiki).
+- **Testing**: Unit tests for this project are implemented in this repository [Test Suite](https://github.com/walbourn/directxmeshtest/) and can be run using CTest per the instructions at [Test Documentation](https://github.com/walbourn/directxmeshtest/wiki). See [test copilot instructions](https://github.com/walbourn/directxmeshtest/blob/main/.github/copilot-instructions.md) for additional information on the tests.
 - **Security**: This project uses secure coding practices from the Microsoft Secure Coding Guidelines, and is subject to the `SECURITY.md` file in the root of the repository. Functions that read input from geometry files are subject to OneFuzz fuzz testing to ensure they are secure against malformed files.
 - **Dependencies**: The project uses CMake and VCPKG for managing dependencies, making optional use of DirectXMath and DirectX-Headers. The project can be built without these dependencies, relying on the Windows SDK for core functionality.
 - **Continuous Integration**: This project implements GitHub Actions for continuous integration, ensuring that all code changes are tested and validated before merging. This includes building the project for a number of configurations and toolsets, running a subset of unit tests, and static code analysis including GitHub super-linter, CodeQL, and MSVC Code Analysis.
@@ -49,14 +49,14 @@ wiki/         # Local clone of the GitHub wiki documentation repository.
 
 - Use RAII for all resource ownership (memory, file handles, etc.).
 - Many classes utilize the pImpl idiom to hide implementation details, and to enable optimized memory alignment in the implementation.
-- Use `std::unique_ptr` for exclusive ownership and `std::shared_ptr` for shared ownership.
-- Use `Microsoft::WRL::ComPtr` for COM object management.
+- Use `std::unique_ptr` for exclusive ownership.
 - Make use of anonymous namespaces to limit scope of functions and variables.
 - Make use of `assert` for debugging checks, but be sure to validate input parameters in release builds.
 - Explicitly `= delete` copy constructors and copy-assignment operators on all classes that use the pImpl idiom.
 - Explicitly utilize `= default` or `=delete` for copy constructors, assignment operators, move constructors and move-assignment operators where appropriate.
 - Use 16-byte alignment (`_aligned_malloc` / `_aligned_free`) to support SIMD operations in the implementation, but do not expose this requirement in public APIs.
 > For non-Windows support, the implementation uses C++17 `aligned_alloc` instead of `_aligned_malloc`.
+- All implementation `.cpp` files include `DirectXMeshP.h` as their first include (precompiled header). MinGW builds skip precompiled headers.
 
 #### SAL Annotations
 
@@ -116,12 +116,12 @@ HRESULT DirectX::ComputeNormals(
 
 #### Enum Flags Pattern
 
-Flags enums follow this pattern — a `uint32_t`-based unscoped enum with a `_DEFAULT = 0x0` base case, followed by a call to `DEFINE_ENUM_FLAG_OPERATORS` (defined in `DirectXMesh.inl`) to enable `|`, `&`, and `~` operators:
+Flags enums follow this pattern — a `uint32_t`-based unscoped enum with a `_DEFAULT = 0` base case, followed by a call to `DEFINE_ENUM_FLAG_OPERATORS` (invoked in `DirectXMesh.inl`) to enable `|`, `&`, and `~` operators:
 
 ```cpp
 enum CNORM_FLAGS : uint32_t
 {
-    CNORM_DEFAULT = 0x0,
+    CNORM_DEFAULT = 0,
     // Default is to compute normals using weight-by-angle
 
     CNORM_WEIGHT_BY_AREA = 0x1,
@@ -143,7 +143,7 @@ See [this blog post](https://walbourn.github.io/modern-c++-bitmask-types/) for m
 
 - Don’t use raw pointers for ownership.
 - Avoid macros for constants—prefer `constexpr` or `inline` `const`.
-- Don’t put implementation logic in header files unless using templates, although the SimpleMath library does use an .inl file for performance.
+- Don’t put implementation logic in header files unless using templates, although the DirectXMesh library does use an .inl file for performance for a few specific utility functions that are called in tight loops (e.g., `IsValidIB`, `IsValidVB`).
 - Avoid using `using namespace` in header files to prevent polluting the global namespace.
 
 ## Naming Conventions
@@ -175,8 +175,8 @@ Every source file (`.cpp`, `.h`, etc.) must begin with this block:
 ```
 
 Section separators within files use:
-- Major sections: `//-------------------------------------------------------------------------------------`
-- Subsections:   `//---------------------------------------------------------------------------------`
+- Major sections: `//=====================================================================================`
+- Subsections:   `//-------------------------------------------------------------------------------------`
 
 The project does **not** use Doxygen. API documentation is maintained exclusively on the GitHub wiki.
 
@@ -184,7 +184,7 @@ The project does **not** use Doxygen. API documentation is maintained exclusivel
 
 - [Source git repository on GitHub](https://github.com/microsoft/DirectXMesh.git)
 - [DirectXMesh documentation git repository on GitHub](https://github.com/microsoft/DirectXMesh.wiki.git)
-- [DirectXMesh test suite git repository on GitHub](https://github.com/walbourn/directxmeshtest.wiki.git).
+- [DirectXMesh test suite git repository on GitHub](https://github.com/walbourn/directxmeshtest.git).
 - [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 - [Microsoft Secure Coding Guidelines](https://learn.microsoft.com/en-us/security/develop/secure-coding-guidelines)
 - [CMake Documentation](https://cmake.org/documentation/)
@@ -222,7 +222,7 @@ When creating documentation:
 
 ## Cross-platform Support Notes
 
-- The code supports building for Windows and Linux.
+- The code targets Win32 desktop applications for Windows 8.1 or later, Xbox One, Xbox Series X\|S, Universal Windows Platform (UWP) apps for Windows 10 and Windows 11, and Linux.
 - Portability and conformance of the code is validated by building with Visual C++, clang/LLVM for Windows, MinGW, and GCC for Linux compilers.
 - The project ships MSBuild projects for Visual Studio 2022 (`.sln` / `.vcxproj`) and Visual Studio 2026 (`.slnx` / `.vcxproj`). VS 2019 projects have been retired.
 
@@ -233,8 +233,9 @@ Use these established guards — do not invent new ones:
 | Guard | Purpose |
 | --- | --- |
 | `_WIN32` | Windows platform (desktop, UWP, Xbox) |
-| `_GAMING_XBOX` | Xbox One or Xbox Series X\|S |
-| `_GAMING_XBOX_SCARLETT` | Xbox Series X\|S |
+| `_GAMING_XBOX` | Xbox platform (GDK - covers both Xbox One and Xbox Series X\|S) |
+| `_GAMING_XBOX_SCARLETT` | Xbox Series X\|S (GDK with Xbox Extensions) |
+| `_GAMING_XBOX_XBOXONE` | Xbox One (GDK with Xbox Extensions) |
 | `_XBOX_ONE && _TITLE` | Legacy Xbox One XDK — **no longer supported**; triggers a `#error` at compile time |
 | `_MSC_VER` | MSVC-specific (and MSVC-like clang-cl) pragmas and warning suppression |
 | `__INTEL_COMPILER` | Intel C++ Compiler classic warning suppression |
@@ -248,7 +249,7 @@ Use these established guards — do not invent new ones:
 
 > `_M_ARM`/ `__arm__` is legacy 32-bit ARM which is deprecated.
 
-Non-Windows builds (Linux/WSL) omit WIC entirely and use `<directx/dxgiformat.h>` and `<wsl/winadapter.h>` from the DirectX-Headers package instead of the Windows SDK.
+Non-Windows builds (Linux/WSL) use `<directx/dxgiformat.h>` and `<wsl/winadapter.h>` from the DirectX-Headers package instead of the Windows SDK.
 
 ### Error Codes
 
