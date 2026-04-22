@@ -56,7 +56,7 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 
 * The CMake projects require 3.21 or later.
 
-* Starting with the April 2026 release, the OptimzeFaces(LRU)(Ex) functions now take `nVerts` in order to validate the input indices. This is a *breaking change*.
+* Starting with the April 2026 release, the OptimizeFaces(LRU)(Ex) functions now take `nVerts` in order to validate the input indices. This is a *breaking change*.
 
 ```cpp
 hr = OptimizeFaces(indices, nFaces, adjacency, faceRemap, vertexCache, restart);
