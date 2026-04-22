@@ -56,9 +56,21 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 
 * The CMake projects require 3.21 or later.
 
+* Starting with the April 2026 release, the OptimizeFaces(LRU)(Ex) functions now take an `nVerts` parameter in order to validate the input indices. This is a *breaking change*.
+
+```cpp
+hr = OptimizeFaces(indices, nFaces, adjacency, faceRemap, vertexCache, restart);
+```
+
+Must be updated to:
+
+```cpp
+hr = OptimizeFaces(indices, nFaces, nVerts, adjacency, faceRemap, vertexCache, restart);
+```
+
 * Starting with the March 2025 release, Windows 7 and Windows 8.0 support has been retired.
 
-* Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the _C++ Standard_ section _17.5.2.1.3 Bitmask types_. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have _breaking change_ impacts to client code:
+* Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the *C++ Standard* section *17.5.2.1.3 Bitmask types*. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have *breaking change* impacts to client code:
 
   * You cannot pass the ``0`` literal as your flags value. Instead you must make use of the appropriate default enum value: ``CNORM_DEFAULT``, ``VALIDATE_DEFAULT``, or ``MESHLET_DEFAULT``.
 
@@ -83,7 +95,7 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 
 ## Support
 
-For questions, consider using [Stack Overflow](https://stackoverflow.com/questions/tagged/directxtk) with the _directxtk_ tag, or the [DirectX Discord Server](https://discord.gg/directx) in the _dx12-developers_ or _dx9-dx11-developers_ channel.
+For questions, consider using [Stack Overflow](https://stackoverflow.com/questions/tagged/directxtk) with the *directxtk* tag, or the [DirectX Discord Server](https://discord.gg/directx) in the *dx12-developers* or *dx9-dx11-developers* channel.
 
 For bug reports and feature requests, please use GitHub [issues](https://github.com/microsoft/DirectXMesh/issues) for this project.
 

@@ -268,7 +268,7 @@ namespace DirectX
 
     enum CNORM_FLAGS : uint32_t
     {
-        CNORM_DEFAULT = 0x0,
+        CNORM_DEFAULT = 0,
         // Default is to compute normals using weight-by-angle
 
         CNORM_WEIGHT_BY_AREA = 0x1,
@@ -340,7 +340,7 @@ namespace DirectX
 
     enum VALIDATE_FLAGS : uint32_t
     {
-        VALIDATE_DEFAULT = 0x0,
+        VALIDATE_DEFAULT = 0,
 
         VALIDATE_BACKFACING = 0x1,
         // Check for duplicate neighbor from triangle (requires adjacency)
@@ -426,48 +426,48 @@ namespace DirectX
     };
 
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFaces(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFaces(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRU(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRU(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
         // Reorders faces to increase hit rate of vertex caches
 
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesEx(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesEx(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t vertexCache = OPTFACES_V_DEFAULT,
         _In_ uint32_t restart = OPTFACES_R_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRUEx(
-        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint16_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
     DIRECTX_MESH_API HRESULT __cdecl OptimizeFacesLRUEx(
-        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const uint32_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
         _In_ uint32_t lruCacheSize = OPTFACES_LRU_DEFAULT);
@@ -573,7 +573,7 @@ namespace DirectX
 
     enum MESHLET_FLAGS : uint32_t
     {
-        MESHLET_DEFAULT = 0x0,
+        MESHLET_DEFAULT = 0,
 
         MESHLET_WIND_CW = 0x1,
         // Vertices are clock-wise (defaults to CCW)

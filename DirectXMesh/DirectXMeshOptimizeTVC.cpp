@@ -31,7 +31,9 @@ namespace
         {}
 
         HRESULT initialize(
-            _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
+            _In_reads_(nFaces * 3) const index_t* indices,
+            size_t nFaces,
+            size_t nVerts,
             _In_reads_(nFaces * 3) const uint32_t* adjacency,
             const std::vector<std::pair<size_t, size_t>>& subsets)
         {
@@ -74,7 +76,13 @@ namespace
                     index_t i1 = indices[face * 3 + 1];
                     index_t i2 = indices[face * 3 + 2];
 
-                    if (i0 == index_t(-1)
+                    if ((i0 != index_t(-1) && i0 >= nVerts)
+                        || (i1 != index_t(-1) && i1 >= nVerts)
+                        || (i2 != index_t(-1) && i2 >= nVerts))
+                    {
+                        return E_UNEXPECTED;
+                    }
+                    else if (i0 == index_t(-1)
                         || i1 == index_t(-1)
                         || i2 == index_t(-1)
                         || i0 == i1
@@ -163,7 +171,7 @@ namespace
         }
 
         HRESULT setSubset(
-            _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
+            _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces, size_t nVerts,
             size_t faceOffset, size_t faceCount) noexcept
         {
             if (!indices || !mListElements)
@@ -201,6 +209,11 @@ namespace
                     // filter out unused triangles
                     continue;
                 }
+
+                if (i0 >= nVerts
+                    || i1 >= nVerts
+                    || i2 >= nVerts)
+                    return E_UNEXPECTED;
 
                 uint32_t unprocessed = 0;
 
@@ -508,7 +521,7 @@ namespace
     //---------------------------------------------------------------------------------
     template<class index_t>
     HRESULT StripReorderImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_opt_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap)
@@ -518,7 +531,7 @@ namespace
             return E_UNEXPECTED;
 
         mesh_status<index_t> status;
-        HRESULT hr = status.initialize(indices, nFaces, adjacency, subsets);
+        HRESULT hr = status.initialize(indices, nFaces, nVerts, adjacency, subsets);
         if (FAILED(hr))
             return hr;
 
@@ -530,7 +543,7 @@ namespace
 
         for (const auto& it : subsets)
         {
-            hr = status.setSubset(indices, nFaces, it.first, it.second);
+            hr = status.setSubset(indices, nFaces, nVerts, it.first, it.second);
             if (FAILED(hr))
                 return hr;
 
@@ -585,7 +598,7 @@ namespace
     //---------------------------------------------------------------------------------
     template<class index_t>
     HRESULT VertexCacheStripReorderImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces,
+        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces, _In_ size_t nVerts,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         _In_reads_opt_(nFaces) const uint32_t* attributes,
         _Out_writes_(nFaces) uint32_t* faceRemap,
@@ -596,7 +609,7 @@ namespace
             return E_UNEXPECTED;
 
         mesh_status<index_t> status;
-        HRESULT hr = status.initialize(indices, nFaces, adjacency, subsets);
+        HRESULT hr = status.initialize(indices, nFaces, nVerts, adjacency, subsets);
         if (FAILED(hr))
             return hr;
 
@@ -616,7 +629,7 @@ namespace
 
         for (const auto& it : subsets)
         {
-            hr = status.setSubset(indices, nFaces, it.first, it.second);
+            hr = status.setSubset(indices, nFaces, nVerts, it.first, it.second);
             if (FAILED(hr))
                 return hr;
 
@@ -771,12 +784,13 @@ _Use_decl_annotations_
 HRESULT DirectX::OptimizeFaces(
     const uint16_t* indices,
     size_t nFaces,
+    size_t nVerts,
     const uint32_t* adjacency,
     uint32_t* faceRemap,
     uint32_t vertexCache,
     uint32_t restart)
 {
-    if (!indices || !nFaces || !adjacency || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !adjacency || !faceRemap)
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
@@ -784,14 +798,14 @@ HRESULT DirectX::OptimizeFaces(
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {
-        return StripReorderImpl<uint16_t>(indices, nFaces, adjacency, nullptr, faceRemap);
+        return StripReorderImpl<uint16_t>(indices, nFaces, nVerts, adjacency, nullptr, faceRemap);
     }
     else
     {
         if (restart > vertexCache)
             return E_INVALIDARG;
 
-        return VertexCacheStripReorderImpl<uint16_t>(indices, nFaces, adjacency, nullptr, faceRemap, vertexCache, restart);
+        return VertexCacheStripReorderImpl<uint16_t>(indices, nFaces, nVerts, adjacency, nullptr, faceRemap, vertexCache, restart);
     }
 }
 
@@ -799,12 +813,13 @@ _Use_decl_annotations_
 HRESULT DirectX::OptimizeFaces(
     const uint32_t* indices,
     size_t nFaces,
+    size_t nVerts,
     const uint32_t* adjacency,
     uint32_t* faceRemap,
     uint32_t vertexCache,
     uint32_t restart)
 {
-    if (!indices || !nFaces || !adjacency || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !adjacency || !faceRemap)
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
@@ -812,14 +827,14 @@ HRESULT DirectX::OptimizeFaces(
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {
-        return StripReorderImpl<uint32_t>(indices, nFaces, adjacency, nullptr, faceRemap);
+        return StripReorderImpl<uint32_t>(indices, nFaces, nVerts, adjacency, nullptr, faceRemap);
     }
     else
     {
         if (restart > vertexCache)
             return E_INVALIDARG;
 
-        return VertexCacheStripReorderImpl<uint32_t>(indices, nFaces, adjacency, nullptr, faceRemap, vertexCache, restart);
+        return VertexCacheStripReorderImpl<uint32_t>(indices, nFaces, nVerts, adjacency, nullptr, faceRemap, vertexCache, restart);
     }
 }
 
@@ -829,13 +844,14 @@ _Use_decl_annotations_
 HRESULT DirectX::OptimizeFacesEx(
     const uint16_t* indices,
     size_t nFaces,
+    size_t nVerts,
     const uint32_t* adjacency,
     const uint32_t* attributes,
     uint32_t* faceRemap,
     uint32_t vertexCache,
     uint32_t restart)
 {
-    if (!indices || !nFaces || !adjacency || !attributes || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !adjacency || !attributes || !faceRemap)
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
@@ -843,14 +859,14 @@ HRESULT DirectX::OptimizeFacesEx(
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {
-        return StripReorderImpl<uint16_t>(indices, nFaces, adjacency, attributes, faceRemap);
+        return StripReorderImpl<uint16_t>(indices, nFaces, nVerts, adjacency, attributes, faceRemap);
     }
     else
     {
         if (restart > vertexCache)
             return E_INVALIDARG;
 
-        return VertexCacheStripReorderImpl<uint16_t>(indices, nFaces, adjacency, attributes, faceRemap, vertexCache, restart);
+        return VertexCacheStripReorderImpl<uint16_t>(indices, nFaces, nVerts, adjacency, attributes, faceRemap, vertexCache, restart);
     }
 }
 
@@ -858,13 +874,14 @@ _Use_decl_annotations_
 HRESULT DirectX::OptimizeFacesEx(
     const uint32_t* indices,
     size_t nFaces,
+    size_t nVerts,
     const uint32_t* adjacency,
     const uint32_t* attributes,
     uint32_t* faceRemap,
     uint32_t vertexCache,
     uint32_t restart)
 {
-    if (!indices || !nFaces || !adjacency || !attributes || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !adjacency || !attributes || !faceRemap)
         return E_INVALIDARG;
 
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
@@ -872,13 +889,13 @@ HRESULT DirectX::OptimizeFacesEx(
 
     if (vertexCache == OPTFACES_V_STRIPORDER)
     {
-        return StripReorderImpl<uint32_t>(indices, nFaces, adjacency, attributes, faceRemap);
+        return StripReorderImpl<uint32_t>(indices, nFaces, nVerts, adjacency, attributes, faceRemap);
     }
     else
     {
         if (restart > vertexCache)
             return E_INVALIDARG;
 
-        return VertexCacheStripReorderImpl<uint32_t>(indices, nFaces, adjacency, attributes, faceRemap, vertexCache, restart);
+        return VertexCacheStripReorderImpl<uint32_t>(indices, nFaces, nVerts, adjacency, attributes, faceRemap, vertexCache, restart);
     }
 }

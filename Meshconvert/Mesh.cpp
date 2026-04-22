@@ -654,20 +654,20 @@ HRESULT Mesh::Optimize(bool lru) noexcept
             // Optimize faces for pre-transform vertex cache
             if (lru)
             {
-                hr = OptimizeFacesLRUEx(mIndices.get(), mnFaces, mAttributes.get(), remap.get());
+                hr = OptimizeFacesLRUEx(mIndices.get(), mnFaces, mnVerts, mAttributes.get(), remap.get());
             }
             else
             {
-                hr = OptimizeFacesEx(mIndices.get(), mnFaces, mAdjacency.get(), mAttributes.get(), remap.get());
+                hr = OptimizeFacesEx(mIndices.get(), mnFaces, mnVerts, mAdjacency.get(), mAttributes.get(), remap.get());
             }
         }
         else if (lru)
         {
-            hr = OptimizeFacesLRU(mIndices.get(), mnFaces, remap.get());
+            hr = OptimizeFacesLRU(mIndices.get(), mnFaces, mnVerts, remap.get());
         }
         else
         {
-            hr = OptimizeFaces(mIndices.get(), mnFaces, mAdjacency.get(), remap.get());
+            hr = OptimizeFaces(mIndices.get(), mnFaces, mnVerts, mAdjacency.get(), remap.get());
         }
         if (FAILED(hr))
             return hr;

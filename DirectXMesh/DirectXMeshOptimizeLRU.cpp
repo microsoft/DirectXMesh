@@ -194,7 +194,7 @@ namespace
 
     template <typename IndexType>
     HRESULT OptimizeFacesImpl(
-        _In_reads_(indexCount) const IndexType* indexList, uint32_t indexCount,
+        _In_reads_(indexCount) const IndexType* indexList, uint32_t indexCount, size_t nVerts,
         _Out_writes_(indexCount / 3) uint32_t* faceRemap, uint32_t lruCacheSize, uint32_t offset)
     {
         std::unique_ptr<OptimizeVertexData<IndexType>[]> vertexDataList(new (std::nothrow) OptimizeVertexData<IndexType>[indexCount]);
@@ -244,6 +244,9 @@ namespace
                     vertexRemap[idx] = UNUSED32;
                     continue;
                 }
+
+                if (indexList[idx] >= nVerts)
+                    return E_UNEXPECTED;
 
                 if (!i || first || sortFunc(indexSorted[i - 1], idx))
                 {
@@ -510,10 +513,11 @@ _Use_decl_annotations_
 HRESULT DirectX::OptimizeFacesLRU(
     const uint16_t* indices,
     size_t nFaces,
+    size_t nVerts,
     uint32_t* faceRemap,
     uint32_t lruCacheSize)
 {
-    if (!indices || !nFaces || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !faceRemap)
         return E_INVALIDARG;
 
     if (!lruCacheSize || lruCacheSize > kMaxVertexCacheSize)
@@ -528,17 +532,18 @@ HRESULT DirectX::OptimizeFacesLRU(
     std::call_once(s_initOnce, ComputeVertexScores);
 #endif
 
-    return OptimizeFacesImpl<uint16_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
+    return OptimizeFacesImpl<uint16_t>(indices, static_cast<uint32_t>(nFaces * 3), nVerts, faceRemap, lruCacheSize, 0);
 }
 
 _Use_decl_annotations_
 HRESULT DirectX::OptimizeFacesLRU(
     const uint32_t* indices,
     size_t nFaces,
+    size_t nVerts,
     uint32_t* faceRemap,
     uint32_t lruCacheSize)
 {
-    if (!indices || !nFaces || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !faceRemap)
         return E_INVALIDARG;
 
     if (!lruCacheSize || lruCacheSize > kMaxVertexCacheSize)
@@ -553,7 +558,7 @@ HRESULT DirectX::OptimizeFacesLRU(
     std::call_once(s_initOnce, ComputeVertexScores);
 #endif
 
-    return OptimizeFacesImpl<uint32_t>(indices, static_cast<uint32_t>(nFaces * 3), faceRemap, lruCacheSize, 0);
+    return OptimizeFacesImpl<uint32_t>(indices, static_cast<uint32_t>(nFaces * 3), nVerts, faceRemap, lruCacheSize, 0);
 }
 
 
@@ -562,11 +567,12 @@ _Use_decl_annotations_
 HRESULT DirectX::OptimizeFacesLRUEx(
     const uint16_t* indices,
     size_t nFaces,
+    size_t nVerts,
     const uint32_t* attributes,
     uint32_t* faceRemap,
     uint32_t lruCacheSize)
 {
-    if (!indices || !nFaces || !attributes || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !attributes || !faceRemap)
         return E_INVALIDARG;
 
     if (!lruCacheSize || lruCacheSize > kMaxVertexCacheSize)
@@ -602,7 +608,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
             return E_UNEXPECTED;
 
         HRESULT hr = OptimizeFacesImpl<uint16_t>(
-            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3),
+            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3), nVerts,
             &faceRemap[it.first], lruCacheSize, uint32_t(it.first));
         if (FAILED(hr))
             return hr;
@@ -615,11 +621,12 @@ _Use_decl_annotations_
 HRESULT DirectX::OptimizeFacesLRUEx(
     const uint32_t* indices,
     size_t nFaces,
+    size_t nVerts,
     const uint32_t* attributes,
     uint32_t* faceRemap,
     uint32_t lruCacheSize)
 {
-    if (!indices || !nFaces || !attributes || !faceRemap)
+    if (!indices || !nFaces || !nVerts || !attributes || !faceRemap)
         return E_INVALIDARG;
 
     if (!lruCacheSize || lruCacheSize > kMaxVertexCacheSize)
@@ -655,7 +662,7 @@ HRESULT DirectX::OptimizeFacesLRUEx(
             return E_UNEXPECTED;
 
         HRESULT hr = OptimizeFacesImpl<uint32_t>(
-            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3),
+            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3), nVerts,
             &faceRemap[it.first], lruCacheSize, uint32_t(it.first));
         if (FAILED(hr))
             return hr;
