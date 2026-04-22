@@ -70,7 +70,7 @@ hr = OptimizeFaces(indices, nFaces, nVerts, adjacency, faceRemap, vertexCache, r
 
 * Starting with the March 2025 release, Windows 7 and Windows 8.0 support has been retired.
 
-* Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the *C++ Standard* section *17.5.2.1.3 Bitmask types*. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have _breaking change_ impacts to client code:
+* Starting with the June 2020 release, this library makes use of typed enum bitmask flags per the recommendation of the *C++ Standard* section *17.5.2.1.3 Bitmask types*. This is consistent with Direct3D 12's use of the ``DEFINE_ENUM_FLAG_OPERATORS`` macro. This may have *breaking change* impacts to client code:
 
   * You cannot pass the ``0`` literal as your flags value. Instead you must make use of the appropriate default enum value: ``CNORM_DEFAULT``, ``VALIDATE_DEFAULT``, or ``MESHLET_DEFAULT``.
 
@@ -95,7 +95,7 @@ hr = OptimizeFaces(indices, nFaces, nVerts, adjacency, faceRemap, vertexCache, r
 
 ## Support
 
-For questions, consider using [Stack Overflow](https://stackoverflow.com/questions/tagged/directxtk) with the _directxtk_ tag, or the [DirectX Discord Server](https://discord.gg/directx) in the _dx12-developers_ or _dx9-dx11-developers_ channel.
+For questions, consider using [Stack Overflow](https://stackoverflow.com/questions/tagged/directxtk) with the *directxtk* tag, or the [DirectX Discord Server](https://discord.gg/directx) in the *dx12-developers* or *dx9-dx11-developers* channel.
 
 For bug reports and feature requests, please use GitHub [issues](https://github.com/microsoft/DirectXMesh/issues) for this project.
 
