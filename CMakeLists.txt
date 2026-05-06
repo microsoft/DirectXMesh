@@ -104,7 +104,8 @@ endif()
 source_group(${PROJECT_NAME} REGULAR_EXPRESSION DirectXMesh/*.*)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/DirectXMesh>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/DirectXMesh>)
+target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
@@ -127,13 +128,17 @@ endif()
 
 if(directxmath_FOUND)
     message(STATUS "Using DirectXMath package")
-    target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectXMath)
+    if((NOT MINGW) AND WIN32)
+      target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectXMath)
+    endif()
 endif()
 
 if(directx-headers_FOUND)
     message(STATUS "Using DirectX-Headers package")
-    target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectX-Headers)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE USING_DIRECTX_HEADERS)
+    if((NOT MINGW) AND WIN32)
+      target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectX-Headers)
+      target_compile_definitions(${PROJECT_NAME} PRIVATE USING_DIRECTX_HEADERS)
+    endif()
 endif()
 
 #--- Utilities
@@ -146,7 +151,8 @@ add_library(Utilities INTERFACE)
 source_group(Utilities REGULAR_EXPRESSION Utilities/*.*)
 
 target_include_directories(Utilities INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Utilities>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Utilities>)
+target_include_directories(Utilities SYSTEM INTERFACE
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/utils>)
 
 #--- Package
@@ -167,10 +173,9 @@ install(TARGETS ${PROJECT_NAME}
   COMPONENT library)
 
 # Create pkg-config file
-include(build/JoinPaths.cmake)
 # from: https://github.com/jtojnar/cmake-snips#concatenating-paths-when-building-pkg-config-files
-join_paths(DIRECTXMESH_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
-join_paths(DIRECTXMESH_LIBDIR_FOR_PKG_CONFIG "\${prefix}"     "${CMAKE_INSTALL_LIBDIR}")
+cmake_path(APPEND DIRECTXMESH_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
+cmake_path(APPEND DIRECTXMESH_LIBDIR_FOR_PKG_CONFIG "\${prefix}"     "${CMAKE_INSTALL_LIBDIR}")
 
 set(DIRECTXMESH_DEP_L "")
 if(directxmath_FOUND)
@@ -225,6 +230,8 @@ install(FILES
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PACKAGE_NAME})
 
 #--- Command-line tool
+set(TOOL_EXES "")
+
 if(BUILD_TOOLS AND WIN32)
   set(TOOL_EXES meshconvert)
 
@@ -284,8 +291,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         target_compile_options(${t} PRIVATE "-Wno-attributes")
       endif()
     endforeach()
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 14)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     if(ENABLE_CODE_ANALYSIS)
       message(STATUS "Building with Code Analysis (PREFIX)")
@@ -322,6 +327,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     endforeach()
 
     if(BUILD_FUZZING AND (NOT WINDOWS_STORE))
+      # Prevent fuzzing builds (which is otherwise configured as a Release mode) from disabling assertions
       string(REPLACE "/DNDEBUG" "" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
       string(REPLACE "/DNDEBUG" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
 
@@ -335,7 +341,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
 if(WIN32)
-    if(BUILD_DX12 OR (${DIRECTX_ARCH} MATCHES "^arm64"))
+    if(BUILD_DX12 OR (DIRECTX_ARCH MATCHES "^arm64"))
         message(STATUS "Building with DirectX 12 Runtime support")
         set(WINVER 0x0A00)
     else()
