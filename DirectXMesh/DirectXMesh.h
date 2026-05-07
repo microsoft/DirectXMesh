@@ -40,7 +40,7 @@
 #include <DirectXCollision.h>
 #include <DirectXPackedVector.h>
 
-#define DIRECTX_MESH_VERSION 171
+#define DIRECTX_MESH_VERSION 172
 
 #if defined(_WIN32) && defined(DIRECTX_MESH_EXPORT)
 #ifdef __GNUC__
