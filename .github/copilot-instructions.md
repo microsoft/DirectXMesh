@@ -110,7 +110,7 @@ HRESULT DirectX::ComputeNormals(
 #### `noexcept` Rules
 
 - All query and utility functions that cannot fail (e.g., `IsValidVB`, `IsValidIB`) are marked `noexcept`.
-- HRESULT-returning functions that do not perform heap allocation or use Standard C++ containers are `noexcept` — errors are communicated via return code, never via exceptions (e.g., `ComputeNormals`, `ReorderIB`, `FinalizeIB`, `FinalizeVB`, `CompactVB`, `OptimizeVertices`, `ComputeCullData`).
+- HRESULT-returning functions that do not use Standard C++ containers are `noexcept` — errors are communicated via return code, never via exceptions (e.g., `ComputeNormals`, `ReorderIB`, `FinalizeIB`, `FinalizeVB`, `CompactVB`, `OptimizeVertices`, `ComputeCullData`). Note that `noexcept` HRESULT functions may still allocate scratch memory internally using `new (std::nothrow)` and return `E_OUTOFMEMORY` on failure — `noexcept` only means they will not throw C++ exceptions.
 - HRESULT-returning functions that use `std::vector`, `std::function`, or other potentially throwing types are *not* marked `noexcept` — they may throw on allocation failure (e.g., `GenerateAdjacencyAndPointReps`, `Validate`, `Clean`, `WeldVertices`, `ComputeMeshlets`, `OptimizeFaces`).
 - Constructors and functions that perform heap allocation or utilize Standard C++ containers that may throw are marked `noexcept(false)`.
 
