@@ -6,6 +6,12 @@ Releases available for download on [GitHub](https://github.com/microsoft/DirectX
 
 ## Release History
 
+### May 7, 2026
+* *breaking change* Added **nVerts** parameter to `OptimizeFaces(LRU)Ex` functions to improve input bounds checking
+* Extra bounds checking for all functions that take indices via an array
+* CMake project updates
+* Minor comments cleanup
+
 ### March 31, 2026
 * Minor code review
 * VS 2026 support

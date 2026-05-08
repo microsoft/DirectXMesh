@@ -6,7 +6,7 @@ https://go.microsoft.com/fwlink/?LinkID=324981
 
 Copyright (c) Microsoft Corporation.
 
-## March 31, 2026
+## May 7, 2026
 
 This package contains DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.
 
@@ -56,7 +56,7 @@ For a full change history, see [CHANGELOG.md](https://github.com/microsoft/Direc
 
 * The CMake projects require 3.21 or later.
 
-* Starting with the April 2026 release, the OptimizeFaces(LRU)(Ex) functions now take an `nVerts` parameter in order to validate the input indices. This is a *breaking change*.
+* Starting with the May 2026 release, the functions `OptimizeFaces`, `OptimizeFacesLRU`, `OptimizeFacesEx`, and `OptimizeFacesLRUEx` now take an `nVerts` parameter in order to validate the input indices. This is a *breaking change*.
 
 ```cpp
 hr = OptimizeFaces(indices, nFaces, adjacency, faceRemap, vertexCache, restart);
