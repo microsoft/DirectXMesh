@@ -36,6 +36,7 @@ https://github.com/microsoft/DirectXMesh/wiki
 
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingEmptyCatchBlock', '', Scope='Module')]
 param(
     [string]$PAT = "",
     [switch]$SkipTestRepo,
@@ -184,6 +185,7 @@ function Push-SignedTag {
 
 #--- Helper: create a GitHub release ---
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Scope='Function')]
 function New-GitHubRelease {
     param(
         [Parameter(Mandatory)] [string]$Owner,
