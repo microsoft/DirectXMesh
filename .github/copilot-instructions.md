@@ -311,7 +311,7 @@ When reviewing documentation, do the following:
 20. Run `.\vcpkg --x-add-version directxmesh` to update the VCPKG versioning history.
 21. Submit a PR to the VCPKG repository to update the DirectXMesh port back to the main GitHub repo. The PR will be reviewed and merged by the VCPKG maintainers.
 22. If relevant changes were made to the `meshconvert` tool, update the winget manifests for that tool in the `winget` repository.
-  - Git pull a local repository to `D:\winget-pkgs` in sync with the `master` branch of the WinGet repository.
-  - Run the PowerShell script `build\updatewinget.ps1` to update the winget manifests for the tool with the new release version.
-  - Submit a PR to the `winget` repository to update the manifests for the tool.
+- Git pull a local repository to `D:\winget-pkgs` in sync with the `master` branch of the WinGet repository.
+- Run the PowerShell script `build\updatewinget.ps1` to update the winget manifests for the tool with the new release version.
+- Submit a PR to the `winget` repository to update the manifests for the tool.
 23. Update the GitHub release with links to the matching NuGet packages, the VCPKG port, and the winget manifests for the tools.
