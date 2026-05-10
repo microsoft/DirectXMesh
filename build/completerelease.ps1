@@ -185,7 +185,7 @@ function Push-SignedTag {
 
 #--- Helper: create a GitHub release ---
 
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Scope='Function')]
 function New-GitHubRelease {
     param(
         [Parameter(Mandatory)] [string]$Owner,
