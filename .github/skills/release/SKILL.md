@@ -52,15 +52,8 @@ description: Guide for performing the DirectXMesh release process. Use this skil
 
 17. Git pull a local repository of VCPKG to `d:\vcpkg` in sync with the `main` branch of the VCPKG repository.
 18. Run the PowerShell script `build\updatevcpkg.ps1` to update the DirectXMesh port in VCPKG with the new release version. This will edit the files in `ports\directxmesh`.
-19. Test the VCPKG port using the script at `assets/vcpkgdxmesh.cmd` (in this skill folder). Copy it to `d:\vcpkg` and run from there. This tests the following triplets and features:
-    - **Windows desktop**: `x86-windows`, `x64-windows`, `arm64-windows`, `arm64ec-windows` (dynamic), plus `-static` and `-static-md` variants for x86/x64/arm64.
-    - **Features**: `[tools]`, `[dx12]`, `[spectre]` on desktop triplets.
-    - **UWP**: `x86-uwp`, `x64-uwp`, `arm64-uwp`.
-    - **MinGW** (if compilers available): `x64-mingw-dynamic`, `x64-mingw-static`, `x86-mingw-dynamic`, `x86-mingw-static` with `[dx12]` and `[tools]` features.
-    - **Xbox** (if GDKX available, or pass `xbox` argument): `x64-xbox-scarlett`, `x64-xbox-scarlett-static`, `x64-xbox-xboxone`, `x64-xbox-xboxone-static`.
-    - **Linux** (run separately on Linux): `x64-linux`, `arm64-linux` with default and `[dx12]` features.
-
     If the port includes patches, review them to determine if they should be removed or updated for the new release (the `updatevcpkg.ps1` script will warn about this).
+19. Test the VCPKG port using the script at `assets/vcpkgdxmesh.cmd` (in this skill folder). Copy it to `d:\vcpkg` and run from there after bootstrapping VCPKG.
 20. Run `.\vcpkg x-add-version directxmesh` to update the VCPKG versioning history.
 21. Submit a PR to the VCPKG repository to update the DirectXMesh port back to the main GitHub repo. The PR will be reviewed and merged by the VCPKG maintainers.
 
