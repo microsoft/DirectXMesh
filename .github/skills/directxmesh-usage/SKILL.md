@@ -77,48 +77,24 @@ All functions reside in the `DirectX` namespace. Most functions have overloads f
 
 ## Typical Processing Pipeline
 
+```mermaid
+flowchart TD
+    A[Load geometry\npositions, indices, texcoords] --> B
+    B[GenerateAdjacencyAndPointReps] -->|adjacency, pointRep| C
+    C[Validate\noptional diagnostics] --> D
+    D[Clean\nfix bowties, degenerate triangles] -->|dupVerts| E
+    E[ComputeNormals / ComputeTangentFrame] --> F
+    F[AttributeSort] -->|faceRemap| G
+    G[OptimizeFaces] -->|faceRemap| H
+    H[ReorderIB\napply face remap] --> I
+    I[OptimizeVertices] -->|vertexRemap| J
+    J[FinalizeIB + FinalizeVB\napply vertex remap and dupVerts] --> K
+    K[CompactVB\noptional, remove trailing unused vertices] --> L
+    L[ComputeMeshlets] -->|"meshlets, uniqueVertexIB (uint8_t), primitiveIndices"| M
+    M[ComputeCullData\nfor mesh shader GPU culling]
 ```
-Load geometry (positions, indices, texcoords)
-    │
-    ▼
-GenerateAdjacencyAndPointReps  ──→  adjacency[], pointRep[]
-    │
-    ▼
-Validate (optional diagnostics)
-    │
-    ▼
-Clean (fix bowties, degenerate triangles) ──→ dupVerts[]
-    │
-    ▼
-ComputeNormals / ComputeTangentFrame
-    │
-    ▼
-AttributeSort ──→ faceRemap[]
-    │
-    ▼
-OptimizeFaces ──→ faceRemap[]
-    │
-    ▼
-ReorderIB (apply face remap)
-    │
-    ▼
-OptimizeVertices ──→ vertexRemap[]
-    │
-    ▼
-FinalizeIB + FinalizeVB (apply vertex remap and dupVerts)
-    │
-    ▼
-CompactVB (optional, remove trailing unused vertices)
-    │
-    ▼
-ComputeMeshlets ──→ meshlets[], uniqueVertexIB (uint8_t[]), primitiveIndices[]
-    │
-    ▼
-ComputeCullData (for mesh shader GPU culling)
-    NOTE: uniqueVertexIB from ComputeMeshlets is a packed buffer of
-    uint16_t or uint32_t indices (matching the original IB format).
-    Reinterpret-cast it to the appropriate type for ComputeCullData.
-```
+
+> **Note:** `uniqueVertexIB` from `ComputeMeshlets` is a packed buffer of `uint16_t` or `uint32_t` indices (matching the original IB format). Reinterpret-cast it to the appropriate type for `ComputeCullData`.
 
 ## Error Handling
 
