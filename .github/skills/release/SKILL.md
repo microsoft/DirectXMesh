@@ -34,7 +34,7 @@ description: Guide for performing the DirectXMesh release process. Use this skil
 7. Push the `main` branch to the MSCodeHub mirror repository. Be sure to include `--tags`.
 8. Create a PR on MSCodeHub from the `main` branch to the `release` branch.
 9. Merge the PR on MSCodeHub to update the release branch, which will trigger the Azure DevOps pipeline to build signed binaries and the NuGet packages.
-10. Run the PowerShell script `build\downloadartifacts.ps1` to download the signed binaries from the Azure DevOps pipeline artifacts.
+10. Run the PowerShell script `build\downloadbuild.ps1` to download the signed binaries from the Azure DevOps pipeline artifacts.
 11. Edit the GitHub release and upload the signed binaries to the release assets.
 
 ### Phase 4: Source Archive Signing
@@ -45,15 +45,23 @@ description: Guide for performing the DirectXMesh release process. Use this skil
 ### Phase 5: NuGet Validation and Publishing
 
 14. Validate the NuGet packages with <https://github.com/walbourn/contentexporter> by pushing the NuGet packages to a local Packages Source folder, updating the NuGet packages from that folder, and then build the project.
-15. Run the PowerShell script `build\promotenuget.ps1` with the `-Release` parameter to promote the version to the Release view on the project-scoped ADO feed.
+15. Run the PowerShell script `build\promotenuget.ps1 -Version <version> -Release` to promote the version to the Release view on the project-scoped ADO feed. The `-Version` parameter is required and should match the NuGet package version (e.g., `2026.6.2.1`).
 16. Run the MSCodeHub pipeline to publish the NuGet packages to nuget.org. The pipeline will automatically push the most recent package promoted to the Release view to nuget.org.
 
 ### Phase 6: VCPKG Port Update
 
 17. Git pull a local repository of VCPKG to `d:\vcpkg` in sync with the `main` branch of the VCPKG repository.
 18. Run the PowerShell script `build\updatevcpkg.ps1` to update the DirectXMesh port in VCPKG with the new release version. This will edit the files in `ports\directxmesh`.
-19. Test the VCPKG port using all appropriate triplets and features.
-20. Run `.\vcpkg --x-add-version directxmesh` to update the VCPKG versioning history.
+19. Test the VCPKG port using the script at `assets/vcpkgdxmesh.cmd` (in this skill folder). Copy it to `d:\vcpkg` and run from there. This tests the following triplets and features:
+    - **Windows desktop**: `x86-windows`, `x64-windows`, `arm64-windows`, `arm64ec-windows` (dynamic), plus `-static` and `-static-md` variants for x86/x64/arm64.
+    - **Features**: `[tools]`, `[dx12]`, `[spectre]` on desktop triplets.
+    - **UWP**: `x86-uwp`, `x64-uwp`, `arm64-uwp`.
+    - **MinGW** (if compilers available): `x64-mingw-dynamic`, `x64-mingw-static`, `x86-mingw-dynamic`, `x86-mingw-static` with `[dx12]` and `[tools]` features.
+    - **Xbox** (if GDKX available, or pass `xbox` argument): `x64-xbox-scarlett`, `x64-xbox-scarlett-static`, `x64-xbox-xboxone`, `x64-xbox-xboxone-static`.
+    - **Linux** (run separately on Linux): `x64-linux`, `arm64-linux` with default and `[dx12]` features.
+
+    If the port includes patches, review them to determine if they should be removed or updated for the new release (the `updatevcpkg.ps1` script will warn about this).
+20. Run `.\vcpkg x-add-version directxmesh` to update the VCPKG versioning history.
 21. Submit a PR to the VCPKG repository to update the DirectXMesh port back to the main GitHub repo. The PR will be reviewed and merged by the VCPKG maintainers.
 
 ### Phase 7: WinGet Manifests (Conditional)
@@ -74,7 +82,7 @@ When fully completed, be sure to update the GitHub release with links to the mat
 | --- | --- |
 | `build\preparerelease.ps1` | Creates topic branch, updates version numbers and changelog stub |
 | `build\completerelease.ps1` | Sets tags, creates GitHub release from changelog |
-| `build\downloadartifacts.ps1` | Downloads signed binaries from Azure DevOps |
-| `build\promotenuget.ps1 -Release` | Promotes NuGet package to Release view on ADO feed |
-| `build\updatevcpkg.ps1` | Updates DirectXTK VCPKG port files |
+| `build\downloadbuild.ps1` | Downloads signed binaries from Azure DevOps |
+| `build\promotenuget.ps1 -Version <ver> -Release` | Promotes NuGet package to Release view on ADO feed |
+| `build\updatevcpkg.ps1` | Updates DirectXMesh VCPKG port files |
 | `build\updatewinget.ps1` | Updates winget manifests for CLI tools |
