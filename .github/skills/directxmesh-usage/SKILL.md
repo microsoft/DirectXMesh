@@ -3,7 +3,7 @@ name: directxmesh-usage
 description: Guide for integrating the DirectXMesh geometry processing library into a C++ project.
 ---
 
-# Using DirectXMesh in Your Project
+# DirectXMesh Usage Guide
 
 This skill provides guidance for integrating the DirectXMesh geometry processing library into a C++ project.
 
@@ -14,6 +14,15 @@ Invoke this skill when:
 - Adding DirectXMesh as a dependency to a new or existing project.
 - Writing code that processes mesh geometry (normals, tangents, optimization, meshlets).
 - Needing to understand the typical DirectXMesh processing pipeline.
+
+## Overview
+
+DirectXMesh is a geometry processing library for Direct3D 11 and Direct3D 12 applications. It provides support for loading and saving mesh data, and performing various geometry processing operations including normal and tangent computation, adjacency generation, and mesh optimization.
+
+- **Repository**: <https://github.com/microsoft/DirectXMesh>
+- **Documentation**: <https://github.com/microsoft/DirectXMesh/wiki>
+- **NuGet Packages**: `directxmesh_desktop_win10`, `directxmesh_uwp`
+- **vcpkg Port**: `directxmesh`
 
 ## Integration Methods
 
@@ -36,29 +45,20 @@ In your `vcpkg.json` file, add the following:
 vcpkg install directxmesh
 ```
 
-Features: `dx12` (DirectX 12 input layout support). Triplets: `x64-windows`, `x64-linux`, `arm64-windows`, etc.
+Features: `dx12` (DirectX 12 input layout support), `tools` (command-line tools). Triplets: `x64-windows`, `x64-linux`, `arm64-windows`, etc.
 
-For DLL usage (`x64-windows` default triplet), define `DIRECTX_MESH_IMPORT` in your consuming project.
+For DLL usage (`x64-windows` default triplet), define `DIRECTX_MESH_IMPORT` in your consuming project. For static library usage, use `-static-md` triplet variants.
 
-### CMake (FetchContent)
+CMakeLists.txt:
 
 ```cmake
-include(FetchContent)
-FetchContent_Declare(
-  DirectXMesh
-  GIT_REPOSITORY https://github.com/microsoft/DirectXMesh.git
-  GIT_TAG main
-)
-FetchContent_MakeAvailable(DirectXMesh)
-target_link_libraries(${PROJECT_NAME} PRIVATE DirectXMesh)
+find_package(directxmesh CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Microsoft::DirectXMesh)
 ```
-
-Key CMake options: `BUILD_DX12` (ON by default), `BUILD_SHARED_LIBS` (OFF by default).
 
 ### NuGet
 
-- **directxmesh_desktop_win10** — Windows desktop (Win10/Win11), includes DX12 and ARM64.
-- **directxmesh_uwp** — Universal Windows Platform apps.
+Use `directxmesh_desktop_win10` for Win32 desktop applications or `directxmesh_uwp` for UWP apps.
 
 ### Project Reference
 
@@ -138,3 +138,9 @@ ComputeCullData (for mesh shader GPU culling)
 - Windows desktop (Win8.1+), UWP, Xbox (GDK), and Linux are supported.
 - Non-Windows builds require the [DirectX-Headers](https://github.com/microsoft/DirectX-Headers) package and define `USING_DIRECTX_HEADERS`.
 - The library requires C++17 to build but the public API is C++11 compatible.
+
+## Further Reading
+
+- [Getting Started](https://github.com/microsoft/DirectXMesh/wiki/Getting-Started)
+- [DirectXMesh Wiki](https://github.com/microsoft/DirectXMesh/wiki)
+- [API Reference](reference/overview.md)
