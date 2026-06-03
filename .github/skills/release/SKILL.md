@@ -13,6 +13,7 @@ description: Guide for performing the DirectXMesh release process. Use this skil
 - Local repositories:
   - VCPKG at `d:\vcpkg` (synced with `main` branch)
   - WinGet at `D:\winget-pkgs` (synced with `master` branch, only if tool updates needed)
+- PATs will be needed for scripts that access GitHub and ADO.
 
 <!-- markdownlint-disable MD029 -->
 ## Steps
