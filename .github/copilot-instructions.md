@@ -39,6 +39,7 @@ build/        # Miscellaneous build files and scripts.
 DirectXMesh/  # DirectXMesh implementation files.
 Utilities/    # Utility headers such as a WaveFront .obj file loader and a FVF converter.
 Meshconvert/  # CLI tool for importing WaveFront .obj files and converting to CMO, SDKMESH, or VBO formats.
+skills/       # Published CoPilot skills for use by developers.
 Tests/        # Tests are designed to be cloned from a separate repository at this location.
 wiki/         # Local clone of the GitHub wiki documentation repository.
 ```
