@@ -40,11 +40,23 @@ These components are designed to work without requiring any content from the leg
 
 * ``skills\``
 
-   * Contains published CoPilot skills for use by developers.
+  * Contains published CoPilot skills for use by developers.
 
 ## Documentation
 
 Documentation is available on the [GitHub wiki](https://github.com/Microsoft/DirectXMesh/wiki).
+
+## CoPilot Usage
+
+For CoPilot CLI assistance with using DirectXMesh, try:
+
+```bash
+winget install GitHub.Copilot
+winget install GitHub.cli
+gh skill install microsoft/directxmesh directxmesh-usage
+copilot
+/skills list
+```
 
 ## Notices
 
