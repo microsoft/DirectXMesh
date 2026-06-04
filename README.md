@@ -53,7 +53,7 @@ For CoPilot CLI assistance with using DirectXMesh, try:
 ```bash
 winget install GitHub.Copilot
 winget install GitHub.cli
-gh skill install microsoft/directxmesh directxmesh-usage
+gh skill install microsoft/directxmesh
 copilot
 /skills list
 ```
