@@ -45,7 +45,7 @@ vcpkg install directxmesh[tools]
 
 ## Basic Syntax
 
-```
+```plaintext
 meshconvert [options] [--file-list <filename>] <file-name(s)>
 ```
 
