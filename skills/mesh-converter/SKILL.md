@@ -1,6 +1,11 @@
 ---
 name: mesh-converter
-description: Guide for using the meshconvert command-line tool to convert Wavefront OBJ files to DirectX runtime formats (CMO, SDKMESH, VBO).
+description: >-
+  Guide for using the meshconvert command-line tool to convert Wavefront OBJ files to DirectX runtime formats (CMO, SDKMESH, VBO).
+license: MIT
+metadata:
+  author: chuckw
+  version: "1.0"
 ---
 
 # Mesh Converter Skill

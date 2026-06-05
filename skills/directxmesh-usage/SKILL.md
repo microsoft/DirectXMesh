@@ -1,6 +1,11 @@
 ---
 name: directxmesh-usage
-description: Guide for integrating the DirectXMesh geometry processing library into a C++ project.
+description: >-
+  Guide for integrating the DirectXMesh geometry processing library into a C++ project.
+license: MIT
+metadata:
+  author: chuckw
+  version: "1.0"
 ---
 
 # DirectXMesh Usage Guide
