@@ -275,20 +275,23 @@ endforeach()
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|IntelLLVM")
     set(WarningsLib -Wall -Wpedantic -Wextra)
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16.0)
-        list(APPEND WarningsLib "-Wno-unsafe-buffer-usage")
+        list(APPEND WarningsLib -Wno-unsafe-buffer-usage)
     endif()
     target_compile_options(${PROJECT_NAME} PRIVATE ${WarningsLib})
 
-    set(WarningsEXE ${WarningsLib} "-Wno-c++98-compat" "-Wno-c++98-compat-pedantic" "-Wno-switch" "-Wno-switch-enum" "-Wno-switch-default" "-Wno-double-promotion" "-Wno-exit-time-destructors" "-Wno-missing-prototypes")
+    set(WarningsEXE ${WarningsLib}
+        -Wno-c++98-compat -Wno-c++98-compat-pedantic
+        -Wno-switch -Wno-switch-enum -Wno-switch-default -Wno-double-promotion -Wno-exit-time-destructors
+        -Wno-missing-prototypes -Wno-padded)
     foreach(t IN LISTS TOOL_EXES)
       target_compile_options(${t} PRIVATE ${WarningsEXE})
     endforeach()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     foreach(t IN LISTS TOOL_EXES ITEMS ${PROJECT_NAME})
-      target_compile_options(${t} PRIVATE "-Wno-ignored-attributes" "-Walloc-size-larger-than=4GB")
+      target_compile_options(${t} PRIVATE -Wno-ignored-attributes -Walloc-size-larger-than=4GB)
 
       if(BUILD_SHARED_LIBS)
-        target_compile_options(${t} PRIVATE "-Wno-attributes")
+        target_compile_options(${t} PRIVATE -Wno-attributes)
       endif()
     endforeach()
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
