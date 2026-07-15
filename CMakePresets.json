@@ -305,8 +305,8 @@
 
     { "name": "x64-Debug-Linux",     "description": "WSL Linux x64 (Debug)", "inherits": [ "base", "x64", "Debug", "VCPKG" ] },
     { "name": "x64-Release-Linux",   "description": "WSL Linux x64 (Release)", "inherits": [ "base", "x64", "Release", "VCPKG" ] },
-    { "name": "arm64-Debug-Linux",   "description": "WSL Linux ARM64 (Debug)", "inherits": [ "base", "ARM64", "Debug", "VCPKG" ] },
-    { "name": "arm64-Release-Linux", "description": "WSL Linux ARM64 (Release)", "inherits": [ "base", "ARM64", "Release", "VCPKG" ] },
+    { "name": "arm64-Debug-Linux",   "description": "WSL Linux AArch64 (Debug)", "inherits": [ "base", "ARM64", "Debug", "VCPKG" ] },
+    { "name": "arm64-Release-Linux", "description": "WSL Linux AArch64 (Release)", "inherits": [ "base", "ARM64", "Release", "VCPKG" ] },
 
     { "name": "x64-Debug-ICC"     , "description": "Intel Classic Compiler (Debug) with DX12", "inherits": [ "base", "x64", "Debug", "Intel" ] },
     { "name": "x64-Release-ICC"   , "description": "Intel Classic Compiler (Release) with DX12", "inherits": [ "base", "x64", "Release", "Intel" ] },
@@ -341,6 +341,11 @@
     { "name": "x64-Release-MinGW"  , "configurePreset": "x64-Release-MinGW" },
     { "name": "x86-Debug-MinGW"    , "configurePreset": "x86-Debug-MinGW" },
     { "name": "x86-Release-MinGW"  , "configurePreset": "x86-Release-MinGW" },
+
+    { "name": "x64-Debug-Linux", "configurePreset": "x64-Debug-Linux" },
+    { "name": "x64-Release-Linux", "configurePreset": "x64-Release-Linux" },
+    { "name": "arm64-Debug-Linux", "configurePreset": "arm64-Debug-Linux" },
+    { "name": "arm64-Release-Linux", "configurePreset": "arm64-Release-Linux" },
 
     { "name": "x64-Debug-ICC"  , "configurePreset": "x64-Debug-ICC" },
     { "name": "x64-Release-ICC", "configurePreset": "x64-Release-ICC" },
