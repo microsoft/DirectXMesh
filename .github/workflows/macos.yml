@@ -74,7 +74,9 @@ jobs:
           runVcpkgInstall: true
           vcpkgJsonGlob: '**/build/vcpkg.json'
           vcpkgGitCommitId: '${{ env.VCPKG_COMMIT_ID }}'
-          runVcpkgFormatString: '[`install`, `--allow-unsupported`, `--recurse`, `--clean-after-build`, `--x-install-root`, `$[env.VCPKG_INSTALLED_DIR]`, `--triplet`, `arm64-osx`]'
+          runVcpkgFormatString: >
+            [`install`, `--allow-unsupported`, `--recurse`, `--clean-after-build`, `--x-install-root`,
+            `$[env.VCPKG_INSTALLED_DIR]`, `--triplet`, `arm64-osx`]
 
       - name: 'Configure CMake'
         working-directory: ${{ github.workspace }}
