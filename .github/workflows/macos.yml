@@ -74,7 +74,7 @@ jobs:
           runVcpkgInstall: true
           vcpkgJsonGlob: '**/build/vcpkg.json'
           vcpkgGitCommitId: '${{ env.VCPKG_COMMIT_ID }}'
-          runVcpkgFormatString: '[`install`, `--allow-unsupported`, `--recurse`, `--clean-after-build`, `--x-install-root`, `$[env.VCPKG_INSTALLED_DIR]`, `--triplet`, `arm64-macos`]'
+          runVcpkgFormatString: '[`install`, `--allow-unsupported`, `--recurse`, `--clean-after-build`, `--x-install-root`, `$[env.VCPKG_INSTALLED_DIR]`, `--triplet`, `arm64-osx`]'
 
       - name: 'Configure CMake'
         working-directory: ${{ github.workspace }}
@@ -82,7 +82,7 @@ jobs:
           cmake --preset=${{ matrix.build_type }}
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           -DVCPKG_MANIFEST_DIR="${{ github.workspace }}/build"
-          -DVCPKG_TARGET_TRIPLET="arm64-macos"
+          -DVCPKG_TARGET_TRIPLET="arm64-osx"
 
       - name: 'Build'
         working-directory: ${{ github.workspace }}
@@ -98,7 +98,7 @@ jobs:
           cmake --preset=${{ matrix.build_type }}
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           -DVCPKG_MANIFEST_DIR="${{ github.workspace }}/build"
-          -DVCPKG_TARGET_TRIPLET="arm64-macos" -DBUILD_SHARED_LIBS=ON
+          -DVCPKG_TARGET_TRIPLET="arm64-osx" -DBUILD_SHARED_LIBS=ON
 
       - name: 'Build (-shared)'
         working-directory: ${{ github.workspace }}
