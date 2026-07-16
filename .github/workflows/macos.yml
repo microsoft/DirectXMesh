@@ -82,7 +82,7 @@ jobs:
           cmake --preset=${{ matrix.build_type }}
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           -DVCPKG_MANIFEST_DIR="${{ github.workspace }}/build"
-          -DVCPKG_TARGET_TRIPLET="arm64-osx"
+          -DVCPKG_TARGET_TRIPLET="arm64-osx" -DVCPKG_INSTALL_OPTIONS=--allow-unsupported
 
       - name: 'Build'
         working-directory: ${{ github.workspace }}
@@ -98,7 +98,7 @@ jobs:
           cmake --preset=${{ matrix.build_type }}
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
           -DVCPKG_MANIFEST_DIR="${{ github.workspace }}/build"
-          -DVCPKG_TARGET_TRIPLET="arm64-osx" -DBUILD_SHARED_LIBS=ON
+          -DVCPKG_TARGET_TRIPLET="arm64-osx" -DVCPKG_INSTALL_OPTIONS=--allow-unsupported -DBUILD_SHARED_LIBS=ON
 
       - name: 'Build (-shared)'
         working-directory: ${{ github.workspace }}
