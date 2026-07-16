@@ -311,6 +311,7 @@ The project includes published CoPilot skills for developers:
 - **mesh-converter**: Provides guidance for using the meshconvert command-line tool. Located in the `skills/mesh-converter/` directory.
 
 To use these skills in the Copilot CLI:
+
 ```bash
 /skills list
 /skills search directxmesh
