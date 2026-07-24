@@ -25,7 +25,7 @@ steps:
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} pcdbg
     inputs:
-      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.sln
+      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.slnx
       vsVersion: ${{ parameters.msVersion }}
       platform: x64
       configuration: Debug
@@ -34,7 +34,7 @@ steps:
   - task: VSBuild@1
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} pcrel
     inputs:
-      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.sln
+      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.slnx
       vsVersion: ${{ parameters.msVersion }}
       platform: x64
       configuration: Release
@@ -44,7 +44,7 @@ steps:
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} xbdbg
     condition: eq(${{ parameters.xboxone }}, true)
     inputs:
-      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.sln
+      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.slnx
       vsVersion: ${{ parameters.msVersion }}
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Debug
@@ -54,7 +54,7 @@ steps:
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} xbrel
     condition: eq(${{ parameters.xboxone }}, true)
     inputs:
-      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.sln
+      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.slnx
       vsVersion: ${{ parameters.msVersion }}
       platform: Gaming.Xbox.XboxOne.x64
       configuration: Release
@@ -64,7 +64,7 @@ steps:
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} scardbg
     condition: eq(${{ parameters.scarlett }}, true)
     inputs:
-      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.sln
+      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.slnx
       vsVersion: ${{ parameters.msVersion }}
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Debug
@@ -74,7 +74,7 @@ steps:
     displayName: Build solution DirectXMesh_GDKX_${{ parameters.vsYear }} scarrel
     condition: eq(${{ parameters.scarlett }}, true)
     inputs:
-      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.sln
+      solution: DirectXMesh_GDKX_${{ parameters.vsYear }}.slnx
       vsVersion: ${{ parameters.msVersion }}
       platform: Gaming.Xbox.Scarlett.x64
       configuration: Release

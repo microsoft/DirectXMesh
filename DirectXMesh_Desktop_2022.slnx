@@ -3,13 +3,12 @@
     <BuildType Name="Debug" />
     <BuildType Name="Profile" />
     <BuildType Name="Release" />
-    <Platform Name="ARM64" />
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="DirectXMesh/DirectXMesh_Desktop_2026.vcxproj" Id="6857f086-f6fe-4150-9ed7-7446f1c1c220" />
-  <Project Path="Meshconvert/Meshconvert_Desktop_2026.vcxproj" Id="6d4cfd0e-8772-462a-9ac1-7dbad9c16880" />
+  <Project Path="DirectXMesh/DirectXMesh_Desktop_2022.vcxproj" Id="6857f086-f6fe-4150-9ed7-7446f1c1c220" />
+  <Project Path="Meshconvert/Meshconvert_Desktop_2022.vcxproj" Id="6d4cfd0e-8772-462a-9ac1-7dbad9c16880" />
 </Solution>

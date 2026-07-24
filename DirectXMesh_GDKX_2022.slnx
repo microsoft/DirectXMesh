@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Profile" />
+    <BuildType Name="Release" />
+    <Platform Name="Gaming.Xbox.Scarlett.x64" />
+    <Platform Name="Gaming.Xbox.XboxOne.x64" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="DirectXMesh/DirectXMesh_GDKX_2022.vcxproj" Id="2c69b4bd-1de5-4e96-a674-13f186a5fe62" />
+</Solution>
