@@ -9,6 +9,6 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="DirectXMesh/DirectXMesh_Desktop_2022.vcxproj" Id="6857f086-f6fe-4150-9ed7-7446f1c1c220" />
+  <Project DefaultStartup="true" Path="DirectXMesh/DirectXMesh_Desktop_2022.vcxproj" Id="6857f086-f6fe-4150-9ed7-7446f1c1c220" />
   <Project Path="Meshconvert/Meshconvert_Desktop_2022.vcxproj" Id="6d4cfd0e-8772-462a-9ac1-7dbad9c16880" />
 </Solution>
