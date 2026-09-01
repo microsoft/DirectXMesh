@@ -201,7 +201,11 @@ namespace
                     if (k == UNUSED32)
                         continue;
 
-                    assert(k < nFaces);
+                    if (k >= nFaces)
+                    {
+                        result = false;
+                        continue;
+                    }
 
                     const uint32_t edge = find_edge<uint32_t>(&adjacency[k * 3], uint32_t(face));
                     if (edge >= 3)
@@ -331,6 +335,8 @@ namespace
                     faceSeen[curFace * 3 + curPoint] = true;
 
                     uint32_t j = indices[curFace * 3 + curPoint];
+                    if (j == index_t(-1))
+                        continue;
 
                     if (faceIds[j] == index_t(-1))
                     {
