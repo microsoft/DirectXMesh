@@ -24,8 +24,7 @@ static_assert(XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM == DXGI_FORMAT_R10G10B10
 //-------------------------------------------------------------------------------------
 // Returns bytes-per-element for a given DXGI format, or 0 on failure
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-size_t DirectX::BytesPerElement(DXGI_FORMAT fmt) noexcept
+_Use_decl_annotations_ size_t DirectX::BytesPerElement(DXGI_FORMAT fmt) noexcept
 {
     // This list only includes those formats that are valid for use by IB or VB
 
@@ -33,13 +32,11 @@ size_t DirectX::BytesPerElement(DXGI_FORMAT fmt) noexcept
     {
     case DXGI_FORMAT_R32G32B32A32_FLOAT:
     case DXGI_FORMAT_R32G32B32A32_UINT:
-    case DXGI_FORMAT_R32G32B32A32_SINT:
-        return 16;
+    case DXGI_FORMAT_R32G32B32A32_SINT:             return 16;
 
     case DXGI_FORMAT_R32G32B32_FLOAT:
     case DXGI_FORMAT_R32G32B32_UINT:
-    case DXGI_FORMAT_R32G32B32_SINT:
-        return 12;
+    case DXGI_FORMAT_R32G32B32_SINT:                return 12;
 
     case DXGI_FORMAT_R16G16B16A16_FLOAT:
     case DXGI_FORMAT_R16G16B16A16_UNORM:
@@ -48,8 +45,7 @@ size_t DirectX::BytesPerElement(DXGI_FORMAT fmt) noexcept
     case DXGI_FORMAT_R16G16B16A16_SINT:
     case DXGI_FORMAT_R32G32_FLOAT:
     case DXGI_FORMAT_R32G32_UINT:
-    case DXGI_FORMAT_R32G32_SINT:
-        return 8;
+    case DXGI_FORMAT_R32G32_SINT:                   return 8;
 
     case DXGI_FORMAT_R10G10B10A2_UNORM:
     case DXGI_FORMAT_R10G10B10A2_UINT:
@@ -68,8 +64,7 @@ size_t DirectX::BytesPerElement(DXGI_FORMAT fmt) noexcept
     case DXGI_FORMAT_R32_SINT:
     case DXGI_FORMAT_B8G8R8A8_UNORM:
     case DXGI_FORMAT_B8G8R8X8_UNORM:
-    case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
-        return 4;
+    case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM: return 4;
 
     case DXGI_FORMAT_R8G8_UNORM:
     case DXGI_FORMAT_R8G8_UINT:
@@ -81,24 +76,20 @@ size_t DirectX::BytesPerElement(DXGI_FORMAT fmt) noexcept
     case DXGI_FORMAT_R16_SNORM:
     case DXGI_FORMAT_R16_SINT:
     case DXGI_FORMAT_B5G6R5_UNORM:
-    case DXGI_FORMAT_B5G5R5A1_UNORM:
-        return 2;
+    case DXGI_FORMAT_B5G5R5A1_UNORM:                return 2;
 
     case DXGI_FORMAT_R8_UNORM:
     case DXGI_FORMAT_R8_UINT:
     case DXGI_FORMAT_R8_SNORM:
-    case DXGI_FORMAT_R8_SINT:
-        return 1;
+    case DXGI_FORMAT_R8_SINT:                       return 1;
 
-    case DXGI_FORMAT_B4G4R4A4_UNORM:
-        return 2;
+    case DXGI_FORMAT_B4G4R4A4_UNORM:                return 2;
 
     default:
         // No BC, sRGB, XRBias, SharedExp, Typeless, Depth, or Video formats
         return 0;
     }
 }
-
 
 //=====================================================================================
 // Input Layout Descriptor Utilities
@@ -109,8 +100,7 @@ size_t DirectX::BytesPerElement(DXGI_FORMAT fmt) noexcept
 //-------------------------------------------------------------------------------------
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-_Use_decl_annotations_
-bool DirectX::IsValid(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl) noexcept
+_Use_decl_annotations_ bool DirectX::IsValid(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl) noexcept
 {
     if (!vbDecl || !nDecl)
     {
@@ -142,8 +132,7 @@ bool DirectX::IsValid(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl) noex
         else
             alignment = 4;
 
-        if ((vbDecl[j].AlignedByteOffset != D3D11_APPEND_ALIGNED_ELEMENT)
-            && (vbDecl[j].AlignedByteOffset % alignment) != 0)
+        if ((vbDecl[j].AlignedByteOffset != D3D11_APPEND_ALIGNED_ELEMENT) && (vbDecl[j].AlignedByteOffset % alignment) != 0)
         {
             // Invalid alignment for element
             return false;
@@ -164,11 +153,9 @@ bool DirectX::IsValid(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl) noex
             }
             break;
 
-        case D3D11_INPUT_PER_INSTANCE_DATA:
-            break;
+        case D3D11_INPUT_PER_INSTANCE_DATA: break;
 
-        default:
-            return false;
+        default:                            return false;
         }
 
         if (!vbDecl[j].SemanticName)
@@ -238,11 +225,9 @@ bool DirectX::IsValid(const D3D12_INPUT_LAYOUT_DESC& vbDecl) noexcept
             }
             break;
 
-        case D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA:
-            break;
+        case D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA: break;
 
-        default:
-            return false;
+        default:                                           return false;
         }
 
         if (!vbDecl.pInputElementDescs[j].SemanticName)
@@ -263,10 +248,8 @@ bool DirectX::IsValid(const D3D12_INPUT_LAYOUT_DESC& vbDecl) noexcept
 //-------------------------------------------------------------------------------------
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-_Use_decl_annotations_
-void DirectX::ComputeInputLayout(
-    const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl,
-    uint32_t* offsets, uint32_t* strides) noexcept
+_Use_decl_annotations_ void
+DirectX::ComputeInputLayout(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl, uint32_t* offsets, uint32_t* strides) noexcept
 {
     assert(IsValid(vbDecl, nDecl));
 
@@ -322,7 +305,7 @@ void DirectX::ComputeInputLayout(
         if (strides)
         {
             const uint32_t istride = uint32_t(alignedByteOffset + bpe);
-            strides[slot] = std::max<uint32_t>(strides[slot], istride);
+            strides[slot]          = std::max<uint32_t>(strides[slot], istride);
         }
 
         prevABO[slot] = uint32_t(alignedByteOffset + bpe + (bpe % alignment));
@@ -331,9 +314,8 @@ void DirectX::ComputeInputLayout(
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-_Use_decl_annotations_
-void DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl,
-    uint32_t* offsets, uint32_t* strides) noexcept
+_Use_decl_annotations_ void
+DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl, uint32_t* offsets, uint32_t* strides) noexcept
 {
     assert(IsValid(vbDecl));
 
@@ -388,7 +370,7 @@ void DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl,
         if (strides)
         {
             uint32_t istride = uint32_t(alignedByteOffset + bpe);
-            strides[slot] = std::max<uint32_t>(strides[slot], istride);
+            strides[slot]    = std::max<uint32_t>(strides[slot], istride);
         }
 
         prevABO[slot] = uint32_t(alignedByteOffset + bpe + (bpe % alignment));
@@ -399,8 +381,7 @@ void DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl,
 //=====================================================================================
 // Attribute Utilities
 //=====================================================================================
-_Use_decl_annotations_
-std::vector<std::pair<size_t, size_t>> DirectX::ComputeSubsets(const uint32_t* attributes, size_t nFaces)
+_Use_decl_annotations_ std::vector<std::pair<size_t, size_t>> DirectX::ComputeSubsets(const uint32_t* attributes, size_t nFaces)
 {
     std::vector<std::pair<size_t, size_t>> subsets;
 
@@ -414,8 +395,8 @@ std::vector<std::pair<size_t, size_t>> DirectX::ComputeSubsets(const uint32_t* a
     }
 
     uint32_t lastAttr = attributes[0];
-    size_t offset = 0;
-    size_t count = 1;
+    size_t   offset   = 0;
+    size_t   count    = 1;
 
     for (size_t j = 1; j < nFaces; ++j)
     {
@@ -423,8 +404,8 @@ std::vector<std::pair<size_t, size_t>> DirectX::ComputeSubsets(const uint32_t* a
         {
             subsets.emplace_back(std::pair<size_t, size_t>(offset, count));
             lastAttr = attributes[j];
-            offset = j;
-            count = 1;
+            offset   = j;
+            count    = 1;
         }
         else
         {
@@ -447,9 +428,12 @@ std::vector<std::pair<size_t, size_t>> DirectX::ComputeSubsets(const uint32_t* a
 namespace
 {
     template<class index_t>
-    void ComputeVertexCacheMissRateImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize,
-        float& acmr, float& atvr) noexcept
+    void ComputeVertexCacheMissRateImpl(_In_reads_(nFaces * 3) const index_t* indices,
+        size_t                                                                nFaces,
+        size_t                                                                nVerts,
+        size_t                                                                cacheSize,
+        float&                                                                acmr,
+        float&                                                                atvr) noexcept
     {
         acmr = -1.f;
         atvr = -1.f;
@@ -497,7 +481,8 @@ namespace
                 ++misses;
                 fifo[tail] = indices[j];
                 ++tail;
-                if (tail == cacheSize) tail = 0;
+                if (tail == cacheSize)
+                    tail = 0;
             }
         }
 
@@ -507,21 +492,17 @@ namespace
         // ideal is 1.0, worst case is 6.0
         atvr = float(misses) / float(nVerts);
     }
-}
+} // namespace
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-void DirectX::ComputeVertexCacheMissRate(
-    const uint16_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize,
-    float& acmr, float& atvr)
+_Use_decl_annotations_ void
+DirectX::ComputeVertexCacheMissRate(const uint16_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize, float& acmr, float& atvr)
 {
     ComputeVertexCacheMissRateImpl<uint16_t>(indices, nFaces, nVerts, cacheSize, acmr, atvr);
 }
 
-_Use_decl_annotations_
-void DirectX::ComputeVertexCacheMissRate(
-    const uint32_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize,
-    float& acmr, float& atvr)
+_Use_decl_annotations_ void
+DirectX::ComputeVertexCacheMissRate(const uint32_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize, float& acmr, float& atvr)
 {
     ComputeVertexCacheMissRateImpl<uint32_t>(indices, nFaces, nVerts, cacheSize, acmr, atvr);
 }

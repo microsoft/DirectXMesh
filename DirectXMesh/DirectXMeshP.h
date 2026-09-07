@@ -13,7 +13,8 @@
 
 #ifdef _MSC_VER
 // Off by default warnings
-#pragma warning(disable : 4619 4616 4061 4365 4514 4571 4623 4625 4626 4628 4668 4710 4711 4746 4774 4820 4865 4987 5026 5027 5031 5032 5039 5045 5219 5246 5264 26812)
+#pragma warning(disable \
+    : 4619 4616 4061 4365 4514 4571 4623 4625 4626 4628 4668 4710 4711 4746 4774 4820 4865 4987 5026 5027 5031 5032 5039 5045 5219 5246 5264 26812)
 // C4619/4616 #pragma warning warnings
 // C4061 enumerator 'X' in switch of enum 'X' is not explicitly handled by a case label
 // C4365 signed/unsigned mismatch
@@ -92,12 +93,12 @@
 
 #ifdef _GAMING_XBOX_SCARLETT
 #pragma warning(push)
-#pragma warning(disable: 5204 5249)
+#pragma warning(disable : 5204 5249)
 #include <d3d12_xs.h>
 #pragma warning(pop)
 #elif defined(_GAMING_XBOX)
 #pragma warning(push)
-#pragma warning(disable: 5204)
+#pragma warning(disable : 5204)
 #include <d3d12_x.h>
 #pragma warning(pop)
 #elif defined(_XBOX_ONE) && defined(_TITLE)
@@ -200,25 +201,27 @@ namespace DirectX
             CCW
         };
 
-        orbit_iterator(_In_reads_(nFaces * 3) const uint32_t* adjacency, _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces) noexcept :
-            m_face(UNUSED32),
-            m_pointIndex(UNUSED32),
-            m_currentFace(UNUSED32),
-            m_currentEdge(UNUSED32),
-            m_nextEdge(UNUSED32),
-            m_adjacency(adjacency),
-            m_indices(indices),
-            m_nFaces(nFaces),
-            m_clockWise(false),
-            m_stopOnBoundary(false)
+        orbit_iterator(_In_reads_(nFaces * 3) const uint32_t* adjacency,
+            _In_reads_(nFaces * 3) const index_t*             indices,
+            size_t                                            nFaces) noexcept
+            : m_face(UNUSED32),
+              m_pointIndex(UNUSED32),
+              m_currentFace(UNUSED32),
+              m_currentEdge(UNUSED32),
+              m_nextEdge(UNUSED32),
+              m_adjacency(adjacency),
+              m_indices(indices),
+              m_nFaces(nFaces),
+              m_clockWise(false),
+              m_stopOnBoundary(false)
         {}
 
         void initialize(uint32_t face, uint32_t point, WalkType wtype) noexcept
         {
             m_face = m_currentFace = face;
-            m_pointIndex = point;
-            m_clockWise = (wtype != CCW);
-            m_stopOnBoundary = (wtype != ALL);
+            m_pointIndex           = point;
+            m_clockWise            = (wtype != CCW);
+            m_stopOnBoundary       = (wtype != ALL);
 
             m_nextEdge = find(face, point);
             assert(m_nextEdge < 3);
@@ -253,7 +256,7 @@ namespace DirectX
             assert(!done());
 
             const uint32_t ret = m_currentFace;
-            m_currentEdge = m_nextEdge;
+            m_currentEdge      = m_nextEdge;
 
             for (;;)
             {
@@ -299,14 +302,14 @@ namespace DirectX
                 else if (m_clockWise && !m_stopOnBoundary)
                 {
                     // hit boundary and need to restart to go counter-clockwise
-                    m_clockWise = false;
+                    m_clockWise   = false;
                     m_currentFace = m_face;
 
                     m_nextEdge = find(m_face, m_pointIndex);
                     assert(m_nextEdge < 3);
                     _Analysis_assume_(m_nextEdge < 3);
 
-                    m_nextEdge = (m_nextEdge + 2) % 3;
+                    m_nextEdge    = (m_nextEdge + 2) % 3;
                     m_currentEdge = (m_currentEdge + 2) % 3;
 
                     // Don't break out of loop so we can go the other way
@@ -325,7 +328,7 @@ namespace DirectX
         {
             m_currentFace = m_face;
 
-            m_nextEdge = find(m_currentFace, m_pointIndex);
+            m_nextEdge                     = find(m_currentFace, m_pointIndex);
             const uint32_t initialNextEdge = m_nextEdge;
             assert(m_nextEdge < 3);
             _Analysis_assume_(m_nextEdge < 3);
@@ -337,7 +340,7 @@ namespace DirectX
             uint32_t prevFace;
             do
             {
-                prevFace = m_currentFace;
+                prevFace      = m_currentFace;
                 m_currentFace = m_adjacency[m_currentFace * 3 + m_nextEdge];
 
                 if (m_currentFace != UNUSED32)
@@ -354,13 +357,12 @@ namespace DirectX
 
                     m_nextEdge = (m_nextEdge + 2) % 3;
                 }
-            }
-            while ((m_currentFace != m_face) && (m_currentFace != UNUSED32));
+            } while ((m_currentFace != m_face) && (m_currentFace != UNUSED32));
 
             if (m_currentFace == UNUSED32)
             {
                 m_currentFace = prevFace;
-                m_nextEdge = (m_nextEdge + 1) % 3;
+                m_nextEdge    = (m_nextEdge + 1) % 3;
 
                 m_pointIndex = m_indices[m_currentFace * 3 + m_nextEdge];
 
@@ -371,30 +373,29 @@ namespace DirectX
                 m_nextEdge = initialNextEdge;
             }
 
-            m_clockWise = true;
+            m_clockWise   = true;
             m_currentEdge = m_nextEdge;
-            m_face = m_currentFace;
+            m_face        = m_currentFace;
             return ret;
         }
 
-        bool done() const noexcept { return (m_currentFace == UNUSED32); }
+        bool     done() const noexcept { return (m_currentFace == UNUSED32); }
         uint32_t getpoint() const noexcept { return m_clockWise ? m_currentEdge : ((m_currentEdge + 1) % 3); }
 
     private:
-        uint32_t        m_face;
-        uint32_t        m_pointIndex;
-        uint32_t        m_currentFace;
-        uint32_t        m_currentEdge;
-        uint32_t        m_nextEdge;
+        uint32_t m_face;
+        uint32_t m_pointIndex;
+        uint32_t m_currentFace;
+        uint32_t m_currentEdge;
+        uint32_t m_nextEdge;
 
         const uint32_t* m_adjacency;
         const index_t*  m_indices;
         size_t          m_nFaces;
 
-        bool            m_clockWise;
-        bool            m_stopOnBoundary;
+        bool m_clockWise;
+        bool m_stopOnBoundary;
     };
-
 
     //-------------------------------------------------------------------------------------
     template<class index_t>
@@ -413,4 +414,4 @@ namespace DirectX
         return edge;
     }
 
-} // namespace
+} // namespace DirectX

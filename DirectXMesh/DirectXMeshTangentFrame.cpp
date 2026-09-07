@@ -19,15 +19,15 @@ namespace
     // Compute tangent and bi-tangent for each vertex
     //---------------------------------------------------------------------------------
     template<class index_t>
-    HRESULT ComputeTangentFrameImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
-        _In_reads_(nVerts) const XMFLOAT3* positions,
-        _In_reads_(nVerts) const XMFLOAT3* normals,
-        _In_reads_(nVerts) const XMFLOAT2* texcoords,
-        size_t nVerts,
-        _Out_writes_opt_(nVerts) XMFLOAT3* tangents3,
-        _Out_writes_opt_(nVerts) XMFLOAT4* tangents4,
-        _Out_writes_opt_(nVerts) XMFLOAT3* bitangents) noexcept
+    HRESULT ComputeTangentFrameImpl(_In_reads_(nFaces * 3) const index_t* indices,
+        size_t                                                            nFaces,
+        _In_reads_(nVerts) const XMFLOAT3*                                positions,
+        _In_reads_(nVerts) const XMFLOAT3*                                normals,
+        _In_reads_(nVerts) const XMFLOAT2*                                texcoords,
+        size_t                                                            nVerts,
+        _Out_writes_opt_(nVerts) XMFLOAT3*                                tangents3,
+        _Out_writes_opt_(nVerts) XMFLOAT4*                                tangents4,
+        _Out_writes_opt_(nVerts) XMFLOAT3*                                bitangents) noexcept
     {
         if (!indices || !nFaces || !positions || !normals || !texcoords || !nVerts)
             return E_INVALIDARG;
@@ -38,7 +38,7 @@ namespace
         if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
             return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-        static constexpr float EPSILON = 0.0001f;
+        static constexpr float   EPSILON = 0.0001f;
         static const XMVECTORF32 s_flips = { { { 1.f, -1.f, -1.f, 1.f } } };
 
         auto temp = make_AlignedArrayXMVECTOR(uint64_t(nVerts) * 2);
@@ -56,14 +56,10 @@ namespace
             index_t i1 = indices[face * 3 + 1];
             index_t i2 = indices[face * 3 + 2];
 
-            if (i0 == index_t(-1)
-                || i1 == index_t(-1)
-                || i2 == index_t(-1))
+            if (i0 == index_t(-1) || i1 == index_t(-1) || i2 == index_t(-1))
                 continue;
 
-            if (i0 >= nVerts
-                || i1 >= nVerts
-                || i2 >= nVerts)
+            if (i0 >= nVerts || i1 >= nVerts || i2 >= nVerts)
                 return E_UNEXPECTED;
 
             const XMVECTOR t0 = XMLoadFloat2(&texcoords[i0]);
@@ -76,9 +72,9 @@ namespace
             XMStoreFloat4A(&tmp, s);
 
             float d = tmp.x * tmp.w - tmp.z * tmp.y;
-            d = (fabsf(d) <= EPSILON) ? 1.f : (1.f / d);
-            s = XMVectorScale(s, d);
-            s = XMVectorMultiply(s, s_flips);
+            d       = (fabsf(d) <= EPSILON) ? 1.f : (1.f / d);
+            s       = XMVectorScale(s, d);
+            s       = XMVectorMultiply(s, s_flips);
 
             XMMATRIX m0;
             m0.r[0] = XMVectorPermute<3, 2, 6, 7>(s, g_XMZero);
@@ -87,7 +83,7 @@ namespace
 
             const XMVECTOR p0 = XMLoadFloat3(&positions[i0]);
             const XMVECTOR p1 = XMLoadFloat3(&positions[i1]);
-            XMVECTOR p2 = XMLoadFloat3(&positions[i2]);
+            XMVECTOR       p2 = XMLoadFloat3(&positions[i2]);
 
             XMMATRIX m1;
             m1.r[0] = XMVectorSubtract(p1, p0);
@@ -109,15 +105,16 @@ namespace
         {
             // Gram-Schmidt orthonormalization
             XMVECTOR b0 = XMLoadFloat3(&normals[j]);
-            b0 = XMVector3Normalize(b0);
+            b0          = XMVector3Normalize(b0);
 
             const XMVECTOR tan1 = tangent1[j];
-            XMVECTOR b1 = XMVectorSubtract(tan1, XMVectorMultiply(XMVector3Dot(b0, tan1), b0));
-            b1 = XMVector3Normalize(b1);
+            XMVECTOR       b1   = XMVectorSubtract(tan1, XMVectorMultiply(XMVector3Dot(b0, tan1), b0));
+            b1                  = XMVector3Normalize(b1);
 
             const XMVECTOR tan2 = tangent2[j];
-            XMVECTOR b2 = XMVectorSubtract(XMVectorSubtract(tan2, XMVectorMultiply(XMVector3Dot(b0, tan2), b0)), XMVectorMultiply(XMVector3Dot(b1, tan2), b1));
-            b2 = XMVector3Normalize(b2);
+            XMVECTOR       b2   = XMVectorSubtract(XMVectorSubtract(tan2, XMVectorMultiply(XMVector3Dot(b0, tan2), b0)),
+                XMVectorMultiply(XMVector3Dot(b1, tan2), b1));
+            b2                  = XMVector3Normalize(b2);
 
             // handle degenerate vectors
             const float len1 = XMVectorGetX(XMVector3Length(b1));
@@ -168,8 +165,8 @@ namespace
 
             if (tangents4)
             {
-                XMVECTOR bi = XMVector3Cross(b0, tan1);
-                const float w = XMVector3Less(XMVector3Dot(bi, tan2), g_XMZero) ? -1.f : 1.f;
+                XMVECTOR    bi = XMVector3Cross(b0, tan1);
+                const float w  = XMVector3Less(XMVector3Dot(bi, tan2), g_XMZero) ? -1.f : 1.f;
 
                 bi = XMVectorSetW(b1, w);
                 XMStoreFloat4(&tangents4[j], bi);
@@ -183,23 +180,21 @@ namespace
 
         return S_OK;
     }
-}
+} // namespace
 
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::ComputeTangentFrame(
-    const uint16_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    const XMFLOAT3* normals,
-    const XMFLOAT2* texcoords,
-    size_t nVerts,
-    XMFLOAT3* tangents,
-    XMFLOAT3* bitangents) noexcept
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indices,
+    size_t                                                                  nFaces,
+    const XMFLOAT3*                                                         positions,
+    const XMFLOAT3*                                                         normals,
+    const XMFLOAT2*                                                         texcoords,
+    size_t                                                                  nVerts,
+    XMFLOAT3*                                                               tangents,
+    XMFLOAT3*                                                               bitangents) noexcept
 {
     if (!tangents && !bitangents)
         return E_INVALIDARG;
@@ -207,17 +202,15 @@ HRESULT DirectX::ComputeTangentFrame(
     return ComputeTangentFrameImpl<uint16_t>(indices, nFaces, positions, normals, texcoords, nVerts, tangents, nullptr, bitangents);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::ComputeTangentFrame(
-    const uint32_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    const XMFLOAT3* normals, const XMFLOAT2* texcoords,
-    size_t nVerts,
-    XMFLOAT3* tangents,
-    XMFLOAT3* bitangents) noexcept
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indices,
+    size_t                                                                  nFaces,
+    const XMFLOAT3*                                                         positions,
+    const XMFLOAT3*                                                         normals,
+    const XMFLOAT2*                                                         texcoords,
+    size_t                                                                  nVerts,
+    XMFLOAT3*                                                               tangents,
+    XMFLOAT3*                                                               bitangents) noexcept
 {
     if (!tangents && !bitangents)
         return E_INVALIDARG;
@@ -225,18 +218,15 @@ HRESULT DirectX::ComputeTangentFrame(
     return ComputeTangentFrameImpl<uint32_t>(indices, nFaces, positions, normals, texcoords, nVerts, tangents, nullptr, bitangents);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::ComputeTangentFrame(
-    const uint16_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    const XMFLOAT3* normals,
-    const XMFLOAT2* texcoords,
-    size_t nVerts,
-    XMFLOAT4* tangents,
-    XMFLOAT3* bitangents) noexcept
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indices,
+    size_t                                                                  nFaces,
+    const XMFLOAT3*                                                         positions,
+    const XMFLOAT3*                                                         normals,
+    const XMFLOAT2*                                                         texcoords,
+    size_t                                                                  nVerts,
+    XMFLOAT4*                                                               tangents,
+    XMFLOAT3*                                                               bitangents) noexcept
 {
     if (!tangents && !bitangents)
         return E_INVALIDARG;
@@ -244,18 +234,15 @@ HRESULT DirectX::ComputeTangentFrame(
     return ComputeTangentFrameImpl<uint16_t>(indices, nFaces, positions, normals, texcoords, nVerts, nullptr, tangents, bitangents);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::ComputeTangentFrame(
-    const uint32_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    const XMFLOAT3* normals,
-    const XMFLOAT2* texcoords,
-    size_t nVerts,
-    XMFLOAT4* tangents,
-    XMFLOAT3* bitangents) noexcept
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indices,
+    size_t                                                                  nFaces,
+    const XMFLOAT3*                                                         positions,
+    const XMFLOAT3*                                                         normals,
+    const XMFLOAT2*                                                         texcoords,
+    size_t                                                                  nVerts,
+    XMFLOAT4*                                                               tangents,
+    XMFLOAT3*                                                               bitangents) noexcept
 {
     if (!tangents && !bitangents)
         return E_INVALIDARG;
@@ -263,17 +250,14 @@ HRESULT DirectX::ComputeTangentFrame(
     return ComputeTangentFrameImpl<uint32_t>(indices, nFaces, positions, normals, texcoords, nVerts, nullptr, tangents, bitangents);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::ComputeTangentFrame(
-    const uint16_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    const XMFLOAT3* normals,
-    const XMFLOAT2* texcoords,
-    size_t nVerts,
-    XMFLOAT4* tangents) noexcept
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indices,
+    size_t                                                                  nFaces,
+    const XMFLOAT3*                                                         positions,
+    const XMFLOAT3*                                                         normals,
+    const XMFLOAT2*                                                         texcoords,
+    size_t                                                                  nVerts,
+    XMFLOAT4*                                                               tangents) noexcept
 {
     if (!tangents)
         return E_INVALIDARG;
@@ -281,17 +265,14 @@ HRESULT DirectX::ComputeTangentFrame(
     return ComputeTangentFrameImpl<uint16_t>(indices, nFaces, positions, normals, texcoords, nVerts, nullptr, tangents, nullptr);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::ComputeTangentFrame(
-    const uint32_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    const XMFLOAT3* normals,
-    const XMFLOAT2* texcoords,
-    size_t nVerts,
-    XMFLOAT4* tangents) noexcept
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indices,
+    size_t                                                                  nFaces,
+    const XMFLOAT3*                                                         positions,
+    const XMFLOAT3*                                                         normals,
+    const XMFLOAT2*                                                         texcoords,
+    size_t                                                                  nVerts,
+    XMFLOAT4*                                                               tangents) noexcept
 {
     if (!tangents)
         return E_INVALIDARG;

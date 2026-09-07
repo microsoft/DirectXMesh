@@ -20,24 +20,24 @@ using namespace DirectX::PackedVector;
 
 namespace
 {
-    constexpr size_t c_MaxSlot = 32;
+    constexpr size_t c_MaxSlot   = 32;
     constexpr size_t c_MaxStride = 2048;
 
     enum INPUT_CLASSIFICATION
     {
-        PER_VERTEX_DATA = 0,
+        PER_VERTEX_DATA   = 0,
         PER_INSTANCE_DATA = 1
     };
 
     struct InputElementDesc
     {
-        const char*             SemanticName;
-        unsigned int            SemanticIndex;
-        DXGI_FORMAT             Format;
-        unsigned int            InputSlot;
-        unsigned int            AlignedByteOffset;
-        INPUT_CLASSIFICATION    InputSlotClass;
-        unsigned int            InstanceDataStepRate;
+        const char*          SemanticName;
+        unsigned int         SemanticIndex;
+        DXGI_FORMAT          Format;
+        unsigned int         InputSlot;
+        unsigned int         AlignedByteOffset;
+        INPUT_CLASSIFICATION InputSlotClass;
+        unsigned int         InstanceDataStepRate;
     };
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
@@ -55,28 +55,32 @@ namespace
     static_assert(c_MaxSlot == D3D12_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "D3D12 mismatch");
     static_assert(c_MaxStride == D3D12_REQ_MULTI_ELEMENT_STRUCTURE_SIZE_IN_BYTES, "D3D12 mismatch");
 #endif
-}
+} // namespace
 
 class VBWriter::Impl
 {
 public:
-    Impl() noexcept :
-        mStrides{},
-        mBuffers{},
-        mVerts{},
-        mDefaultStrides{},
-        mTempSize(0)
+    Impl() noexcept
+        : mStrides{},
+          mBuffers{},
+          mVerts{},
+          mDefaultStrides{},
+          mTempSize(0)
     {}
 
-    Impl(const Impl&) = delete;
+    Impl(const Impl&)            = delete;
     Impl& operator=(const Impl&) = delete;
 
-    Impl(Impl&&) = default;
+    Impl(Impl&&)            = default;
     Impl& operator=(Impl&&) = default;
 
     HRESULT Initialize(_In_reads_(nDecl) const InputElementDesc* vbDecl, size_t nDecl);
-    HRESULT AddStream(_Out_writes_bytes_(stride*nVerts) void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept;
-    HRESULT Write(_In_reads_(count) const XMVECTOR* buffer, _In_z_ const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const;
+    HRESULT AddStream(_Out_writes_bytes_(stride* nVerts) void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept;
+    HRESULT Write(_In_reads_(count) const XMVECTOR* buffer,
+        _In_z_ const char*                          semanticName,
+        unsigned int                                semanticIndex,
+        size_t                                      count,
+        bool                                        x2bias) const;
 
     void Release() noexcept
     {
@@ -131,19 +135,18 @@ public:
 private:
     using SemanticMap = std::multimap<std::string, uint32_t>;
 
-    std::vector<InputElementDesc>           mInputDesc;
-    SemanticMap                             mSemantics;
-    uint32_t                                mStrides[c_MaxSlot];
-    void*                                   mBuffers[c_MaxSlot];
-    size_t                                  mVerts[c_MaxSlot];
-    uint32_t                                mDefaultStrides[c_MaxSlot];
-    mutable size_t                          mTempSize;
-    mutable ScopedAlignedArrayXMVECTOR      mTempBuffer;
+    std::vector<InputElementDesc>      mInputDesc;
+    SemanticMap                        mSemantics;
+    uint32_t                           mStrides[c_MaxSlot];
+    void*                              mBuffers[c_MaxSlot];
+    size_t                             mVerts[c_MaxSlot];
+    uint32_t                           mDefaultStrides[c_MaxSlot];
+    mutable size_t                     mTempSize;
+    mutable ScopedAlignedArrayXMVECTOR mTempBuffer;
 };
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT VBWriter::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
+_Use_decl_annotations_ HRESULT VBWriter::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
 {
     Release();
 
@@ -202,10 +205,8 @@ HRESULT VBWriter::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
     return S_OK;
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT VBWriter::Impl::AddStream(void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
+_Use_decl_annotations_ HRESULT VBWriter::Impl::AddStream(void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
 {
     if (!vb || !nVerts)
         return E_INVALIDARG;
@@ -221,41 +222,40 @@ HRESULT VBWriter::Impl::AddStream(void* vb, size_t nVerts, size_t inputSlot, siz
 
     mStrides[inputSlot] = (stride > 0) ? uint32_t(stride) : mDefaultStrides[inputSlot];
     mBuffers[inputSlot] = vb;
-    mVerts[inputSlot] = nVerts;
+    mVerts[inputSlot]   = nVerts;
 
     return S_OK;
 }
 
-
 //-------------------------------------------------------------------------------------
-#define STORE_VERTS( type, func )\
-        for(size_t icount = 0; icount < count; ++icount)\
-        {\
-            if ((ptr + sizeof(type)) > eptr)\
-                return E_UNEXPECTED;\
-            func(reinterpret_cast<type*>(ptr), *buffer++);\
-            ptr += stride;\
-        }\
-        break;
+#define STORE_VERTS(type, func)                        \
+    for (size_t icount = 0; icount < count; ++icount)  \
+    {                                                  \
+        if ((ptr + sizeof(type)) > eptr)               \
+            return E_UNEXPECTED;                       \
+        func(reinterpret_cast<type*>(ptr), *buffer++); \
+        ptr += stride;                                 \
+    }                                                  \
+    break;
 
-#define STORE_VERTS_X2( type, func, x2bias )\
-        for(size_t icount = 0; icount < count; ++icount)\
-        {\
-            if ((ptr + sizeof(type)) > eptr)\
-                return E_UNEXPECTED;\
-            XMVECTOR v = *buffer++;\
-            if (x2bias)\
-            {\
-                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);\
-                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);\
-            }\
-            func(reinterpret_cast<type*>(ptr), v);\
-            ptr += stride;\
-        }\
-        break;
+#define STORE_VERTS_X2(type, func, x2bias)                        \
+    for (size_t icount = 0; icount < count; ++icount)             \
+    {                                                             \
+        if ((ptr + sizeof(type)) > eptr)                          \
+            return E_UNEXPECTED;                                  \
+        XMVECTOR v = *buffer++;                                   \
+        if (x2bias)                                               \
+        {                                                         \
+            v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);       \
+            v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf); \
+        }                                                         \
+        func(reinterpret_cast<type*>(ptr), v);                    \
+        ptr += stride;                                            \
+    }                                                             \
+    break;
 
-_Use_decl_annotations_
-HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+_Use_decl_annotations_ HRESULT
+VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     if (!buffer || !semanticName || !count)
         return E_INVALIDARG;
@@ -286,51 +286,37 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         return E_UNEXPECTED;
 
     const uint8_t* eptr = vb + stride * mVerts[inputSlot];
-    uint8_t* ptr = vb + mInputDesc[it->second].AlignedByteOffset;
+    uint8_t*       ptr  = vb + mInputDesc[it->second].AlignedByteOffset;
 
     switch (static_cast<int>(mInputDesc[it->second].Format))
     {
-    case DXGI_FORMAT_R32G32B32A32_FLOAT:
-        STORE_VERTS(XMFLOAT4, XMStoreFloat4)
+    case DXGI_FORMAT_R32G32B32A32_FLOAT: STORE_VERTS(XMFLOAT4, XMStoreFloat4)
 
-    case DXGI_FORMAT_R32G32B32A32_UINT:
-        STORE_VERTS(XMUINT4, XMStoreUInt4)
+    case DXGI_FORMAT_R32G32B32A32_UINT:  STORE_VERTS(XMUINT4, XMStoreUInt4)
 
-    case DXGI_FORMAT_R32G32B32A32_SINT:
-        STORE_VERTS(XMINT4, XMStoreSInt4)
+    case DXGI_FORMAT_R32G32B32A32_SINT:  STORE_VERTS(XMINT4, XMStoreSInt4)
 
-    case DXGI_FORMAT_R32G32B32_FLOAT:
-        STORE_VERTS(XMFLOAT3, XMStoreFloat3)
+    case DXGI_FORMAT_R32G32B32_FLOAT:    STORE_VERTS(XMFLOAT3, XMStoreFloat3)
 
-    case DXGI_FORMAT_R32G32B32_UINT:
-        STORE_VERTS(XMUINT3, XMStoreUInt3)
+    case DXGI_FORMAT_R32G32B32_UINT:     STORE_VERTS(XMUINT3, XMStoreUInt3)
 
-    case DXGI_FORMAT_R32G32B32_SINT:
-        STORE_VERTS(XMINT3, XMStoreSInt3)
+    case DXGI_FORMAT_R32G32B32_SINT:     STORE_VERTS(XMINT3, XMStoreSInt3)
 
-    case DXGI_FORMAT_R16G16B16A16_FLOAT:
-        STORE_VERTS(XMHALF4, XMStoreHalf4)
+    case DXGI_FORMAT_R16G16B16A16_FLOAT: STORE_VERTS(XMHALF4, XMStoreHalf4)
 
-    case DXGI_FORMAT_R16G16B16A16_UNORM:
-        STORE_VERTS_X2(XMUSHORTN4, XMStoreUShortN4, x2bias)
+    case DXGI_FORMAT_R16G16B16A16_UNORM: STORE_VERTS_X2(XMUSHORTN4, XMStoreUShortN4, x2bias)
 
-    case DXGI_FORMAT_R16G16B16A16_UINT:
-        STORE_VERTS(XMUSHORT4, XMStoreUShort4)
+    case DXGI_FORMAT_R16G16B16A16_UINT:  STORE_VERTS(XMUSHORT4, XMStoreUShort4)
 
-    case DXGI_FORMAT_R16G16B16A16_SNORM:
-        STORE_VERTS(XMSHORTN4, XMStoreShortN4)
+    case DXGI_FORMAT_R16G16B16A16_SNORM: STORE_VERTS(XMSHORTN4, XMStoreShortN4)
 
-    case DXGI_FORMAT_R16G16B16A16_SINT:
-        STORE_VERTS(XMSHORT4, XMStoreShort4)
+    case DXGI_FORMAT_R16G16B16A16_SINT:  STORE_VERTS(XMSHORT4, XMStoreShort4)
 
-    case DXGI_FORMAT_R32G32_FLOAT:
-        STORE_VERTS(XMFLOAT2, XMStoreFloat2)
+    case DXGI_FORMAT_R32G32_FLOAT:       STORE_VERTS(XMFLOAT2, XMStoreFloat2)
 
-    case DXGI_FORMAT_R32G32_UINT:
-        STORE_VERTS(XMUINT2, XMStoreUInt2)
+    case DXGI_FORMAT_R32G32_UINT:        STORE_VERTS(XMUINT2, XMStoreUInt2)
 
-    case DXGI_FORMAT_R32G32_SINT:
-        STORE_VERTS(XMINT2, XMStoreSInt2)
+    case DXGI_FORMAT_R32G32_SINT:        STORE_VERTS(XMINT2, XMStoreSInt2)
 
     case DXGI_FORMAT_R10G10B10A2_UNORM:
         for (size_t icount = 0; icount < count; ++icount)
@@ -341,49 +327,37 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
             if (x2bias)
             {
                 XMVECTOR v2 = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
-                v2 = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
-                v = XMVectorSelect(v, v2, g_XMSelect1110);
+                v2          = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
+                v           = XMVectorSelect(v, v2, g_XMSelect1110);
             }
             XMStoreUDecN4(reinterpret_cast<XMUDECN4*>(ptr), v);
             ptr += stride;
         }
         break;
 
-    case DXGI_FORMAT_R10G10B10A2_UINT:
-        STORE_VERTS(XMUDEC4, XMStoreUDec4)
+    case DXGI_FORMAT_R10G10B10A2_UINT: STORE_VERTS(XMUDEC4, XMStoreUDec4)
 
-    case DXGI_FORMAT_R11G11B10_FLOAT:
-        STORE_VERTS_X2(XMFLOAT3PK, XMStoreFloat3PK, x2bias)
+    case DXGI_FORMAT_R11G11B10_FLOAT:  STORE_VERTS_X2(XMFLOAT3PK, XMStoreFloat3PK, x2bias)
 
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-        STORE_VERTS_X2(XMUBYTEN4, XMStoreUByteN4, x2bias)
+    case DXGI_FORMAT_R8G8B8A8_UNORM:   STORE_VERTS_X2(XMUBYTEN4, XMStoreUByteN4, x2bias)
 
-    case DXGI_FORMAT_R8G8B8A8_UINT:
-        STORE_VERTS(XMUBYTE4, XMStoreUByte4)
+    case DXGI_FORMAT_R8G8B8A8_UINT:    STORE_VERTS(XMUBYTE4, XMStoreUByte4)
 
-    case DXGI_FORMAT_R8G8B8A8_SNORM:
-        STORE_VERTS(XMBYTEN4, XMStoreByteN4)
+    case DXGI_FORMAT_R8G8B8A8_SNORM:   STORE_VERTS(XMBYTEN4, XMStoreByteN4)
 
-    case DXGI_FORMAT_R8G8B8A8_SINT:
-        STORE_VERTS(XMBYTE4, XMStoreByte4)
+    case DXGI_FORMAT_R8G8B8A8_SINT:    STORE_VERTS(XMBYTE4, XMStoreByte4)
 
-    case DXGI_FORMAT_R16G16_FLOAT:
-        STORE_VERTS(XMHALF2, XMStoreHalf2)
+    case DXGI_FORMAT_R16G16_FLOAT:     STORE_VERTS(XMHALF2, XMStoreHalf2)
 
-    case DXGI_FORMAT_R16G16_UNORM:
-        STORE_VERTS_X2(XMUSHORTN2, XMStoreUShortN2, x2bias)
+    case DXGI_FORMAT_R16G16_UNORM:     STORE_VERTS_X2(XMUSHORTN2, XMStoreUShortN2, x2bias)
 
-    case DXGI_FORMAT_R16G16_UINT:
-        STORE_VERTS(XMUSHORT2, XMStoreUShort2)
+    case DXGI_FORMAT_R16G16_UINT:      STORE_VERTS(XMUSHORT2, XMStoreUShort2)
 
-    case DXGI_FORMAT_R16G16_SNORM:
-        STORE_VERTS(XMSHORTN2, XMStoreShortN2)
+    case DXGI_FORMAT_R16G16_SNORM:     STORE_VERTS(XMSHORTN2, XMStoreShortN2)
 
-    case DXGI_FORMAT_R16G16_SINT:
-        STORE_VERTS(XMSHORT2, XMStoreShort2)
+    case DXGI_FORMAT_R16G16_SINT:      STORE_VERTS(XMSHORT2, XMStoreShort2)
 
-    case DXGI_FORMAT_R32_FLOAT:
-        STORE_VERTS(float, XMStoreFloat)
+    case DXGI_FORMAT_R32_FLOAT:        STORE_VERTS(float, XMStoreFloat)
 
     case DXGI_FORMAT_R32_UINT:
         for (size_t icount = 0; icount < count; ++icount)
@@ -407,24 +381,20 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         }
         break;
 
-    case DXGI_FORMAT_R8G8_UNORM:
-        STORE_VERTS_X2(XMUBYTEN2, XMStoreUByteN2, x2bias)
+    case DXGI_FORMAT_R8G8_UNORM: STORE_VERTS_X2(XMUBYTEN2, XMStoreUByteN2, x2bias)
 
-    case DXGI_FORMAT_R8G8_UINT:
-        STORE_VERTS(XMUBYTE2, XMStoreUByte2)
+    case DXGI_FORMAT_R8G8_UINT:  STORE_VERTS(XMUBYTE2, XMStoreUByte2)
 
-    case DXGI_FORMAT_R8G8_SNORM:
-        STORE_VERTS(XMBYTEN2, XMStoreByteN2)
+    case DXGI_FORMAT_R8G8_SNORM: STORE_VERTS(XMBYTEN2, XMStoreByteN2)
 
-    case DXGI_FORMAT_R8G8_SINT:
-        STORE_VERTS(XMBYTE2, XMStoreByte2)
+    case DXGI_FORMAT_R8G8_SINT:  STORE_VERTS(XMBYTE2, XMStoreByte2)
 
     case DXGI_FORMAT_R16_FLOAT:
         for (size_t icount = 0; icount < count; ++icount)
         {
             if ((ptr + sizeof(HALF)) > eptr)
                 return E_UNEXPECTED;
-            const float f = XMVectorGetX(*buffer++);
+            const float f                 = XMVectorGetX(*buffer++);
             *reinterpret_cast<HALF*>(ptr) = XMConvertFloatToHalf(f);
             ptr += stride;
         }
@@ -445,7 +415,7 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
             {
                 f = std::max<float>(std::min<float>(f, 1.f), 0.f);
             }
-            *reinterpret_cast<uint16_t*>(ptr) = static_cast<uint16_t>(f*65535.f + 0.5f);
+            *reinterpret_cast<uint16_t*>(ptr) = static_cast<uint16_t>(f * 65535.f + 0.5f);
             ptr += stride;
         }
         break;
@@ -455,8 +425,8 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(uint16_t)) > eptr)
                 return E_UNEXPECTED;
-            float f = XMVectorGetX(*buffer++);
-            f = std::max<float>(std::min<float>(f, 65535.f), 0.f);
+            float f                           = XMVectorGetX(*buffer++);
+            f                                 = std::max<float>(std::min<float>(f, 65535.f), 0.f);
             *reinterpret_cast<uint16_t*>(ptr) = static_cast<uint16_t>(f);
             ptr += stride;
         }
@@ -467,8 +437,8 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(int16_t)) > eptr)
                 return E_UNEXPECTED;
-            float f = XMVectorGetX(*buffer++);
-            f = std::max<float>(std::min<float>(f, 1.f), -1.f);
+            float f                          = XMVectorGetX(*buffer++);
+            f                                = std::max<float>(std::min<float>(f, 1.f), -1.f);
             *reinterpret_cast<int16_t*>(ptr) = static_cast<int16_t>(f * 32767.f);
             ptr += stride;
         }
@@ -479,8 +449,8 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(int16_t)) > eptr)
                 return E_UNEXPECTED;
-            float f = XMVectorGetX(*buffer++);
-            f = std::max<float>(std::min<float>(f, 32767.f), -32767.f);
+            float f                          = XMVectorGetX(*buffer++);
+            f                                = std::max<float>(std::min<float>(f, 32767.f), -32767.f);
             *reinterpret_cast<int16_t*>(ptr) = static_cast<int16_t>(f);
             ptr += stride;
         }
@@ -512,8 +482,8 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
             if ((ptr + sizeof(uint8_t)) > eptr)
                 return E_UNEXPECTED;
             float f = XMVectorGetX(*buffer++);
-            f = std::max<float>(std::min<float>(f, 255.f), 0.f);
-            *ptr = static_cast<uint8_t>(f);
+            f       = std::max<float>(std::min<float>(f, 255.f), 0.f);
+            *ptr    = static_cast<uint8_t>(f);
             ptr += stride;
         }
         break;
@@ -523,8 +493,8 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(int8_t)) > eptr)
                 return E_UNEXPECTED;
-            float f = XMVectorGetX(*buffer++);
-            f = std::max<float>(std::min<float>(f, 1.f), -1.f);
+            float f                         = XMVectorGetX(*buffer++);
+            f                               = std::max<float>(std::min<float>(f, 1.f), -1.f);
             *reinterpret_cast<int8_t*>(ptr) = static_cast<int8_t>(f * 127.f);
             ptr += stride;
         }
@@ -535,65 +505,63 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         {
             if ((ptr + sizeof(int8_t)) > eptr)
                 return E_UNEXPECTED;
-            float f = XMVectorGetX(*buffer++);
-            f = std::max<float>(std::min<float>(f, 127.f), -127.f);
+            float f                         = XMVectorGetX(*buffer++);
+            f                               = std::max<float>(std::min<float>(f, 127.f), -127.f);
             *reinterpret_cast<int8_t*>(ptr) = static_cast<int8_t>(f);
             ptr += stride;
         }
         break;
 
-    case DXGI_FORMAT_B5G6R5_UNORM:
+    case DXGI_FORMAT_B5G6R5_UNORM: {
+        static const XMVECTORF32 s_Scale = { { { 31.f, 63.f, 31.f, 1.f } } };
+        for (size_t icount = 0; icount < count; ++icount)
         {
-            static const XMVECTORF32 s_Scale = { { { 31.f, 63.f, 31.f, 1.f } } };
-            for (size_t icount = 0; icount < count; ++icount)
+            if ((ptr + sizeof(XMU565)) > eptr)
+                return E_UNEXPECTED;
+            XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
+            if (x2bias)
             {
-                if ((ptr + sizeof(XMU565)) > eptr)
-                    return E_UNEXPECTED;
-                XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
-                if (x2bias)
-                {
-                    v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
-                    v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
-                }
-            #if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
-                v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
-            #else
-                v = XMVectorMultiply(v, s_Scale);
-            #endif
-                XMStoreU565(reinterpret_cast<XMU565*>(ptr), v);
-                ptr += stride;
+                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
             }
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+            v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
+#else
+            v = XMVectorMultiply(v, s_Scale);
+#endif
+            XMStoreU565(reinterpret_cast<XMU565*>(ptr), v);
+            ptr += stride;
         }
-        break;
+    }
+    break;
 
-    case DXGI_FORMAT_B5G5R5A1_UNORM:
+    case DXGI_FORMAT_B5G5R5A1_UNORM: {
+        static const XMVECTORF32 s_Scale = { { { 31.f, 31.f, 31.f, 1.f } } };
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+        static const XMVECTORF32 s_OneHalfXYZ = { { { 0.5f, 0.5f, 0.5f, 0.f } } };
+#endif
+        for (size_t icount = 0; icount < count; ++icount)
         {
-            static const XMVECTORF32 s_Scale = { { { 31.f, 31.f, 31.f, 1.f } } };
-        #if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
-            static const XMVECTORF32 s_OneHalfXYZ = { { { 0.5f, 0.5f, 0.5f, 0.f } } };
-        #endif
-            for (size_t icount = 0; icount < count; ++icount)
+            if ((ptr + sizeof(XMU555)) > eptr)
+                return E_UNEXPECTED;
+            XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
+            if (x2bias)
             {
-                if ((ptr + sizeof(XMU555)) > eptr)
-                    return E_UNEXPECTED;
-                XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
-                if (x2bias)
-                {
-                    XMVECTOR v2 = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
-                    v2 = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
-                    v = XMVectorSelect(v, v2, g_XMSelect1110);
-                }
-            #if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
-                v = XMVectorMultiplyAdd(v, s_Scale, s_OneHalfXYZ);
-            #else
-                v = XMVectorMultiply(v, s_Scale);
-            #endif
-                XMStoreU555(reinterpret_cast<XMU555*>(ptr), v);
-                reinterpret_cast<XMU555*>(ptr)->w = (XMVectorGetW(v) > 0.5f) ? 1u : 0u;
-                ptr += stride;
+                XMVECTOR v2 = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                v2          = XMVectorMultiplyAdd(v2, g_XMOneHalf, g_XMOneHalf);
+                v           = XMVectorSelect(v, v2, g_XMSelect1110);
             }
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+            v = XMVectorMultiplyAdd(v, s_Scale, s_OneHalfXYZ);
+#else
+            v = XMVectorMultiply(v, s_Scale);
+#endif
+            XMStoreU555(reinterpret_cast<XMU555*>(ptr), v);
+            reinterpret_cast<XMU555*>(ptr)->w = (XMVectorGetW(v) > 0.5f) ? 1u : 0u;
+            ptr += stride;
         }
-        break;
+    }
+    break;
 
     case DXGI_FORMAT_B8G8R8A8_UNORM:
         for (size_t icount = 0; icount < count; ++icount)
@@ -628,41 +596,38 @@ HRESULT VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, 
         }
         break;
 
-    case DXGI_FORMAT_B4G4R4A4_UNORM:
+    case DXGI_FORMAT_B4G4R4A4_UNORM: {
+        static const XMVECTORF32 s_Scale = { { { 15.f, 15.f, 15.f, 15.f } } };
+        for (size_t icount = 0; icount < count; ++icount)
         {
-            static const XMVECTORF32 s_Scale = { { { 15.f, 15.f, 15.f, 15.f } } };
-            for (size_t icount = 0; icount < count; ++icount)
+            if ((ptr + sizeof(XMUNIBBLE4)) > eptr)
+                return E_UNEXPECTED;
+            XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
+            if (x2bias)
             {
-                if ((ptr + sizeof(XMUNIBBLE4)) > eptr)
-                    return E_UNEXPECTED;
-                XMVECTOR v = XMVectorSwizzle<2, 1, 0, 3>(*buffer++);
-                if (x2bias)
-                {
-                    v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
-                    v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
-                }
-            #if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
-                v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
-            #else
-                v = XMVectorMultiply(v, s_Scale);
-            #endif
-                XMStoreUNibble4(reinterpret_cast<XMUNIBBLE4*>(ptr), v);
-                ptr += stride;
+                v = XMVectorClamp(v, g_XMNegativeOne, g_XMOne);
+                v = XMVectorMultiplyAdd(v, g_XMOneHalf, g_XMOneHalf);
             }
+#if defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC) || __arm__ || __aarch64__
+            v = XMVectorMultiplyAdd(v, s_Scale, g_XMOneHalf);
+#else
+            v = XMVectorMultiply(v, s_Scale);
+#endif
+            XMStoreUNibble4(reinterpret_cast<XMUNIBBLE4*>(ptr), v);
+            ptr += stride;
         }
-        break;
+    }
+    break;
 
     case XBOX_DXGI_FORMAT_R10G10B10_SNORM_A2_UNORM:
         // Xbox One specific format
         STORE_VERTS(XMXDECN4, XMStoreXDecN4)
 
-    default:
-        return E_FAIL;
+    default: return E_FAIL;
     }
 
     return S_OK;
 }
-
 
 //=====================================================================================
 // Entry-points
@@ -673,15 +638,13 @@ VBWriter::VBWriter() noexcept(false)
     : pImpl(std::make_unique<Impl>())
 {}
 
-
-VBWriter::VBWriter(VBWriter&&) noexcept = default;
-VBWriter& VBWriter::operator= (VBWriter&&) noexcept = default;
-VBWriter::~VBWriter() = default;
+VBWriter::VBWriter(VBWriter&&) noexcept            = default;
+VBWriter& VBWriter::operator=(VBWriter&&) noexcept = default;
+VBWriter::~VBWriter()                              = default;
 
 //-------------------------------------------------------------------------------------
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-_Use_decl_annotations_
-HRESULT VBWriter::Initialize(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl)
+_Use_decl_annotations_ HRESULT VBWriter::Initialize(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl)
 {
     return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl), nDecl);
 }
@@ -694,96 +657,91 @@ HRESULT VBWriter::Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl)
 }
 #endif
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT VBWriter::AddStream(void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
+_Use_decl_annotations_ HRESULT VBWriter::AddStream(void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
 {
     return pImpl->AddStream(vb, nVerts, inputSlot, stride);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT VBWriter::Write(const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+_Use_decl_annotations_ HRESULT
+VBWriter::Write(const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     return pImpl->Write(buffer, semanticName, semanticIndex, count, x2bias);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT VBWriter::Write(const float* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+_Use_decl_annotations_ HRESULT
+VBWriter::Write(const float* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
         return E_OUTOFMEMORY;
 
-    XMVECTOR* dptr = temp;
+    XMVECTOR*    dptr = temp;
     const float* sptr = buffer;
     for (size_t j = 0; j < count; ++j)
     {
         XMVECTOR v = XMLoadFloat(sptr++);
-        *(dptr)++ = v;
+        *(dptr)++  = v;
     }
 
     return pImpl->Write(temp, semanticName, semanticIndex, count, x2bias);
 }
 
-_Use_decl_annotations_
-HRESULT VBWriter::Write(const XMFLOAT2* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+_Use_decl_annotations_ HRESULT
+VBWriter::Write(const XMFLOAT2* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
         return E_OUTOFMEMORY;
 
-    XMVECTOR* dptr = temp;
+    XMVECTOR*       dptr = temp;
     const XMFLOAT2* sptr = buffer;
     for (size_t j = 0; j < count; ++j)
     {
         XMVECTOR v = XMLoadFloat2(sptr++);
-        *(dptr)++ = v;
+        *(dptr)++  = v;
     }
 
     return pImpl->Write(temp, semanticName, semanticIndex, count, x2bias);
 }
 
-_Use_decl_annotations_
-HRESULT VBWriter::Write(const XMFLOAT3* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+_Use_decl_annotations_ HRESULT
+VBWriter::Write(const XMFLOAT3* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
         return E_OUTOFMEMORY;
 
-    XMVECTOR* dptr = temp;
+    XMVECTOR*       dptr = temp;
     const XMFLOAT3* sptr = buffer;
     for (size_t j = 0; j < count; ++j)
     {
         XMVECTOR v = XMLoadFloat3(sptr++);
-        *(dptr)++ = v;
+        *(dptr)++  = v;
     }
 
     return pImpl->Write(temp, semanticName, semanticIndex, count, x2bias);
 }
 
-_Use_decl_annotations_
-HRESULT VBWriter::Write(const XMFLOAT4* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+_Use_decl_annotations_ HRESULT
+VBWriter::Write(const XMFLOAT4* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
         return E_OUTOFMEMORY;
 
-    XMVECTOR* dptr = temp;
+    XMVECTOR*       dptr = temp;
     const XMFLOAT4* sptr = buffer;
     for (size_t j = 0; j < count; ++j)
     {
         XMVECTOR v = XMLoadFloat4(sptr++);
-        *(dptr)++ = v;
+        *(dptr)++  = v;
     }
 
     return pImpl->Write(temp, semanticName, semanticIndex, count, x2bias);
 }
-
 
 //-------------------------------------------------------------------------------------
 void VBWriter::Release() noexcept
@@ -791,19 +749,16 @@ void VBWriter::Release() noexcept
     pImpl->Release();
 }
 
-
 //-------------------------------------------------------------------------------------
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-_Use_decl_annotations_
-const D3D11_INPUT_ELEMENT_DESC* VBWriter::GetElement11(const char* semanticName, unsigned int semanticIndex) const
+_Use_decl_annotations_ const D3D11_INPUT_ELEMENT_DESC* VBWriter::GetElement11(const char* semanticName, unsigned int semanticIndex) const
 {
     return reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
 }
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-_Use_decl_annotations_
-const D3D12_INPUT_ELEMENT_DESC* VBWriter::GetElement12(const char* semanticName, unsigned int semanticIndex) const
+_Use_decl_annotations_ const D3D12_INPUT_ELEMENT_DESC* VBWriter::GetElement12(const char* semanticName, unsigned int semanticIndex) const
 {
     return reinterpret_cast<const D3D12_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
 }

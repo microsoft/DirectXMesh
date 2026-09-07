@@ -25,7 +25,7 @@ namespace
     float ComputeVertexCacheScore(uint32_t cachePosition, uint32_t vertexCacheSize) noexcept
     {
         constexpr float FindVertexScore_CacheDecayPower = 1.5f;
-        constexpr float FindVertexScore_LastTriScore = 0.75f;
+        constexpr float FindVertexScore_LastTriScore    = 0.75f;
 
         float score = 0.0f;
         if (cachePosition >= vertexCacheSize)
@@ -48,8 +48,8 @@ namespace
             {
                 // Points for being high in the cache.
                 const float scaler = 1.0f / float(vertexCacheSize - 3u);
-                score = 1.0f - float(cachePosition - 3u) * scaler;
-                score = powf(score, FindVertexScore_CacheDecayPower);
+                score              = 1.0f - float(cachePosition - 3u) * scaler;
+                score              = powf(score, FindVertexScore_CacheDecayPower);
             }
         }
 
@@ -65,15 +65,20 @@ namespace
 
         // Bonus points for having a low number of tris still to
         // use the vert, so we get rid of lone verts quickly.
-        const float valenceBoost = powf(static_cast<float>(numActiveFaces),
-            -FindVertexScore_ValenceBoostPower);
+        const float valenceBoost = powf(static_cast<float>(numActiveFaces), -FindVertexScore_ValenceBoostPower);
 
         score += FindVertexScore_ValenceBoostScale * valenceBoost;
         return score;
     }
 
-    enum { kMaxVertexCacheSize = 64 };
-    enum { kMaxPrecomputedVertexValenceScores = 64 };
+    enum
+    {
+        kMaxVertexCacheSize = 64
+    };
+    enum
+    {
+        kMaxPrecomputedVertexValenceScores = 64
+    };
 
     float s_vertexCacheScores[kMaxVertexCacheSize + 1][kMaxVertexCacheSize];
     float s_vertexValenceScores[kMaxPrecomputedVertexValenceScores];
@@ -82,11 +87,11 @@ namespace
     static INIT_ONCE s_initOnce = INIT_ONCE_STATIC_INIT;
 
     BOOL WINAPI ComputeVertexScores(PINIT_ONCE, PVOID, PVOID*) noexcept
-    #else
+#else
     std::once_flag s_initOnce;
 
     void ComputeVertexScores() noexcept
-    #endif
+#endif
     {
         for (uint32_t cacheSize = 0; cacheSize <= kMaxVertexCacheSize; ++cacheSize)
         {
@@ -101,9 +106,9 @@ namespace
             s_vertexValenceScores[valence] = ComputeVertexValenceScore(valence);
         }
 
-    #ifdef _WIN32
+#ifdef _WIN32
         return TRUE;
-    #endif
+#endif
     }
 
     float FindVertexScore(uint32_t numActiveFaces, uint32_t cachePosition, uint32_t vertexCacheSize) noexcept
@@ -134,25 +139,33 @@ namespace
         return score;
     }
 
-    template <typename IndexType>
+    template<typename IndexType>
     struct OptimizeVertexData
     {
-        float       score;
-        uint32_t    activeFaceListStart;
-        uint32_t    activeFaceListSize;
-        IndexType   cachePos0;
-        IndexType   cachePos1;
+        float     score;
+        uint32_t  activeFaceListStart;
+        uint32_t  activeFaceListSize;
+        IndexType cachePos0;
+        IndexType cachePos1;
 
-        OptimizeVertexData() noexcept : score(0.f), activeFaceListStart(0), activeFaceListSize(0), cachePos0(0), cachePos1(0) {}
+        OptimizeVertexData() noexcept
+            : score(0.f),
+              activeFaceListStart(0),
+              activeFaceListSize(0),
+              cachePos0(0),
+              cachePos1(0)
+        {}
     };
 
-    template <typename T, typename IndexType>
+    template<typename T, typename IndexType>
 
     struct IndexSortCompareIndexed
     {
-        const IndexType *_indexData;
+        const IndexType* _indexData;
 
-        IndexSortCompareIndexed(const IndexType *indexData) noexcept : _indexData(indexData) {}
+        IndexSortCompareIndexed(const IndexType* indexData) noexcept
+            : _indexData(indexData)
+        {}
 
         bool operator()(T a, T b) const noexcept
         {
@@ -166,17 +179,19 @@ namespace
         }
     };
 
-    template <typename T, typename IndexType>
+    template<typename T, typename IndexType>
     struct FaceValenceSort
     {
-        const OptimizeVertexData<IndexType> *_vertexData;
+        const OptimizeVertexData<IndexType>* _vertexData;
 
-        FaceValenceSort(const OptimizeVertexData<IndexType> *vertexData) noexcept : _vertexData(vertexData) {}
+        FaceValenceSort(const OptimizeVertexData<IndexType>* vertexData) noexcept
+            : _vertexData(vertexData)
+        {}
 
         bool operator()(T a, T b) const noexcept
         {
-            const OptimizeVertexData<IndexType> *vA = _vertexData + size_t(a) * 3;
-            const OptimizeVertexData<IndexType> *vB = _vertexData + size_t(b) * 3;
+            const OptimizeVertexData<IndexType>* vA = _vertexData + size_t(a) * 3;
+            const OptimizeVertexData<IndexType>* vB = _vertexData + size_t(b) * 3;
 
             const uint32_t aValence = vA[0].activeFaceListSize + vA[1].activeFaceListSize + vA[2].activeFaceListSize;
             const uint32_t bValence = vB[0].activeFaceListSize + vB[1].activeFaceListSize + vB[2].activeFaceListSize;
@@ -192,10 +207,13 @@ namespace
         }
     };
 
-    template <typename IndexType>
-    HRESULT OptimizeFacesImpl(
-        _In_reads_(indexCount) const IndexType* indexList, uint32_t indexCount, size_t nVerts,
-        _Out_writes_(indexCount / 3) uint32_t* faceRemap, uint32_t lruCacheSize, uint32_t offset)
+    template<typename IndexType>
+    HRESULT OptimizeFacesImpl(_In_reads_(indexCount) const IndexType* indexList,
+        uint32_t                                                      indexCount,
+        size_t                                                        nVerts,
+        _Out_writes_(indexCount / 3) uint32_t*                        faceRemap,
+        uint32_t                                                      lruCacheSize,
+        uint32_t                                                      offset)
     {
         std::unique_ptr<OptimizeVertexData<IndexType>[]> vertexDataList(new (std::nothrow) OptimizeVertexData<IndexType>[indexCount]);
         if (!vertexDataList)
@@ -208,7 +226,7 @@ namespace
 
         const uint32_t faceCount = indexCount / 3;
 
-        std::unique_ptr<uint8_t[]> processedFaceList(new (std::nothrow) uint8_t[faceCount]);
+        std::unique_ptr<uint8_t[]>  processedFaceList(new (std::nothrow) uint8_t[faceCount]);
         std::unique_ptr<uint32_t[]> faceSorted(new (std::nothrow) uint32_t[faceCount]);
         std::unique_ptr<uint32_t[]> faceReverseLookup(new (std::nothrow) uint32_t[faceCount]);
         if (!processedFaceList || !faceSorted || !faceReverseLookup)
@@ -218,7 +236,7 @@ namespace
 
         // build the vertex remap table
         uint32_t uniqueVertexCount = 0;
-        uint32_t unused = 0;
+        uint32_t unused            = 0;
         {
             using indexSorter = IndexSortCompareIndexed<uint32_t, IndexType>;
 
@@ -279,20 +297,20 @@ namespace
             for (uint32_t i = 0; i < uniqueVertexCount; ++i)
             {
                 OptimizeVertexData<IndexType>& vertexData = vertexDataList[i];
-                vertexData.cachePos0 = kEvictedCacheIndex;
-                vertexData.cachePos1 = kEvictedCacheIndex;
-                vertexData.activeFaceListStart = curActiveFaceListPos;
+                vertexData.cachePos0                      = kEvictedCacheIndex;
+                vertexData.cachePos1                      = kEvictedCacheIndex;
+                vertexData.activeFaceListStart            = curActiveFaceListPos;
                 curActiveFaceListPos += vertexData.activeFaceListSize;
                 vertexData.score = FindVertexScore(vertexData.activeFaceListSize, vertexData.cachePos0, lruCacheSize);
 
                 vertexData.activeFaceListSize = 0;
             }
 
-        #ifndef NDEBUG
+#ifndef NDEBUG
             assert(curActiveFaceListPos == (indexCount - unused));
-        #else
+#else
             std::ignore = unused;
-        #endif
+#endif
         }
 
         // sort unprocessed faces by highest score
@@ -318,23 +336,21 @@ namespace
                 if (v == UNUSED32)
                     continue;
 
-                OptimizeVertexData<IndexType>& vertexData = vertexDataList[v];
+                OptimizeVertexData<IndexType>& vertexData                                              = vertexDataList[v];
                 activeFaceList[size_t(vertexData.activeFaceListStart) + vertexData.activeFaceListSize] = i;
                 vertexData.activeFaceListSize++;
             }
         }
 
-        uint32_t vertexCacheBuffer[(kMaxVertexCacheSize + 3) * 2] = {};
-        uint32_t *cache0 = vertexCacheBuffer;
-        uint32_t *cache1 = vertexCacheBuffer + (kMaxVertexCacheSize + 3);
-        uint32_t entriesInCache0 = 0;
+        uint32_t  vertexCacheBuffer[(kMaxVertexCacheSize + 3) * 2] = {};
+        uint32_t* cache0                                           = vertexCacheBuffer;
+        uint32_t* cache1                                           = vertexCacheBuffer + (kMaxVertexCacheSize + 3);
+        uint32_t  entriesInCache0                                  = 0;
 
         uint32_t bestFace = 0;
         for (size_t i = 0; i < indexCount; i += 3)
         {
-            if (vertexRemap[i] == UNUSED32
-                || vertexRemap[i + 1] == UNUSED32
-                || vertexRemap[i + 2] == UNUSED32)
+            if (vertexRemap[i] == UNUSED32 || vertexRemap[i + 1] == UNUSED32 || vertexRemap[i + 2] == UNUSED32)
             {
                 ++bestFace;
                 continue;
@@ -350,9 +366,7 @@ namespace
         uint32_t curFace = 0;
         for (size_t i = 0; i < indexCount; i += 3)
         {
-            if (vertexRemap[i] == UNUSED32
-                || vertexRemap[i + 1] == UNUSED32
-                || vertexRemap[i + 2] == UNUSED32)
+            if (vertexRemap[i] == UNUSED32 || vertexRemap[i + 1] == UNUSED32 || vertexRemap[i + 2] == UNUSED32)
             {
                 continue;
             }
@@ -367,16 +381,14 @@ namespace
                     if (processedFaceList[faceIndex] == 0)
                     {
                         const uint32_t face = faceIndex * 3;
-                        const uint32_t i0 = vertexRemap[face];
-                        const uint32_t i1 = vertexRemap[size_t(face) + 1];
-                        const uint32_t i2 = vertexRemap[size_t(face) + 2];
+                        const uint32_t i0   = vertexRemap[face];
+                        const uint32_t i1   = vertexRemap[size_t(face) + 1];
+                        const uint32_t i2   = vertexRemap[size_t(face) + 2];
                         if (i0 != UNUSED32 && i1 != UNUSED32 && i2 != UNUSED32)
                         {
                             // we're searching a pre-sorted list, first one we find will be the best
-                            bestFace = face;
-                            bestScore = vertexDataList[i0].score
-                                + vertexDataList[i1].score
-                                + vertexDataList[i2].score;
+                            bestFace  = face;
+                            bestScore = vertexDataList[i0].score + vertexDataList[i1].score + vertexDataList[i2].score;
                             break;
                         }
                     }
@@ -385,7 +397,7 @@ namespace
             }
 
             processedFaceList[bestFace / 3] = 1;
-            uint16_t entriesInCache1 = 0;
+            uint16_t entriesInCache1        = 0;
 
             faceRemap[curFace] = (bestFace / 3) + offset;
             curFace++;
@@ -401,7 +413,7 @@ namespace
 
                 if (vertexData.cachePos1 >= entriesInCache1)
                 {
-                    vertexData.cachePos1 = entriesInCache1;
+                    vertexData.cachePos1      = entriesInCache1;
                     cache1[entriesInCache1++] = vertexRemap[bestFace + v];
 
                     if (vertexData.activeFaceListSize == 1)
@@ -413,8 +425,8 @@ namespace
 
                 assert(vertexData.activeFaceListSize > 0);
                 uint32_t* begin = activeFaceList.get() + vertexData.activeFaceListStart;
-                uint32_t* end = activeFaceList.get() + (size_t(vertexData.activeFaceListStart) + vertexData.activeFaceListSize);
-                uint32_t* it = std::find(begin, end, bestFace);
+                uint32_t* end   = activeFaceList.get() + (size_t(vertexData.activeFaceListStart) + vertexData.activeFaceListSize);
+                uint32_t* it    = std::find(begin, end, bestFace);
 
                 assert(it != end);
 
@@ -424,10 +436,10 @@ namespace
                 vertexData.score = FindVertexScore(vertexData.activeFaceListSize, vertexData.cachePos1, lruCacheSize);
 
                 // need to re-sort the faces that use this vertex, as their score will change due to activeFaceListSize shrinking
-                for (const uint32_t *fi = begin; fi != end - 1; ++fi)
+                for (const uint32_t* fi = begin; fi != end - 1; ++fi)
                 {
                     const uint32_t faceIndex = *fi / 3;
-                    uint32_t n = faceReverseLookup[faceIndex];
+                    uint32_t       n         = faceReverseLookup[faceIndex];
                     assert(faceSorted[n] == faceIndex);
 
                     // found it, now move it up
@@ -435,7 +447,7 @@ namespace
                     {
                         if (faceValenceSort(n, n - 1))
                         {
-                            faceReverseLookup[faceSorted[n]] = n - 1;
+                            faceReverseLookup[faceSorted[n]]     = n - 1;
                             faceReverseLookup[faceSorted[n - 1]] = n;
                             std::swap(faceSorted[n], faceSorted[n - 1]);
                             n--;
@@ -455,9 +467,9 @@ namespace
 
                 if (vertexData.cachePos1 >= entriesInCache1)
                 {
-                    vertexData.cachePos1 = entriesInCache1;
+                    vertexData.cachePos1      = entriesInCache1;
                     cache1[entriesInCache1++] = cache0[c0];
-                    vertexData.score = FindVertexScore(vertexData.activeFaceListSize, vertexData.cachePos1, lruCacheSize);
+                    vertexData.score          = FindVertexScore(vertexData.activeFaceListSize, vertexData.cachePos1, lruCacheSize);
 
                     // don't need to re-sort this vertex... once it gets out of the cache, it'll have its original score
                 }
@@ -469,13 +481,13 @@ namespace
             for (uint32_t c1 = 0; c1 < entriesInCache1; ++c1)
             {
                 OptimizeVertexData<IndexType>& vertexData = vertexDataList[cache1[c1]];
-                vertexData.cachePos0 = vertexData.cachePos1;
-                vertexData.cachePos1 = kEvictedCacheIndex;
+                vertexData.cachePos0                      = vertexData.cachePos1;
+                vertexData.cachePos1                      = kEvictedCacheIndex;
 
                 for (uint32_t j = 0; j < vertexData.activeFaceListSize; ++j)
                 {
-                    const uint32_t face = activeFaceList[size_t(vertexData.activeFaceListStart) + j];
-                    float faceScore = 0.f;
+                    const uint32_t face      = activeFaceList[size_t(vertexData.activeFaceListStart) + j];
+                    float          faceScore = 0.f;
 
                     for (uint32_t v = 0; v < 3; v++)
                     {
@@ -486,7 +498,7 @@ namespace
                     if (faceScore > bestScore)
                     {
                         bestScore = faceScore;
-                        bestFace = face;
+                        bestFace  = face;
                     }
                 }
             }
@@ -503,19 +515,14 @@ namespace
 
         return S_OK;
     }
-}
+} // namespace
 
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
-_Use_decl_annotations_
-HRESULT DirectX::OptimizeFacesLRU(
-    const uint16_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    uint32_t* faceRemap,
-    uint32_t lruCacheSize)
+_Use_decl_annotations_ HRESULT
+DirectX::OptimizeFacesLRU(const uint16_t* indices, size_t nFaces, size_t nVerts, uint32_t* faceRemap, uint32_t lruCacheSize)
 {
     if (!indices || !nFaces || !nVerts || !faceRemap)
         return E_INVALIDARG;
@@ -535,13 +542,8 @@ HRESULT DirectX::OptimizeFacesLRU(
     return OptimizeFacesImpl<uint16_t>(indices, static_cast<uint32_t>(nFaces * 3), nVerts, faceRemap, lruCacheSize, 0);
 }
 
-_Use_decl_annotations_
-HRESULT DirectX::OptimizeFacesLRU(
-    const uint32_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    uint32_t* faceRemap,
-    uint32_t lruCacheSize)
+_Use_decl_annotations_ HRESULT
+DirectX::OptimizeFacesLRU(const uint32_t* indices, size_t nFaces, size_t nVerts, uint32_t* faceRemap, uint32_t lruCacheSize)
 {
     if (!indices || !nFaces || !nVerts || !faceRemap)
         return E_INVALIDARG;
@@ -561,16 +563,13 @@ HRESULT DirectX::OptimizeFacesLRU(
     return OptimizeFacesImpl<uint32_t>(indices, static_cast<uint32_t>(nFaces * 3), nVerts, faceRemap, lruCacheSize, 0);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::OptimizeFacesLRUEx(
-    const uint16_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    const uint32_t* attributes,
-    uint32_t* faceRemap,
-    uint32_t lruCacheSize)
+_Use_decl_annotations_ HRESULT DirectX::OptimizeFacesLRUEx(const uint16_t* indices,
+    size_t                                                                 nFaces,
+    size_t                                                                 nVerts,
+    const uint32_t*                                                        attributes,
+    uint32_t*                                                              faceRemap,
+    uint32_t                                                               lruCacheSize)
 {
     if (!indices || !nFaces || !nVerts || !attributes || !faceRemap)
         return E_INVALIDARG;
@@ -607,9 +606,12 @@ HRESULT DirectX::OptimizeFacesLRUEx(
         if (faceMax > nFaces)
             return E_UNEXPECTED;
 
-        HRESULT hr = OptimizeFacesImpl<uint16_t>(
-            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3), nVerts,
-            &faceRemap[it.first], lruCacheSize, uint32_t(it.first));
+        HRESULT hr = OptimizeFacesImpl<uint16_t>(&indices[it.first * 3],
+            static_cast<uint32_t>(it.second * 3),
+            nVerts,
+            &faceRemap[it.first],
+            lruCacheSize,
+            uint32_t(it.first));
         if (FAILED(hr))
             return hr;
     }
@@ -617,14 +619,12 @@ HRESULT DirectX::OptimizeFacesLRUEx(
     return S_OK;
 }
 
-_Use_decl_annotations_
-HRESULT DirectX::OptimizeFacesLRUEx(
-    const uint32_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    const uint32_t* attributes,
-    uint32_t* faceRemap,
-    uint32_t lruCacheSize)
+_Use_decl_annotations_ HRESULT DirectX::OptimizeFacesLRUEx(const uint32_t* indices,
+    size_t                                                                 nFaces,
+    size_t                                                                 nVerts,
+    const uint32_t*                                                        attributes,
+    uint32_t*                                                              faceRemap,
+    uint32_t                                                               lruCacheSize)
 {
     if (!indices || !nFaces || !nVerts || !attributes || !faceRemap)
         return E_INVALIDARG;
@@ -661,9 +661,12 @@ HRESULT DirectX::OptimizeFacesLRUEx(
         if (faceMax > nFaces)
             return E_UNEXPECTED;
 
-        HRESULT hr = OptimizeFacesImpl<uint32_t>(
-            &indices[it.first * 3], static_cast<uint32_t>(it.second * 3), nVerts,
-            &faceRemap[it.first], lruCacheSize, uint32_t(it.first));
+        HRESULT hr = OptimizeFacesImpl<uint32_t>(&indices[it.first * 3],
+            static_cast<uint32_t>(it.second * 3),
+            nVerts,
+            &faceRemap[it.first],
+            lruCacheSize,
+            uint32_t(it.first));
         if (FAILED(hr))
             return hr;
     }
