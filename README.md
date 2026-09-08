@@ -70,6 +70,13 @@ FOR SECURITY ADVISORIES, see [GitHub](https://github.com/microsoft/DirectXMesh/s
 
 For a full change history, see [CHANGELOG.md](https://github.com/microsoft/DirectXMesh/blob/main/CHANGELOG.md).
 
+* clang-format use for this project must match the version use by GitHub Super-Linter to pass the validation. VS 2022 and VS 2026 come with different versions, so to match use:
+
+```cmd
+winget install --id=LLVM.LLVM --version 21.1.2
+powershell -File build/Format.ps1 -LLVM
+```
+
 * The *directxmesh_desktop_win10* and *directxmesh_uwp* NuGet packages are deprecated. The best way to integrate the latest DirectXMesh into your C++ project is using [vcpkg](https://github.com/microsoft/vcpkg/tree/master/ports/directxmesh).
 
 * The CMake projects require 3.21 or later.
