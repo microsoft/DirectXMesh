@@ -16,10 +16,11 @@ using namespace DirectX;
 namespace
 {
     template<class index_t>
-    HRESULT OptimizeVerticesImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
-        size_t nVerts, _Out_writes_(nVerts) uint32_t* vertexRemap,
-        _Out_opt_ size_t* trailingUnused) noexcept
+    HRESULT OptimizeVerticesImpl(_In_reads_(nFaces * 3) const index_t* indices,
+        size_t                                                         nFaces,
+        size_t                                                         nVerts,
+        _Out_writes_(nVerts) uint32_t*                                 vertexRemap,
+        _Out_opt_ size_t*                                              trailingUnused) noexcept
     {
         if (!indices || !nFaces || !nVerts || !vertexRemap)
             return E_INVALIDARG;
@@ -86,17 +87,13 @@ namespace
 
         return S_OK;
     }
-}
+} // namespace
 
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
-_Use_decl_annotations_
-HRESULT DirectX::AttributeSort(
-    size_t nFaces,
-    uint32_t* attributes,
-    uint32_t* faceRemap)
+_Use_decl_annotations_ HRESULT DirectX::AttributeSort(size_t nFaces, uint32_t* attributes, uint32_t* faceRemap)
 {
     if (!nFaces || !attributes || !faceRemap)
         return E_INVALIDARG;
@@ -113,7 +110,9 @@ HRESULT DirectX::AttributeSort(
         list.emplace_back(intpair_t(attributes[j], static_cast<uint32_t>(j)));
     }
 
-    std::stable_sort(list.begin(), list.end(), [](const intpair_t& a, const intpair_t& b) noexcept -> bool
+    std::stable_sort(list.begin(),
+        list.end(),
+        [](const intpair_t& a, const intpair_t& b) noexcept -> bool
         {
             return (a.first < b.first);
         });
@@ -122,32 +121,21 @@ HRESULT DirectX::AttributeSort(
     for (size_t j = 0; j < nFaces; ++j, ++it)
     {
         attributes[j] = it->first;
-        faceRemap[j] = it->second;
+        faceRemap[j]  = it->second;
     }
 
     return S_OK;
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::OptimizeVertices(
-    const uint16_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    uint32_t* vertexRemap,
-    size_t* trailingUnused) noexcept
+_Use_decl_annotations_ HRESULT
+DirectX::OptimizeVertices(const uint16_t* indices, size_t nFaces, size_t nVerts, uint32_t* vertexRemap, size_t* trailingUnused) noexcept
 {
     return OptimizeVerticesImpl<uint16_t>(indices, nFaces, nVerts, vertexRemap, trailingUnused);
 }
 
-_Use_decl_annotations_
-HRESULT DirectX::OptimizeVertices(
-    const uint32_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    uint32_t* vertexRemap,
-    size_t* trailingUnused) noexcept
+_Use_decl_annotations_ HRESULT
+DirectX::OptimizeVertices(const uint32_t* indices, size_t nFaces, size_t nVerts, uint32_t* vertexRemap, size_t* trailingUnused) noexcept
 {
     return OptimizeVerticesImpl<uint32_t>(indices, nFaces, nVerts, vertexRemap, trailingUnused);
 }

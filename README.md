@@ -10,7 +10,7 @@ Copyright (c) Microsoft Corporation.
 
 This package contains DirectXMesh, a shared source library for performing various geometry content processing operations including generating normals and tangent frames, triangle adjacency computations, vertex cache optimization, and meshlet generation.
 
-This code is designed to build with Visual Studio 2022, Visual Studio 2026, or clang for Windows v12 or later, or MinGW. Use of the Windows 10 May 2020 Update SDK ([19041](https://walbourn.github.io/windows-10-may-2020-update-sdk/)) or later is required for Visual Studio. It can also be built for Windows Subsystem for Linux using GCC 12 or later.
+This code is designed to build with Visual Studio 2022, Visual Studio 2026, or clang for Windows v12 or later, or MinGW. Use of the Windows 11 SDK ([22000](https://walbourn.github.io/windows-sdk-for-windows-11/)) or later is required for Visual Studio. It can also be built for Windows Subsystem for Linux using GCC 12 or later.
 
 These components are designed to work without requiring any content from the legacy DirectX SDK. For details, see [Where is the DirectX SDK?](https://aka.ms/dxsdk).
 
@@ -69,6 +69,13 @@ For the latest version of DirectXMesh, bug reports, etc. please visit the projec
 FOR SECURITY ADVISORIES, see [GitHub](https://github.com/microsoft/DirectXMesh/security/advisories).
 
 For a full change history, see [CHANGELOG.md](https://github.com/microsoft/DirectXMesh/blob/main/CHANGELOG.md).
+
+* clang-format use for this project must match the version use by GitHub Super-Linter to pass the validation. VS 2022 and VS 2026 come with different versions, so to match use:
+
+```cmd
+winget install --id=LLVM.LLVM --version 21.1.2
+powershell -File build/Format.ps1 -LLVM
+```
 
 * The *directxmesh_desktop_win10* and *directxmesh_uwp* NuGet packages are deprecated. The best way to integrate the latest DirectXMesh into your C++ project is using [vcpkg](https://github.com/microsoft/vcpkg/tree/master/ports/directxmesh).
 

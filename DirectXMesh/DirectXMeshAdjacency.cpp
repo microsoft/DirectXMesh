@@ -20,24 +20,22 @@ namespace
     //---------------------------------------------------------------------------------
     struct vertexHashEntry
     {
-        XMFLOAT3            v;
-        uint32_t            index;
-        vertexHashEntry *   next;
+        XMFLOAT3         v;
+        uint32_t         index;
+        vertexHashEntry* next;
     };
 
     struct edgeHashEntry
     {
-        uint32_t        v1;
-        uint32_t        v2;
-        uint32_t        vOther;
-        uint32_t        face;
-        edgeHashEntry * next;
+        uint32_t       v1;
+        uint32_t       v2;
+        uint32_t       vOther;
+        uint32_t       face;
+        edgeHashEntry* next;
     };
 
     // <algorithm> std::make_heap doesn't match D3DX10 so we use the same algorithm here
-    void MakeXHeap(
-        _Out_writes_(nVerts) uint32_t *index,
-        _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts) noexcept
+    void MakeXHeap(_Out_writes_(nVerts) uint32_t* index, _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts) noexcept
     {
         for (size_t vert = 0; vert < nVerts; ++vert)
         {
@@ -49,12 +47,12 @@ namespace
             // Create the heap
             uint32_t iulLim = uint32_t(nVerts);
 
-            for (uint32_t vert = uint32_t(nVerts >> 1); --vert != uint32_t(-1); )
+            for (uint32_t vert = uint32_t(nVerts >> 1); --vert != uint32_t(-1);)
             {
                 // Percolate down
-                uint32_t iulI = vert;
-                uint32_t iulJ = vert + vert + 1;
-                const uint32_t ulT = index[iulI];
+                uint32_t       iulI = vert;
+                uint32_t       iulJ = vert + vert + 1;
+                const uint32_t ulT  = index[iulI];
 
                 while (iulJ < iulLim)
                 {
@@ -74,7 +72,7 @@ namespace
                         break;
 
                     index[iulI] = index[iulJ];
-                    iulI = iulJ;
+                    iulI        = iulJ;
                     iulJ += iulJ + 1;
                 }
 
@@ -85,7 +83,7 @@ namespace
             while (--iulLim != uint32_t(-1))
             {
                 const uint32_t ulT = index[iulLim];
-                index[iulLim] = index[0];
+                index[iulLim]      = index[0];
 
                 // Percolate down
                 uint32_t iulI = 0;
@@ -110,7 +108,7 @@ namespace
                         break;
 
                     index[iulI] = index[iulJ];
-                    iulI = iulJ;
+                    iulI        = iulJ;
                     iulJ += iulJ + 1;
                 }
 
@@ -121,22 +119,22 @@ namespace
         }
     }
 
-
     //---------------------------------------------------------------------------------
     // PointRep computation
     //---------------------------------------------------------------------------------
     template<class index_t>
-    HRESULT GeneratePointReps(
-        _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
-        _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts,
-        float epsilon,
-        _Out_writes_(nVerts) uint32_t* pointRep) noexcept
+    HRESULT GeneratePointReps(_In_reads_(nFaces * 3) const index_t* indices,
+        size_t                                                      nFaces,
+        _In_reads_(nVerts) const XMFLOAT3*                          positions,
+        size_t                                                      nVerts,
+        float                                                       epsilon,
+        _Out_writes_(nVerts) uint32_t*                              pointRep) noexcept
     {
         std::unique_ptr<uint32_t[]> temp(new (std::nothrow) uint32_t[nVerts + nFaces * 3]);
         if (!temp)
             return E_OUTOFMEMORY;
 
-        uint32_t* vertexToCorner = temp.get();
+        uint32_t* vertexToCorner   = temp.get();
         uint32_t* vertexCornerList = temp.get() + nVerts;
 
         memset(vertexToCorner, 0xff, sizeof(uint32_t) * nVerts);
@@ -153,7 +151,7 @@ namespace
                 return E_UNEXPECTED;
 
             vertexCornerList[j] = vertexToCorner[k];
-            vertexToCorner[k] = uint32_t(j);
+            vertexToCorner[k]   = uint32_t(j);
         }
 
         if (epsilon == 0.f)
@@ -174,18 +172,16 @@ namespace
 
             for (size_t vert = 0; vert < nVerts; ++vert)
             {
-                auto px = reinterpret_cast<const uint32_t*>(&positions[vert].x);
-                auto py = reinterpret_cast<const uint32_t*>(&positions[vert].y);
-                auto pz = reinterpret_cast<const uint32_t*>(&positions[vert].z);
+                auto           px      = reinterpret_cast<const uint32_t*>(&positions[vert].x);
+                auto           py      = reinterpret_cast<const uint32_t*>(&positions[vert].y);
+                auto           pz      = reinterpret_cast<const uint32_t*>(&positions[vert].z);
                 const uint32_t hashKey = (*px + *py + *pz) % uint32_t(hashSize);
 
                 uint32_t found = UNUSED32;
 
                 for (auto current = hashTable[hashKey]; current != nullptr; current = current->next)
                 {
-                    if (current->v.x == positions[vert].x
-                        && current->v.y == positions[vert].y
-                        && current->v.z == positions[vert].z)
+                    if (current->v.x == positions[vert].x && current->v.y == positions[vert].y && current->v.z == positions[vert].z)
                     {
                         uint32_t head = vertexToCorner[vert];
 
@@ -199,7 +195,8 @@ namespace
 
                             assert((indices[face * 3] == vert) || (indices[face * 3 + 1] == vert) || (indices[face * 3 + 2] == vert));
 
-                            if ((indices[face * 3] == current->index) || (indices[face * 3 + 1] == current->index) || (indices[face * 3 + 2] == current->index))
+                            if ((indices[face * 3] == current->index) || (indices[face * 3 + 1] == current->index)
+                                || (indices[face * 3 + 2] == current->index))
                             {
                                 ispresent = true;
                                 break;
@@ -228,9 +225,9 @@ namespace
                     auto newEntry = &hashEntries[freeEntry];
                     ++freeEntry;
 
-                    newEntry->v = positions[vert];
-                    newEntry->index = uint32_t(vert);
-                    newEntry->next = hashTable[hashKey];
+                    newEntry->v        = positions[vert];
+                    newEntry->index    = uint32_t(vert);
+                    newEntry->next     = hashTable[hashKey];
                     hashTable[hashKey] = newEntry;
 
                     pointRep[vert] = uint32_t(vert);
@@ -260,8 +257,7 @@ namespace
             while (tail < nVerts)
             {
                 // move head until just out of epsilon
-                while ((head < nVerts)
-                    && ((positions[tail].x - positions[head].x) <= epsilon))
+                while ((head < nVerts) && ((positions[tail].x - positions[head].x) <= epsilon))
                 {
                     ++head;
                 }
@@ -301,9 +297,11 @@ namespace
                                     assert(face < nFaces);
                                     _Analysis_assume_(face < nFaces);
 
-                                    assert((indices[face * 3] == tailIndex) || (indices[face * 3 + 1] == tailIndex) || (indices[face * 3 + 2] == tailIndex));
+                                    assert((indices[face * 3] == tailIndex) || (indices[face * 3 + 1] == tailIndex)
+                                           || (indices[face * 3 + 2] == tailIndex));
 
-                                    if ((indices[face * 3] == curIndex) || (indices[face * 3 + 1] == curIndex) || (indices[face * 3 + 2] == curIndex))
+                                    if ((indices[face * 3] == curIndex) || (indices[face * 3 + 1] == curIndex)
+                                        || (indices[face * 3 + 2] == curIndex))
                                     {
                                         ispresent = true;
                                         break;
@@ -328,16 +326,16 @@ namespace
         }
     }
 
-
     //---------------------------------------------------------------------------------
     // Convert PointRep to Adjacency
     //---------------------------------------------------------------------------------
     template<class index_t>
-    HRESULT ConvertPointRepsToAdjacencyImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, size_t nFaces,
-        _In_reads_(nVerts) const XMFLOAT3* positions, size_t nVerts,
-        _In_reads_(nVerts) const uint32_t* pointRep,
-        _Out_writes_(nFaces * 3) uint32_t* adjacency) noexcept
+    HRESULT ConvertPointRepsToAdjacencyImpl(_In_reads_(nFaces * 3) const index_t* indices,
+        size_t                                                                    nFaces,
+        _In_reads_(nVerts) const XMFLOAT3*                                        positions,
+        size_t                                                                    nVerts,
+        _In_reads_(nVerts) const uint32_t*                                        pointRep,
+        _Out_writes_(nFaces * 3) uint32_t*                                        adjacency) noexcept
     {
         auto hashSize = std::max<size_t>(nVerts / 3, 1);
 
@@ -360,23 +358,17 @@ namespace
             index_t i1 = indices[face * 3 + 1];
             index_t i2 = indices[face * 3 + 2];
 
-            if (i0 == index_t(-1)
-                || i1 == index_t(-1)
-                || i2 == index_t(-1))
+            if (i0 == index_t(-1) || i1 == index_t(-1) || i2 == index_t(-1))
                 continue;
 
-            if (i0 >= nVerts
-                || i1 >= nVerts
-                || i2 >= nVerts)
+            if (i0 >= nVerts || i1 >= nVerts || i2 >= nVerts)
                 return E_UNEXPECTED;
 
             const uint32_t v1 = pointRep[i0];
             const uint32_t v2 = pointRep[i1];
             const uint32_t v3 = pointRep[i2];
 
-            if (v1 >= nVerts
-                || v2 >= nVerts
-                || v3 >= nVerts)
+            if (v1 >= nVerts || v2 >= nVerts || v3 >= nVerts)
                 return E_UNEXPECTED;
 
             // filter out degenerate triangles
@@ -385,8 +377,8 @@ namespace
 
             for (uint32_t point = 0; point < 3; ++point)
             {
-                const uint32_t va = pointRep[indices[face * 3 + point]];
-                const uint32_t vb = pointRep[indices[face * 3 + ((point + 1) % 3)]];
+                const uint32_t va     = pointRep[indices[face * 3 + point]];
+                const uint32_t vb     = pointRep[indices[face * 3 + ((point + 1) % 3)]];
                 const uint32_t vOther = pointRep[indices[face * 3 + ((point + 2) % 3)]];
 
                 const uint32_t hashKey = va % hashSize;
@@ -397,11 +389,11 @@ namespace
                 auto newEntry = &hashEntries[freeEntry];
                 ++freeEntry;
 
-                newEntry->v1 = va;
-                newEntry->v2 = vb;
-                newEntry->vOther = vOther;
-                newEntry->face = uint32_t(face);
-                newEntry->next = hashTable[hashKey];
+                newEntry->v1       = va;
+                newEntry->v2       = vb;
+                newEntry->vOther   = vOther;
+                newEntry->face     = uint32_t(face);
+                newEntry->next     = hashTable[hashKey];
                 hashTable[hashKey] = newEntry;
             }
         }
@@ -417,9 +409,7 @@ namespace
             index_t i2 = indices[face * 3 + 2];
 
             // filter out unused triangles
-            if (i0 == index_t(-1)
-                || i1 == index_t(-1)
-                || i2 == index_t(-1))
+            if (i0 == index_t(-1) || i1 == index_t(-1) || i2 == index_t(-1))
                 continue;
 
             assert(i0 < nVerts);
@@ -444,14 +434,14 @@ namespace
                     continue;
 
                 // see if edge already entered, if not then enter it
-                const uint32_t va = pointRep[indices[face * 3 + ((point + 1) % 3)]];
-                const uint32_t vb = pointRep[indices[face * 3 + point]];
+                const uint32_t va     = pointRep[indices[face * 3 + ((point + 1) % 3)]];
+                const uint32_t vb     = pointRep[indices[face * 3 + point]];
                 const uint32_t vOther = pointRep[indices[face * 3 + ((point + 2) % 3)]];
 
                 const uint32_t hashKey = va % hashSize;
 
                 edgeHashEntry* current = hashTable[hashKey];
-                edgeHashEntry* prev = nullptr;
+                edgeHashEntry* prev    = nullptr;
 
                 uint32_t foundFace = UNUSED32;
 
@@ -463,11 +453,11 @@ namespace
                         break;
                     }
 
-                    prev = current;
+                    prev    = current;
                     current = current->next;
                 }
 
-                edgeHashEntry* found = current;
+                edgeHashEntry* found     = current;
                 edgeHashEntry* foundPrev = prev;
 
                 float bestDiff = -2.f;
@@ -475,7 +465,7 @@ namespace
                 // Scan for additional matches
                 if (current)
                 {
-                    prev = current;
+                    prev    = current;
                     current = current->next;
 
                     // find 'better' match
@@ -520,14 +510,14 @@ namespace
                             // if face normals are closer, use new match
                             if (diff > bestDiff)
                             {
-                                found = current;
+                                found     = current;
                                 foundPrev = prev;
                                 foundFace = current->face;
-                                bestDiff = diff;
+                                bestDiff  = diff;
                             }
                         }
 
-                        prev = current;
+                        prev    = current;
                         current = current->next;
                     }
                 }
@@ -553,7 +543,7 @@ namespace
                     const uint32_t hashKey2 = vb % hashSize;
 
                     current = hashTable[hashKey2];
-                    prev = nullptr;
+                    prev    = nullptr;
 
                     while (current != nullptr)
                     {
@@ -571,7 +561,7 @@ namespace
                             break;
                         }
 
-                        prev = current;
+                        prev    = current;
                         current = current->next;
                     }
 
@@ -582,7 +572,7 @@ namespace
                     {
                         if (foundFace == adjacency[face * 3 + point2])
                         {
-                            linked = true;
+                            linked                      = true;
                             adjacency[face * 3 + point] = UNUSED32;
                             break;
                         }
@@ -606,11 +596,11 @@ namespace
 
                         if (point2 < 3)
                         {
-                        #ifndef NDEBUG
+#ifndef NDEBUG
                             uint32_t testPoint = indices[foundFace * 3 + ((point2 + 1) % 3)];
-                            testPoint = pointRep[testPoint];
+                            testPoint          = pointRep[testPoint];
                             assert(testPoint == vb);
-                        #endif
+#endif
                             assert(adjacency[foundFace * 3 + point2] == UNUSED32);
 
                             // update neighbor to point back to this face match edge
@@ -623,22 +613,20 @@ namespace
 
         return S_OK;
     }
-}
+} // namespace
 
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::GenerateAdjacencyAndPointReps(
-    const uint16_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    size_t nVerts,
-    float epsilon,
-    uint32_t* pointRep,
-    uint32_t* adjacency)
+_Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(const uint16_t* indices,
+    size_t                                                                            nFaces,
+    const XMFLOAT3*                                                                   positions,
+    size_t                                                                            nVerts,
+    float                                                                             epsilon,
+    uint32_t*                                                                         pointRep,
+    uint32_t*                                                                         adjacency)
 {
     if (!indices || !nFaces || !positions || !nVerts)
         return E_INVALIDARG;
@@ -672,15 +660,13 @@ HRESULT DirectX::GenerateAdjacencyAndPointReps(
     return ConvertPointRepsToAdjacencyImpl<uint16_t>(indices, nFaces, positions, nVerts, pointRep, adjacency);
 }
 
-_Use_decl_annotations_
-HRESULT DirectX::GenerateAdjacencyAndPointReps(
-    const uint32_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    size_t nVerts,
-    float epsilon,
-    uint32_t* pointRep,
-    uint32_t* adjacency)
+_Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(const uint32_t* indices,
+    size_t                                                                            nFaces,
+    const XMFLOAT3*                                                                   positions,
+    size_t                                                                            nVerts,
+    float                                                                             epsilon,
+    uint32_t*                                                                         pointRep,
+    uint32_t*                                                                         adjacency)
 {
     if (!indices || !nFaces || !positions || !nVerts)
         return E_INVALIDARG;
@@ -714,16 +700,13 @@ HRESULT DirectX::GenerateAdjacencyAndPointReps(
     return ConvertPointRepsToAdjacencyImpl<uint32_t>(indices, nFaces, positions, nVerts, pointRep, adjacency);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::ConvertPointRepsToAdjacency(
-    const uint16_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    size_t nVerts,
-    const uint32_t* pointRep,
-    uint32_t* adjacency)
+_Use_decl_annotations_ HRESULT DirectX::ConvertPointRepsToAdjacency(const uint16_t* indices,
+    size_t                                                                          nFaces,
+    const XMFLOAT3*                                                                 positions,
+    size_t                                                                          nVerts,
+    const uint32_t*                                                                 pointRep,
+    uint32_t*                                                                       adjacency)
 {
     if (!indices || !nFaces || !positions || !nVerts || !adjacency)
         return E_INVALIDARG;
@@ -752,14 +735,12 @@ HRESULT DirectX::ConvertPointRepsToAdjacency(
     return ConvertPointRepsToAdjacencyImpl<uint16_t>(indices, nFaces, positions, nVerts, pointRep, adjacency);
 }
 
-_Use_decl_annotations_
-HRESULT DirectX::ConvertPointRepsToAdjacency(
-    const uint32_t* indices,
-    size_t nFaces,
-    const XMFLOAT3* positions,
-    size_t nVerts,
-    const uint32_t* pointRep,
-    uint32_t* adjacency)
+_Use_decl_annotations_ HRESULT DirectX::ConvertPointRepsToAdjacency(const uint32_t* indices,
+    size_t                                                                          nFaces,
+    const XMFLOAT3*                                                                 positions,
+    size_t                                                                          nVerts,
+    const uint32_t*                                                                 pointRep,
+    uint32_t*                                                                       adjacency)
 {
     if (!indices || !nFaces || !positions || !nVerts || !adjacency)
         return E_INVALIDARG;

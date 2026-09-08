@@ -21,11 +21,12 @@ using namespace DirectX;
 namespace
 {
     template<class index_t>
-    HRESULT GenerateGSAdjacencyImpl(
-        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces,
-        _In_reads_(nVerts) const uint32_t* pointRep,
-        _In_reads_(nFaces * 3) const uint32_t* adjacency, _In_ size_t nVerts,
-        _Out_writes_(nFaces * 6) index_t* indicesAdj) noexcept
+    HRESULT GenerateGSAdjacencyImpl(_In_reads_(nFaces * 3) const index_t* indices,
+        _In_ size_t                                                       nFaces,
+        _In_reads_(nVerts) const uint32_t*                                pointRep,
+        _In_reads_(nFaces * 3) const uint32_t*                            adjacency,
+        _In_ size_t                                                       nVerts,
+        _Out_writes_(nFaces * 6) index_t*                                 indicesAdj) noexcept
     {
         if (!indices || !nFaces || !pointRep || !adjacency || !nVerts || !indicesAdj)
             return E_INVALIDARG;
@@ -42,7 +43,7 @@ namespace
         if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
             return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-        size_t inputi = 0;
+        size_t inputi  = 0;
         size_t outputi = 0;
 
         for (size_t face = 0; face < nFaces; ++face)
@@ -79,15 +80,13 @@ namespace
                     }
                     else
                     {
-                        if (v1 >= nVerts
-                            || v2 >= nVerts)
+                        if (v1 >= nVerts || v2 >= nVerts)
                             return E_UNEXPECTED;
 
                         v1 = pointRep[v1];
                         v2 = pointRep[v2];
 
-                        if (((v1 != UNUSED32) && (v1 >= nVerts))
-                            || ((v2 != UNUSED32) && (v2 >= nVerts)))
+                        if (((v1 != UNUSED32) && (v1 >= nVerts)) || ((v2 != UNUSED32) && (v2 >= nVerts)))
                             return E_UNEXPECTED;
 
                         uint32_t vOther = UNUSED32;
@@ -116,7 +115,6 @@ namespace
                         if (vOther == UNUSED32)
                         {
                             indicesAdj[outputi] = indices[face * 3 + ((point + 2) % 3)];
-
                         }
                         else
                         {
@@ -133,35 +131,30 @@ namespace
 
         return S_OK;
     }
-}
+} // namespace
 
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::GenerateGSAdjacency(
-    const uint16_t* indices,
-    size_t nFaces,
-    const uint32_t* pointRep,
-    const uint32_t* adjacency,
-    size_t nVerts,
-    uint16_t* indicesAdj) noexcept
+_Use_decl_annotations_ HRESULT DirectX::GenerateGSAdjacency(const uint16_t* indices,
+    size_t                                                                  nFaces,
+    const uint32_t*                                                         pointRep,
+    const uint32_t*                                                         adjacency,
+    size_t                                                                  nVerts,
+    uint16_t*                                                               indicesAdj) noexcept
 {
     return GenerateGSAdjacencyImpl<uint16_t>(indices, nFaces, pointRep, adjacency, nVerts, indicesAdj);
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::GenerateGSAdjacency(
-    const uint32_t* indices,
-    size_t nFaces,
-    const uint32_t* pointRep,
-    const uint32_t* adjacency,
-    size_t nVerts,
-    uint32_t* indicesAdj) noexcept
+_Use_decl_annotations_ HRESULT DirectX::GenerateGSAdjacency(const uint32_t* indices,
+    size_t                                                                  nFaces,
+    const uint32_t*                                                         pointRep,
+    const uint32_t*                                                         adjacency,
+    size_t                                                                  nVerts,
+    uint32_t*                                                               indicesAdj) noexcept
 {
     return GenerateGSAdjacencyImpl<uint32_t>(indices, nFaces, pointRep, adjacency, nVerts, indicesAdj);
 }
