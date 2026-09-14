@@ -17,14 +17,12 @@ using namespace DirectX;
 // Entry-points
 //=====================================================================================
 
-_Use_decl_annotations_
-HRESULT __cdecl DirectX::ConcatenateMesh(
-    size_t nFaces,
-    size_t nVerts,
-    uint32_t* faceDestMap,
-    uint32_t* vertexDestMap,
-    size_t& totalFaces,
-    size_t& totalVerts) noexcept
+_Use_decl_annotations_ HRESULT __cdecl DirectX::ConcatenateMesh(size_t nFaces,
+    size_t                                                             nVerts,
+    uint32_t*                                                          faceDestMap,
+    uint32_t*                                                          vertexDestMap,
+    size_t&                                                            totalFaces,
+    size_t&                                                            totalVerts) noexcept
 {
     if (!nFaces || !nVerts || !faceDestMap || !vertexDestMap)
         return E_INVALIDARG;

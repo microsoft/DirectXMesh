@@ -16,11 +16,12 @@ using namespace DirectX;
 namespace
 {
     template<class index_t>
-    HRESULT WeldVerticesImpl(
-        _Inout_updates_all_(nFaces * 3) index_t* indices, size_t nFaces,
-        size_t nVerts, _In_reads_(nVerts) const uint32_t* pointRep,
-        _Out_writes_opt_(nVerts) uint32_t* vertexRemap,
-        const std::function<bool __cdecl(uint32_t v0, uint32_t v1)>& weldTest)
+    HRESULT WeldVerticesImpl(_Inout_updates_all_(nFaces * 3) index_t* indices,
+        size_t                                                        nFaces,
+        size_t                                                        nVerts,
+        _In_reads_(nVerts) const uint32_t*                            pointRep,
+        _Out_writes_opt_(nVerts) uint32_t*                            vertexRemap,
+        const std::function<bool __cdecl(uint32_t v0, uint32_t v1)>&  weldTest)
     {
         std::unique_ptr<uint32_t[]> temp(new (std::nothrow) uint32_t[nVerts * 2]);
         if (!temp)
@@ -33,7 +34,7 @@ namespace
         for (uint32_t j = 0; j < nVerts; ++j)
         {
             vertexRemapInverse[j] = j;
-            wedgeList[j] = j;
+            wedgeList[j]          = j;
 
             if (vertexRemap)
                 vertexRemap[j] = j;
@@ -55,7 +56,7 @@ namespace
             {
                 identity = false;
 
-                wedgeList[j] = wedgeList[pr];
+                wedgeList[j]  = wedgeList[pr];
                 wedgeList[pr] = j;
             }
         }
@@ -100,13 +101,11 @@ namespace
                             }
 
                             curInner = wedgeList[curInner];
-                        }
-                        while (curInner != vert);
+                        } while (curInner != vert);
                     }
 
                     curOuter = wedgeList[curOuter];
-                }
-                while (curOuter != vert);
+                } while (curOuter != vert);
             }
         }
 
@@ -142,20 +141,18 @@ namespace
 
         return S_OK;
     }
-}
+} // namespace
 
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
-_Use_decl_annotations_
-HRESULT DirectX::WeldVertices(
-    uint16_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    const uint32_t* pointRep,
-    uint32_t* vertexRemap,
-    std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest)
+_Use_decl_annotations_ HRESULT DirectX::WeldVertices(uint16_t* indices,
+    size_t                                                     nFaces,
+    size_t                                                     nVerts,
+    const uint32_t*                                            pointRep,
+    uint32_t*                                                  vertexRemap,
+    std::function<bool __cdecl(uint32_t v0, uint32_t v1)>      weldTest)
 {
     if (!indices || !nFaces || !nVerts || !pointRep)
         return E_INVALIDARG;
@@ -169,12 +166,12 @@ HRESULT DirectX::WeldVertices(
     return WeldVerticesImpl<uint16_t>(indices, nFaces, nVerts, pointRep, vertexRemap, weldTest);
 }
 
-_Use_decl_annotations_
-HRESULT DirectX::WeldVertices(
-    uint32_t* indices, size_t nFaces,
-    size_t nVerts, const uint32_t* pointRep,
-    uint32_t* vertexRemap,
-    std::function<bool __cdecl(uint32_t v0, uint32_t v1)> weldTest)
+_Use_decl_annotations_ HRESULT DirectX::WeldVertices(uint32_t* indices,
+    size_t                                                     nFaces,
+    size_t                                                     nVerts,
+    const uint32_t*                                            pointRep,
+    uint32_t*                                                  vertexRemap,
+    std::function<bool __cdecl(uint32_t v0, uint32_t v1)>      weldTest)
 {
     if (!indices || !nFaces || !nVerts || !pointRep)
         return E_INVALIDARG;

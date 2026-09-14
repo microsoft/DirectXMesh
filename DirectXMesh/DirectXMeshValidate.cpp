@@ -21,7 +21,7 @@ namespace
 {
 #ifndef _WIN32
     template<size_t sizeOfBuffer>
-    inline int swprintf_s(wchar_t(&buffer)[sizeOfBuffer], const wchar_t* format, ...)
+    inline int swprintf_s(wchar_t (&buffer)[sizeOfBuffer], const wchar_t* format, ...)
     {
         // This is adapter code. It is not a full implementation of swprintf_s!
         va_list ap;
@@ -36,10 +36,12 @@ namespace
     // Validates indices and optionally the adjacency information
     //---------------------------------------------------------------------------------
     template<class index_t>
-    HRESULT ValidateIndices(
-        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces,
-        _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
-        _In_ VALIDATE_FLAGS flags, _In_opt_ std::wstring* msgs)
+    HRESULT ValidateIndices(_In_reads_(nFaces * 3) const index_t* indices,
+        _In_ size_t                                               nFaces,
+        _In_ size_t                                               nVerts,
+        _In_reads_opt_(nFaces * 3) const uint32_t*                adjacency,
+        _In_ VALIDATE_FLAGS                                       flags,
+        _In_opt_ std::wstring* msgs)
     {
         bool result = true;
 
@@ -104,15 +106,11 @@ namespace
             index_t i0 = indices[face * 3];
             index_t i1 = indices[face * 3 + 1];
             index_t i2 = indices[face * 3 + 2];
-            if (i0 == index_t(-1)
-                || i1 == index_t(-1)
-                || i2 == index_t(-1))
+            if (i0 == index_t(-1) || i1 == index_t(-1) || i2 == index_t(-1))
             {
                 if (flags & VALIDATE_UNUSED)
                 {
-                    if (i0 != i1
-                        || i0 != i2
-                        || i1 != i2)
+                    if (i0 != i1 || i0 != i2 || i1 != i2)
                     {
                         if (!msgs)
                             return E_FAIL;
@@ -149,9 +147,7 @@ namespace
             }
 
             // Check for degenerate triangles
-            if (i0 == i1
-                || i0 == i2
-                || i1 == i2)
+            if (i0 == i1 || i0 == i2 || i1 == i2)
             {
                 if (flags & VALIDATE_DEGENERATE)
                 {
@@ -225,9 +221,7 @@ namespace
                 const uint32_t j1 = adjacency[face * 3 + 1];
                 const uint32_t j2 = adjacency[face * 3 + 2];
 
-                if ((j0 == j1 && j0 != UNUSED32)
-                    || (j0 == j2 && j0 != UNUSED32)
-                    || (j1 == j2 && j1 != UNUSED32))
+                if ((j0 == j1 && j0 != UNUSED32) || (j0 == j2 && j0 != UNUSED32) || (j1 == j2 && j1 != UNUSED32))
                 {
                     if (!msgs)
                         return E_FAIL;
@@ -243,8 +237,11 @@ namespace
                         bad = j1;
 
                     wchar_t buff[256] = {};
-                    swprintf_s(buff, L"A neighbor triangle (%u) was found more than once on triangle %zu\n"
-                        L"\t(likley problem is that two triangles share same points with opposite direction)\n", bad, face);
+                    swprintf_s(buff,
+                        L"A neighbor triangle (%u) was found more than once on triangle %zu\n"
+                        L"\t(likley problem is that two triangles share same points with opposite direction)\n",
+                        bad,
+                        face);
                     *msgs += buff;
                 }
             }
@@ -253,15 +250,15 @@ namespace
         return result ? S_OK : E_FAIL;
     }
 
-
     //---------------------------------------------------------------------------------
     // Validates mesh contains no bowties
     // (i.e. a vertex is the apex of two separate triangle fans)
     //---------------------------------------------------------------------------------
     template<class index_t>
-    HRESULT ValidateNoBowties(
-        _In_reads_(nFaces * 3) const index_t* indices, _In_ size_t nFaces,
-        _In_ size_t nVerts, _In_reads_opt_(nFaces * 3) const uint32_t* adjacency,
+    HRESULT ValidateNoBowties(_In_reads_(nFaces * 3) const index_t* indices,
+        _In_ size_t                                                 nFaces,
+        _In_ size_t                                                 nVerts,
+        _In_reads_opt_(nFaces * 3) const uint32_t*                  adjacency,
         _In_opt_ std::wstring* msgs)
     {
         if (!adjacency)
@@ -272,14 +269,14 @@ namespace
             return E_INVALIDARG;
         }
 
-        const size_t tsize = (sizeof(bool) * nFaces * 3) + (sizeof(index_t) * nVerts * 2) + (sizeof(bool) * nVerts);
+        const size_t               tsize = (sizeof(bool) * nFaces * 3) + (sizeof(index_t) * nVerts * 2) + (sizeof(bool) * nVerts);
         std::unique_ptr<uint8_t[]> temp(new (std::nothrow) uint8_t[tsize]);
         if (!temp)
             return E_OUTOFMEMORY;
 
-        auto faceSeen = reinterpret_cast<bool*>(temp.get());
-        auto faceIds = reinterpret_cast<index_t*>(temp.get() + sizeof(bool) * nFaces * 3);
-        auto faceUsing = reinterpret_cast<index_t*>(reinterpret_cast<uint8_t*>(faceIds) + sizeof(index_t) * nVerts);
+        auto faceSeen     = reinterpret_cast<bool*>(temp.get());
+        auto faceIds      = reinterpret_cast<index_t*>(temp.get() + sizeof(bool) * nFaces * 3);
+        auto faceUsing    = reinterpret_cast<index_t*>(reinterpret_cast<uint8_t*>(faceIds) + sizeof(index_t) * nVerts);
         auto vertexBowtie = reinterpret_cast<bool*>(reinterpret_cast<uint8_t*>(faceUsing) + sizeof(index_t) * nVerts);
 
         memset(faceSeen, 0, sizeof(bool) * nFaces * 3);
@@ -297,12 +294,10 @@ namespace
             index_t i1 = indices[face * 3 + 1];
             index_t i2 = indices[face * 3 + 2];
 
-            if (i0 == i1
-                || i0 == i2
-                || i1 == i2)
+            if (i0 == i1 || i0 == i2 || i1 == i2)
             {
                 // ignore degenerate faces
-                faceSeen[face * 3] = true;
+                faceSeen[face * 3]     = true;
                 faceSeen[face * 3 + 1] = true;
                 faceSeen[face * 3 + 2] = true;
                 continue;
@@ -334,7 +329,7 @@ namespace
 
                     if (faceIds[j] == index_t(-1))
                     {
-                        faceIds[j] = index_t(face);
+                        faceIds[j]   = index_t(face);
                         faceUsing[j] = index_t(curFace);
                     }
                     else if ((faceIds[j] != index_t(face)) && !vertexBowtie[j])
@@ -365,21 +360,19 @@ namespace
 
         return result ? S_OK : E_FAIL;
     }
-}
+} // namespace
 
 //=====================================================================================
 // Entry-points
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::Validate(
-    const uint16_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    const uint32_t* adjacency,
-    VALIDATE_FLAGS flags,
-    std::wstring* msgs)
+_Use_decl_annotations_ HRESULT DirectX::Validate(const uint16_t* indices,
+    size_t                                                       nFaces,
+    size_t                                                       nVerts,
+    const uint32_t*                                              adjacency,
+    VALIDATE_FLAGS                                               flags,
+    std::wstring*                                                msgs)
 {
     if (!indices || !nFaces || !nVerts)
         return E_INVALIDARG;
@@ -407,16 +400,13 @@ HRESULT DirectX::Validate(
     return S_OK;
 }
 
-
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT DirectX::Validate(
-    const uint32_t* indices,
-    size_t nFaces,
-    size_t nVerts,
-    const uint32_t* adjacency,
-    VALIDATE_FLAGS flags,
-    std::wstring* msgs)
+_Use_decl_annotations_ HRESULT DirectX::Validate(const uint32_t* indices,
+    size_t                                                       nFaces,
+    size_t                                                       nVerts,
+    const uint32_t*                                              adjacency,
+    VALIDATE_FLAGS                                               flags,
+    std::wstring*                                                msgs)
 {
     if (!indices || !nFaces || !nVerts)
         return E_INVALIDARG;
