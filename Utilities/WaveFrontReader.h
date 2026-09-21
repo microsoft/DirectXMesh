@@ -73,7 +73,10 @@ namespace DX
             DirectX::XMFLOAT2 textureCoordinate;
         };
 
-        WaveFrontReader() noexcept : hasNormals(false), hasTexcoords(false) {}
+        WaveFrontReader() noexcept
+            : hasNormals(false),
+              hasTexcoords(false)
+        {}
 
         HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true, bool loadmtl = true)
         {
@@ -92,20 +95,20 @@ namespace DX
 
             InFile.imbue(std::locale::classic());
 
-        #ifdef _WIN32
+#ifdef _WIN32
             wchar_t fname[_MAX_FNAME] = {};
             _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
             name = fname;
-        #else
+#else
             auto path = std::filesystem::path(szFileName);
-            name = path.filename().c_str();
-        #endif
+            name      = path.filename().c_str();
+#endif
 
-            std::vector<XMFLOAT3>   positions;
-            std::vector<XMFLOAT3>   normals;
-            std::vector<XMFLOAT2>   texCoords;
+            std::vector<XMFLOAT3> positions;
+            std::vector<XMFLOAT3> normals;
+            std::vector<XMFLOAT2> texCoords;
 
-            VertexCache  vertexCache;
+            VertexCache vertexCache;
 
             Material defmat;
 
@@ -115,7 +118,7 @@ namespace DX
             uint32_t curSubset = 0;
 
             wchar_t strMaterialFilename[MAX_PATH] = {};
-            for (;; )
+            for (;;)
             {
                 std::wstring strCommand;
                 InFile.width(MAX_PATH);
@@ -171,11 +174,11 @@ namespace DX
                 else if (0 == wcscmp(strCommand.c_str(), L"f"))
                 {
                     // Face
-                    INT iPosition, iTexCoord, iNormal;
+                    INT    iPosition, iTexCoord, iNormal;
                     Vertex vertex;
 
                     uint32_t faceIndex[MAX_POLY];
-                    size_t iFace = 0;
+                    size_t   iFace = 0;
                     for (;;)
                     {
                         if (iFace >= MAX_POLY)
@@ -320,7 +323,7 @@ namespace DX
 
                     // Convert polygons to triangles
                     const uint32_t i0 = faceIndex[0];
-                    uint32_t i1 = faceIndex[1];
+                    uint32_t       i1 = faceIndex[1];
 
                     for (size_t j = 2; j < iFace; ++j)
                     {
@@ -357,13 +360,13 @@ namespace DX
                     InFile.width(MAX_PATH);
                     InFile >> strName;
 
-                    bool bFound = false;
-                    uint32_t count = 0;
+                    bool     bFound = false;
+                    uint32_t count  = 0;
                     for (auto it = materials.cbegin(); it != materials.cend(); ++it, ++count)
                     {
                         if (0 == wcscmp(it->strName, strName))
                         {
-                            bFound = true;
+                            bFound    = true;
                             curSubset = count;
                             break;
                         }
@@ -384,10 +387,10 @@ namespace DX
                 }
                 else
                 {
-                #ifdef _DEBUG
+#ifdef _DEBUG
                     // Unimplemented or unrecognized command
                     OutputDebugStringW(strCommand.c_str());
-                #endif
+#endif
                 }
 
                 InFile.ignore(1000, L'\n');
@@ -404,12 +407,12 @@ namespace DX
             // If an associated material file was found, read that in as well.
             if (*strMaterialFilename && loadmtl)
             {
-            #ifdef _WIN32
+#ifdef _WIN32
                 wchar_t ext[_MAX_EXT] = {};
                 _wsplitpath_s(strMaterialFilename, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
 
                 wchar_t drive[_MAX_DRIVE] = {};
-                wchar_t dir[_MAX_DIR] = {};
+                wchar_t dir[_MAX_DIR]     = {};
                 _wsplitpath_s(szFileName, drive, _MAX_DRIVE, dir, _MAX_DIR, nullptr, 0, nullptr, 0);
 
                 wchar_t szPath[MAX_PATH] = {};
@@ -417,8 +420,8 @@ namespace DX
                 HRESULT hr = LoadMTL(szPath);
                 if (FAILED(hr))
                     return hr;
-            #else
-                auto path = std::filesystem::path(szFileName);
+#else
+                auto path    = std::filesystem::path(szFileName);
                 auto mtlpath = std::filesystem::path(strMaterialFilename);
                 path.replace_filename(mtlpath.filename());
                 path.replace_extension(mtlpath.extension());
@@ -426,7 +429,7 @@ namespace DX
                 HRESULT hr = LoadMTL(path.c_str());
                 if (FAILED(hr))
                     return hr;
-            #endif
+#endif
             }
 
             return S_OK;
@@ -447,9 +450,9 @@ namespace DX
             InFile.imbue(std::locale::classic());
 
             auto curMaterial = materials.end();
-            bool foundmat = false;
+            bool foundmat    = false;
 
-            for (;; )
+            for (;;)
             {
                 std::wstring strCommand;
                 InFile >> strCommand;
@@ -571,23 +574,20 @@ namespace DX
                     // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strSpecularTexture, MAX_PATH);
                 }
-                else if (0 == wcscmp(strCommand.c_str(), L"map_Kn")
-                    || 0 == wcscmp(strCommand.c_str(), L"norm"))
+                else if (0 == wcscmp(strCommand.c_str(), L"map_Kn") || 0 == wcscmp(strCommand.c_str(), L"norm"))
                 {
                     // Normal texture
                     // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strNormalTexture, MAX_PATH);
                 }
-                else if (0 == wcscmp(strCommand.c_str(), L"map_Ke")
-                    || 0 == wcscmp(strCommand.c_str(), L"map_emissive"))
+                else if (0 == wcscmp(strCommand.c_str(), L"map_Ke") || 0 == wcscmp(strCommand.c_str(), L"map_emissive"))
                 {
                     // Emissive texture
                     // TODO: check for '-options args'
                     LoadTexturePath(InFile, curMaterial->strEmissiveTexture, MAX_PATH);
                     curMaterial->bEmissive = true;
                 }
-                else if (0 == wcscmp(strCommand.c_str(), L"map_RMA")
-                    || 0 == wcscmp(strCommand.c_str(), L"map_ORM"))
+                else if (0 == wcscmp(strCommand.c_str(), L"map_RMA") || 0 == wcscmp(strCommand.c_str(), L"map_ORM"))
                 {
                     // RMA texture
                     // TODO: check for '-options args'
@@ -618,7 +618,7 @@ namespace DX
             attributes.clear();
             materials.clear();
             name.clear();
-            hasNormals = false;
+            hasNormals   = false;
             hasTexcoords = false;
 
             bounds.Center.x = bounds.Center.y = bounds.Center.z = 0.f;
@@ -634,14 +634,14 @@ namespace DX
 
             using namespace DirectX;
 
-        #ifdef _WIN32
+#ifdef _WIN32
             wchar_t fname[_MAX_FNAME] = {};
             _wsplitpath_s(szFileName, nullptr, 0, nullptr, 0, fname, _MAX_FNAME, nullptr, 0);
             name = fname;
-        #else
+#else
             auto path = std::filesystem::path(szFileName);
-            name = path.filename().c_str();
-        #endif
+            name      = path.filename().c_str();
+#endif
 
             Material defmat;
             wcscpy_s(defmat.strName, L"default");
@@ -654,7 +654,7 @@ namespace DX
             hasNormals = hasTexcoords = true;
 
             uint32_t numVertices = 0;
-            uint32_t numIndices = 0;
+            uint32_t numIndices  = 0;
 
             vboFile.read(reinterpret_cast<char*>(&numVertices), sizeof(uint32_t));
             if (!numVertices)
@@ -667,12 +667,12 @@ namespace DX
             vertices.resize(numVertices);
             vboFile.read(reinterpret_cast<char*>(vertices.data()), sizeof(Vertex) * numVertices);
 
-        #if (__cplusplus >= 201703L)
+#if (__cplusplus >= 201703L)
             if constexpr (sizeof(index_t) == 2)
-            #else
-        #pragma warning( suppress : 4127 )
+#else
+#pragma warning(suppress : 4127)
             if (sizeof(index_t) == 2)
-            #endif
+#endif
             {
                 indices.resize(numIndices);
                 vboFile.read(reinterpret_cast<char*>(indices.data()), sizeof(uint16_t) * numIndices);
@@ -703,8 +703,8 @@ namespace DX
             DirectX::XMFLOAT3 vDiffuse;
             DirectX::XMFLOAT3 vSpecular;
             DirectX::XMFLOAT3 vEmissive;
-            uint32_t nShininess;
-            float fAlpha;
+            uint32_t          nShininess;
+            float             fAlpha;
 
             bool bSpecular;
             bool bEmissive;
@@ -716,34 +716,34 @@ namespace DX
             wchar_t strEmissiveTexture[MAX_PATH];
             wchar_t strRMATexture[MAX_PATH];
 
-            Material() noexcept :
-                vAmbient(0.2f, 0.2f, 0.2f),
-                vDiffuse(0.8f, 0.8f, 0.8f),
-                vSpecular(1.0f, 1.0f, 1.0f),
-                vEmissive(0.f, 0.f, 0.f),
-                nShininess(0),
-                fAlpha(1.f),
-                bSpecular(false),
-                bEmissive(false),
-                strName{},
-                strTexture{},
-                strNormalTexture{},
-                strSpecularTexture{},
-                strEmissiveTexture{},
-                strRMATexture{}
+            Material() noexcept
+                : vAmbient(0.2f, 0.2f, 0.2f),
+                  vDiffuse(0.8f, 0.8f, 0.8f),
+                  vSpecular(1.0f, 1.0f, 1.0f),
+                  vEmissive(0.f, 0.f, 0.f),
+                  nShininess(0),
+                  fAlpha(1.f),
+                  bSpecular(false),
+                  bEmissive(false),
+                  strName{},
+                  strTexture{},
+                  strNormalTexture{},
+                  strSpecularTexture{},
+                  strEmissiveTexture{},
+                  strRMATexture{}
             {}
         };
 
-        std::vector<Vertex>     vertices;
-        std::vector<index_t>    indices;
-        std::vector<uint32_t>   attributes;
-        std::vector<Material>   materials;
+        std::vector<Vertex>   vertices;
+        std::vector<index_t>  indices;
+        std::vector<uint32_t> attributes;
+        std::vector<Material> materials;
 
-        std::wstring            name;
-        bool                    hasNormals;
-        bool                    hasTexcoords;
+        std::wstring name;
+        bool         hasNormals;
+        bool         hasTexcoords;
 
-        DirectX::BoundingBox    bounds;
+        DirectX::BoundingBox bounds;
 
     private:
         using VertexCache = std::unordered_multimap<uint32_t, uint32_t>;
@@ -801,12 +801,12 @@ namespace DX
 
             if (!path.empty())
             {
-            #ifdef _WIN32
+#ifdef _WIN32
                 wcscpy_s(texture, maxChar, path.c_str());
-            #else
+#else
                 wcscpy(texture, path.c_str());
-            #endif
+#endif
             }
         }
     };
-}
+} // namespace DX

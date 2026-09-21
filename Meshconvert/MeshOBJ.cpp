@@ -42,7 +42,7 @@ namespace
         if (!inName || !*inName)
             return std::wstring();
 
-        wchar_t txext[_MAX_EXT] = {};
+        wchar_t txext[_MAX_EXT]     = {};
         wchar_t txfname[_MAX_FNAME] = {};
         _wsplitpath_s(inName, nullptr, 0, nullptr, 0, txfname, _MAX_FNAME, txext, _MAX_EXT);
 
@@ -55,20 +55,15 @@ namespace
         _wmakepath_s(texture, nullptr, nullptr, txfname, txext);
         return std::wstring(texture);
     }
-}
+} // namespace
 
 //--------------------------------------------------------------------------------------
-HRESULT LoadFromOBJ(
-    const wchar_t* szFilename,
-    std::unique_ptr<Mesh>& inMesh,
-    std::vector<Mesh::Material>& inMaterial,
-    bool ccw,
-    bool dds)
+HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial, bool ccw, bool dds)
 {
     using Vertex = DX::WaveFrontReader<uint32_t>::Vertex;
 
     DX::WaveFrontReader<uint32_t> wfReader;
-    HRESULT hr = wfReader.Load(szFilename, ccw);
+    HRESULT                       hr = wfReader.Load(szFilename, ccw);
     if (FAILED(hr))
         return hr;
 
@@ -79,26 +74,25 @@ HRESULT LoadFromOBJ(
     if (wfReader.indices.empty() || wfReader.vertices.empty())
         return E_FAIL;
 
-    hr = inMesh->SetIndexData(wfReader.indices.size() / 3, wfReader.indices.data(),
+    hr = inMesh->SetIndexData(wfReader.indices.size() / 3,
+        wfReader.indices.data(),
         wfReader.attributes.empty() ? nullptr : wfReader.attributes.data());
     if (FAILED(hr))
         return hr;
 
-    static const D3D11_INPUT_ELEMENT_DESC s_vboLayout[] =
-    {
+    static const D3D11_INPUT_ELEMENT_DESC s_vboLayout[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
-    static const D3D11_INPUT_ELEMENT_DESC s_vboLayoutAlt[] =
-    {
+    static const D3D11_INPUT_ELEMENT_DESC s_vboLayoutAlt[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
     const D3D11_INPUT_ELEMENT_DESC* layout = s_vboLayout;
-    size_t nDecl = std::size(s_vboLayout);
+    size_t                          nDecl  = std::size(s_vboLayout);
 
     if (!wfReader.hasNormals && !wfReader.hasTexcoords)
     {
@@ -111,7 +105,7 @@ HRESULT LoadFromOBJ(
     else if (!wfReader.hasNormals && wfReader.hasTexcoords)
     {
         layout = s_vboLayoutAlt;
-        nDecl = std::size(s_vboLayoutAlt);
+        nDecl  = std::size(s_vboLayoutAlt);
     }
 
     VBReader vbr;
@@ -136,16 +130,16 @@ HRESULT LoadFromOBJ(
         {
             Mesh::Material mtl = {};
 
-            mtl.name = it.strName;
+            mtl.name          = it.strName;
             mtl.specularPower = (it.bSpecular) ? float(it.nShininess) : 1.f;
-            mtl.alpha = it.fAlpha;
-            mtl.ambientColor = it.vAmbient;
-            mtl.diffuseColor = it.vDiffuse;
+            mtl.alpha         = it.fAlpha;
+            mtl.ambientColor  = it.vAmbient;
+            mtl.diffuseColor  = it.vDiffuse;
             mtl.specularColor = (it.bSpecular) ? it.vSpecular : XMFLOAT3(0.f, 0.f, 0.f);
             mtl.emissiveColor = (it.bEmissive) ? it.vEmissive : XMFLOAT3(0.f, 0.f, 0.f);
 
-            mtl.texture = ProcessTextureFileName(it.strTexture, dds);
-            mtl.normalTexture = ProcessTextureFileName(it.strNormalTexture, dds);
+            mtl.texture         = ProcessTextureFileName(it.strTexture, dds);
+            mtl.normalTexture   = ProcessTextureFileName(it.strNormalTexture, dds);
             mtl.specularTexture = ProcessTextureFileName(it.strSpecularTexture, dds);
             if (it.bEmissive)
             {
@@ -166,8 +160,7 @@ HRESULT LoadFromOBJ(
 }
 
 //--------------------------------------------------------------------------------------
-_Use_decl_annotations_
-HRESULT Mesh::ExportToOBJ(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const
+_Use_decl_annotations_ HRESULT Mesh::ExportToOBJ(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const
 {
     if (!szFileName)
         return E_INVALIDARG;
@@ -189,8 +182,7 @@ HRESULT Mesh::ExportToOBJ(const wchar_t* szFileName, size_t nMaterials, const Ma
     return (os.bad()) ? E_FAIL : S_OK;
 }
 
-_Use_decl_annotations_
-void Mesh::ExportToOBJ(std::wostream& os, size_t nMaterials, const Material* materials) const
+_Use_decl_annotations_ void Mesh::ExportToOBJ(std::wostream& os, size_t nMaterials, const Material* materials) const
 {
     os.imbue(std::locale::classic());
 
