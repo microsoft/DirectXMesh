@@ -49,6 +49,7 @@
 #include <cwctype>
 #include <fstream>
 #include <locale>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -500,46 +501,59 @@ namespace DX
                 if (0 == wcscmp(strCommand.c_str(), L"Ka"))
                 {
                     // Ambient color
-                    // TODO: check for 'spectral' or 'xyz'
-                    float r, g, b;
-                    InFile >> r >> g >> b;
-                    curMaterial->vAmbient = XMFLOAT3(r, g, b);
+                    LoadColor(InFile, curMaterial->vAmbient);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"Kd"))
                 {
                     // Diffuse color
-                    // TODO: check for 'spectral' or 'xyz'
-                    float r, g, b;
-                    InFile >> r >> g >> b;
-                    curMaterial->vDiffuse = XMFLOAT3(r, g, b);
+                    LoadColor(InFile, curMaterial->vDiffuse);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"Ks"))
                 {
                     // Specular color
-                    // TODO: check for 'spectral' or 'xyz'
-                    float r, g, b;
-                    InFile >> r >> g >> b;
-                    curMaterial->vSpecular = XMFLOAT3(r, g, b);
+                    LoadColor(InFile, curMaterial->vSpecular);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"Ke"))
                 {
                     // Emissive color
-                    // TODO: check for 'spectral' or 'xyz'
-                    float r, g, b;
-                    InFile >> r >> g >> b;
-                    curMaterial->vEmissive = XMFLOAT3(r, g, b);
-                    if (r > 0.f || g > 0.f || b > 0.f)
+                    XMFLOAT3 emissive;
+                    if (LoadColor(InFile, emissive))
                     {
-                        curMaterial->bEmissive = true;
+                        curMaterial->vEmissive = emissive;
+                        if (emissive.x > 0.f || emissive.y > 0.f || emissive.z > 0.f)
+                        {
+                            curMaterial->bEmissive = true;
+                        }
                     }
+                }
+                else if (0 == wcscmp(strCommand.c_str(), L"Tf"))
+                {
+                    // Transmission filter (not supported)
+#ifdef _DEBUG
+                    OutputDebugStringW(L"WaveFrontReader: MTL 'Tf' (transmission filter) is not supported\n");
+#endif
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"d"))
                 {
                     // Alpha
-                    // TODO: check for '-halo'
+                    // The '-halo' form makes dissolve depend on the surface orientation, which is not
+                    // supported, so only the factor is used.
+                    std::wistringstream args(LoadLineArguments(InFile));
+                    args.imbue(std::locale::classic());
+
+                    std::wstring token;
+                    args >> token;
+                    if (token != L"-halo")
+                    {
+                        args.clear();
+                        args.seekg(0);
+                    }
+
                     float alpha;
-                    InFile >> alpha;
-                    curMaterial->fAlpha = std::min(1.f, std::max(0.f, alpha));
+                    if (args >> alpha)
+                    {
+                        curMaterial->fAlpha = std::min(1.f, std::max(0.f, alpha));
+                    }
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"Tr"))
                 {
@@ -599,7 +613,7 @@ namespace DX
 
                     // bump, decal, disp, map_d, map_Ka, map_Ns
                     // map_aat
-                    // Ni, sharpness, Tf
+                    // Ni, sharpness
                     // refl
                 }
 
@@ -768,6 +782,81 @@ namespace DX
             VertexCache::value_type entry(hash, index);
             cache.insert(entry);
             return index;
+        }
+
+        // Returns the rest of the current line without any end-of-line comment,
+        // leaving the newline in the stream
+        std::wstring LoadLineArguments(std::wifstream& InFile)
+        {
+            wchar_t buff[1024] = {};
+            InFile.getline(buff, 1024, L'\n');
+            InFile.putback(L'\n');
+
+            std::wstring args = buff;
+            size_t pos = args.find_first_of(L'#');
+            if (pos != std::wstring::npos)
+            {
+                args.resize(pos);
+            }
+
+            return args;
+        }
+
+        // Reads the arguments of an MTL color statement (Ka, Kd, Ks, Ke, Tf), which can be
+        //   r [g b]                        (g and b default to r)
+        //   xyz x [y z]                    CIE XYZ, converted to linear sRGB (y and z default to x)
+        //   spectral file.rfl [factor]     spectral curve, not supported
+        // Returns false and leaves 'color' unchanged if the color could not be read.
+        bool LoadColor(std::wifstream& InFile, DirectX::XMFLOAT3& color)
+        {
+            std::wistringstream args(LoadLineArguments(InFile));
+            args.imbue(std::locale::classic());
+
+            std::wstring token;
+            args >> token;
+            if (token == L"spectral")
+            {
+#ifdef _DEBUG
+                OutputDebugStringW(L"WaveFrontReader: MTL 'spectral' colors are not supported\n");
+#endif
+                return false;
+            }
+
+            const bool xyz = (token == L"xyz");
+            if (!xyz)
+            {
+                args.clear();
+                args.seekg(0);
+            }
+
+            float c[3] = {};
+            if (!(args >> c[0]))
+                return false;
+
+            if (args >> c[1])
+            {
+                if (!(args >> c[2]))
+                    return false;
+            }
+            else
+            {
+                c[1] = c[2] = c[0];
+            }
+
+            if (xyz)
+            {
+                // CIE XYZ to linear sRGB (D65 white point), clamping out-of-gamut values
+                const float r = 3.2404542f * c[0] - 1.5371385f * c[1] - 0.4985314f * c[2];
+                const float g = -0.9692660f * c[0] + 1.8760108f * c[1] + 0.0415560f * c[2];
+                const float b = 0.0556434f * c[0] - 0.2040259f * c[1] + 1.0572252f * c[2];
+                color = DirectX::XMFLOAT3(std::max(0.f, r), std::max(0.f, g), std::max(0.f, b));
+            }
+            else
+            {
+                color = DirectX::XMFLOAT3(c[0], c[1], c[2]);
+            }
+
+            return true;
         }
 
         void LoadTexturePath(std::wifstream& InFile, _Out_writes_(maxChar) wchar_t* texture, size_t maxChar)
