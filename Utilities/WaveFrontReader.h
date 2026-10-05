@@ -49,6 +49,7 @@
 #include <cwctype>
 #include <fstream>
 #include <locale>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -75,7 +76,8 @@ namespace DX
 
         WaveFrontReader() noexcept
             : hasNormals(false),
-              hasTexcoords(false)
+              hasTexcoords(false),
+              hasVertexColors(false)
         {}
 
         HRESULT Load(_In_z_ const wchar_t* szFileName, bool ccw = true, bool loadmtl = true)
@@ -107,6 +109,7 @@ namespace DX
             std::vector<XMFLOAT3> positions;
             std::vector<XMFLOAT3> normals;
             std::vector<XMFLOAT2> texCoords;
+            std::vector<XMFLOAT3> positionColors;
 
             VertexCache vertexCache;
 
@@ -152,6 +155,32 @@ namespace DX
                     float x, y, z;
                     InFile >> x >> y >> z;
                     positions.emplace_back(XMFLOAT3(x, y, z));
+
+                    // Some tools (e.g. MeshLab) write a per-vertex color after the position as
+                    // "v x y z r g b". This is not part of the OBJ specification, so only exactly
+                    // three extra values are treated as a color; a single extra value is the
+                    // optional 'w' coordinate and is ignored.
+                    XMFLOAT3 color(1.f, 1.f, 1.f);
+
+                    std::wstring rest;
+                    std::getline(InFile, rest, L'\n');
+                    InFile.putback(L'\n');
+
+                    std::wistringstream extra(rest);
+                    extra.imbue(std::locale::classic());
+
+                    float values[4] = {};
+                    size_t count = 0;
+                    while (count < std::size(values) && extra >> values[count])
+                        ++count;
+
+                    if (count == 3)
+                    {
+                        color = XMFLOAT3(values[0], values[1], values[2]);
+                        hasVertexColors = true;
+                    }
+
+                    positionColors.emplace_back(color);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"vt"))
                 {
@@ -284,6 +313,12 @@ namespace DX
                         if (index == uint32_t(-1))
                             return E_OUTOFMEMORY;
 
+                        if (index == vertexColors.size())
+                        {
+                            // New vertex: its color comes from the position it was built from
+                            vertexColors.emplace_back(positionColors[vertexIndex]);
+                        }
+
                         constexpr uint32_t maxIndex = (sizeof(index_t) == 2) ? UINT16_MAX : UINT32_MAX;
                         if (index >= maxIndex)
                         {
@@ -398,6 +433,11 @@ namespace DX
 
             if (positions.empty())
                 return E_FAIL;
+
+            if (!hasVertexColors)
+            {
+                vertexColors.clear();
+            }
 
             // Cleanup
             InFile.close();
@@ -617,9 +657,11 @@ namespace DX
             indices.clear();
             attributes.clear();
             materials.clear();
+            vertexColors.clear();
             name.clear();
-            hasNormals   = false;
-            hasTexcoords = false;
+            hasNormals      = false;
+            hasTexcoords    = false;
+            hasVertexColors = false;
 
             bounds.Center.x = bounds.Center.y = bounds.Center.z = 0.f;
             bounds.Extents.x = bounds.Extents.y = bounds.Extents.z = 0.f;
@@ -739,9 +781,14 @@ namespace DX
         std::vector<uint32_t> attributes;
         std::vector<Material> materials;
 
+        // Per-vertex colors from the non-standard "v x y z r g b" extension, one per entry in
+        // 'vertices'. Only filled in when hasVertexColors is true.
+        std::vector<DirectX::XMFLOAT3> vertexColors;
+
         std::wstring name;
         bool         hasNormals;
         bool         hasTexcoords;
+        bool         hasVertexColors;
 
         DirectX::BoundingBox bounds;
 
