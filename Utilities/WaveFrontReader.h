@@ -169,14 +169,14 @@ namespace DX
                     std::wistringstream extra(rest);
                     extra.imbue(std::locale::classic());
 
-                    float values[4] = {};
-                    size_t count = 0;
+                    float  values[4] = {};
+                    size_t count     = 0;
                     while (count < std::size(values) && extra >> values[count])
                         ++count;
 
                     if (count == 3)
                     {
-                        color = XMFLOAT3(values[0], values[1], values[2]);
+                        color           = XMFLOAT3(values[0], values[1], values[2]);
                         hasVertexColors = true;
                     }
 
