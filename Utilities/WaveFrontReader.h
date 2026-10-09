@@ -793,7 +793,7 @@ namespace DX
             InFile.putback(L'\n');
 
             std::wstring args = buff;
-            size_t pos = args.find_first_of(L'#');
+            size_t       pos  = args.find_first_of(L'#');
             if (pos != std::wstring::npos)
             {
                 args.resize(pos);
@@ -849,7 +849,7 @@ namespace DX
                 const float r = 3.2404542f * c[0] - 1.5371385f * c[1] - 0.4985314f * c[2];
                 const float g = -0.9692660f * c[0] + 1.8760108f * c[1] + 0.0415560f * c[2];
                 const float b = 0.0556434f * c[0] - 0.2040259f * c[1] + 1.0572252f * c[2];
-                color = DirectX::XMFLOAT3(std::max(0.f, r), std::max(0.f, g), std::max(0.f, b));
+                color         = DirectX::XMFLOAT3(std::max(0.f, r), std::max(0.f, g), std::max(0.f, b));
             }
             else
             {
