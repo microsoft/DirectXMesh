@@ -846,9 +846,14 @@ namespace DX
             if (xyz)
             {
                 // CIE XYZ to linear sRGB (D65 white point), clamping out-of-gamut values
-                const float r = 3.2404542f * c[0] - 1.5371385f * c[1] - 0.4985314f * c[2];
-                const float g = -0.9692660f * c[0] + 1.8760108f * c[1] + 0.0415560f * c[2];
-                const float b = 0.0556434f * c[0] - 0.2040259f * c[1] + 1.0572252f * c[2];
+                static constexpr float s_XYZToRGB[3][3] = {
+                    { 3.2404542f, -1.5371385f, -0.4985314f },
+                    { -0.9692660f, 1.8760108f, 0.0415560f },
+                    { 0.0556434f, -0.2040259f, 1.0572252f },
+                };
+                const float r = s_XYZToRGB[0][0] * c[0] + s_XYZToRGB[0][1] * c[1] + s_XYZToRGB[0][2] * c[2];
+                const float g = s_XYZToRGB[1][0] * c[0] + s_XYZToRGB[1][1] * c[1] + s_XYZToRGB[1][2] * c[2];
+                const float b = s_XYZToRGB[2][0] * c[0] + s_XYZToRGB[2][1] * c[1] + s_XYZToRGB[2][2] * c[2];
                 color         = DirectX::XMFLOAT3(std::max(0.f, r), std::max(0.f, g), std::max(0.f, b));
             }
             else
