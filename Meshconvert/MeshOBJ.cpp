@@ -80,6 +80,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
     if (FAILED(hr))
         return hr;
 
+    // These layouts are only used to extract data, so the offsets match WaveFrontReader::Vertex
     static const D3D11_INPUT_ELEMENT_DESC s_vboLayout[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
