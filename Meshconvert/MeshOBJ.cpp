@@ -80,6 +80,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
     if (FAILED(hr))
         return hr;
 
+    // These layouts are only used to extract data, so the offsets match WaveFrontReader::Vertex
     static const D3D11_INPUT_ELEMENT_DESC s_vboLayout[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -91,10 +92,33 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
     };
 
+    // Vertex colors are read from a second stream (slot 1) alongside the Vertex data
+    static const D3D11_INPUT_ELEMENT_DESC s_vboLayoutVC[] = {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
+    static const D3D11_INPUT_ELEMENT_DESC s_vboLayoutAltVC[] = {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+    };
+
     const D3D11_INPUT_ELEMENT_DESC* layout = s_vboLayout;
     size_t                          nDecl  = std::size(s_vboLayout);
 
-    if (!wfReader.hasNormals && !wfReader.hasTexcoords)
+    const bool hasColors = wfReader.hasVertexColors && (wfReader.vertexColors.size() == wfReader.vertices.size());
+
+    if (hasColors)
+    {
+        layout = (wfReader.hasNormals) ? s_vboLayoutVC : s_vboLayoutAltVC;
+        nDecl  = (wfReader.hasNormals) ? std::size(s_vboLayoutVC) : std::size(s_vboLayoutAltVC);
+        if (!wfReader.hasTexcoords)
+            --nDecl;
+    }
+    else if (!wfReader.hasNormals && !wfReader.hasTexcoords)
     {
         nDecl = 1;
     }
@@ -116,6 +140,21 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
     hr = vbr.AddStream(wfReader.vertices.data(), wfReader.vertices.size(), 0, sizeof(Vertex));
     if (FAILED(hr))
         return hr;
+
+    std::vector<XMFLOAT4> colors;
+    if (hasColors)
+    {
+        // OBJ vertex colors have no alpha, so use opaque
+        colors.reserve(wfReader.vertexColors.size());
+        for (const auto& c : wfReader.vertexColors)
+        {
+            colors.emplace_back(c.x, c.y, c.z, 1.f);
+        }
+
+        hr = vbr.AddStream(colors.data(), colors.size(), 1, sizeof(XMFLOAT4));
+        if (FAILED(hr))
+            return hr;
+    }
 
     hr = inMesh->SetVertexData(vbr, wfReader.vertices.size());
     if (FAILED(hr))
