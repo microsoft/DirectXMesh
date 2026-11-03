@@ -51,6 +51,7 @@
 #include <locale>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 #include <unordered_map>
 
@@ -501,17 +502,17 @@ namespace DX
                 if (0 == wcscmp(strCommand.c_str(), L"Ka"))
                 {
                     // Ambient color
-                    LoadColor(InFile, curMaterial->vAmbient);
+                    std::ignore = LoadColor(InFile, curMaterial->vAmbient);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"Kd"))
                 {
                     // Diffuse color
-                    LoadColor(InFile, curMaterial->vDiffuse);
+                    std::ignore = LoadColor(InFile, curMaterial->vDiffuse);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"Ks"))
                 {
                     // Specular color
-                    LoadColor(InFile, curMaterial->vSpecular);
+                    std::ignore = LoadColor(InFile, curMaterial->vSpecular);
                 }
                 else if (0 == wcscmp(strCommand.c_str(), L"Ke"))
                 {
