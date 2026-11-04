@@ -310,7 +310,7 @@ namespace DX
                         // list. Store the index in the Indices array. The Vertices and Indices
                         // lists will eventually become the Vertex Buffer and Index Buffer for
                         // the mesh.
-                        const uint32_t index = AddVertex(vertexIndex, &vertex, vertexCache);
+                        uint32_t const index = AddVertex(vertexIndex, &vertex, vertexCache);
                         if (index == uint32_t(-1))
                             return E_OUTOFMEMORY;
 
@@ -334,7 +334,7 @@ namespace DX
                         bool faceEnd = false;
                         for (;;)
                         {
-                            const wchar_t p = InFile.peek();
+                            wchar_t const p = InFile.peek();
 
                             if ('\n' == p || !InFile)
                             {
@@ -358,12 +358,12 @@ namespace DX
                     }
 
                     // Convert polygons to triangles
-                    const uint32_t i0 = faceIndex[0];
+                    uint32_t const i0 = faceIndex[0];
                     uint32_t       i1 = faceIndex[1];
 
                     for (size_t j = 2; j < iFace; ++j)
                     {
-                        const uint32_t index = faceIndex[j];
+                        uint32_t const index = faceIndex[j];
                         indices.emplace_back(static_cast<index_t>(i0));
                         if (ccw)
                         {
@@ -740,7 +740,7 @@ namespace DX
                 vboFile.read(reinterpret_cast<char*>(tmp.data()), sizeof(uint16_t) * numIndices);
 
                 indices.reserve(numIndices);
-                for (const auto it : tmp)
+                for (auto const it : tmp)
                 {
                     indices.emplace_back(it);
                 }
@@ -809,7 +809,7 @@ namespace DX
     private:
         using VertexCache = std::unordered_multimap<uint32_t, uint32_t>;
 
-        uint32_t AddVertex(uint32_t hash, const Vertex* pVertex, VertexCache& cache)
+        uint32_t AddVertex(uint32_t hash, Vertex const* pVertex, VertexCache& cache)
         {
             auto f = cache.equal_range(hash);
 
@@ -869,7 +869,7 @@ namespace DX
                 return false;
             }
 
-            const bool xyz = (token == L"xyz");
+            bool const xyz = (token == L"xyz");
             if (!xyz)
             {
                 args.clear();
@@ -898,9 +898,9 @@ namespace DX
                     { -0.9692660f, 1.8760108f, 0.0415560f },
                     { 0.0556434f, -0.2040259f, 1.0572252f },
                 };
-                const float r = s_XYZToRGB[0][0] * c[0] + s_XYZToRGB[0][1] * c[1] + s_XYZToRGB[0][2] * c[2];
-                const float g = s_XYZToRGB[1][0] * c[0] + s_XYZToRGB[1][1] * c[1] + s_XYZToRGB[1][2] * c[2];
-                const float b = s_XYZToRGB[2][0] * c[0] + s_XYZToRGB[2][1] * c[1] + s_XYZToRGB[2][2] * c[2];
+                float const r = s_XYZToRGB[0][0] * c[0] + s_XYZToRGB[0][1] * c[1] + s_XYZToRGB[0][2] * c[2];
+                float const g = s_XYZToRGB[1][0] * c[0] + s_XYZToRGB[1][1] * c[1] + s_XYZToRGB[1][2] * c[2];
+                float const b = s_XYZToRGB[2][0] * c[0] + s_XYZToRGB[2][1] * c[1] + s_XYZToRGB[2][2] * c[2];
                 color         = DirectX::XMFLOAT3(std::max(0.f, r), std::max(0.f, g), std::max(0.f, b));
             }
             else

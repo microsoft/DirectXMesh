@@ -255,12 +255,12 @@ namespace DirectX
         {
             assert(!done());
 
-            const uint32_t ret = m_currentFace;
+            uint32_t const ret = m_currentFace;
             m_currentEdge      = m_nextEdge;
 
             for (;;)
             {
-                const uint32_t prevFace = m_currentFace;
+                uint32_t const prevFace = m_currentFace;
 
                 assert((size_t(m_currentFace) * 3 + m_nextEdge) < (m_nFaces * 3));
                 _Analysis_assume_((size_t(m_currentFace) * 3 + m_nextEdge) < (m_nFaces * 3));
@@ -329,7 +329,7 @@ namespace DirectX
             m_currentFace = m_face;
 
             m_nextEdge                     = find(m_currentFace, m_pointIndex);
-            const uint32_t initialNextEdge = m_nextEdge;
+            uint32_t const initialNextEdge = m_nextEdge;
             assert(m_nextEdge < 3);
             _Analysis_assume_(m_nextEdge < 3);
 
@@ -389,8 +389,8 @@ namespace DirectX
         uint32_t m_currentEdge;
         uint32_t m_nextEdge;
 
-        const uint32_t* m_adjacency;
-        const index_t*  m_indices;
+        uint32_t const* m_adjacency;
+        index_t const*  m_indices;
         size_t          m_nFaces;
 
         bool m_clockWise;

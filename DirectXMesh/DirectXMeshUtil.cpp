@@ -116,7 +116,7 @@ _Use_decl_annotations_ bool DirectX::IsValid(const D3D11_INPUT_ELEMENT_DESC* vbD
 
     for (size_t j = 0; j < nDecl; ++j)
     {
-        const size_t bpe = BytesPerElement(vbDecl[j].Format);
+        size_t const bpe = BytesPerElement(vbDecl[j].Format);
         if (!bpe)
         {
             // Not a valid DXGI format or it's not valid for VB usage
@@ -274,7 +274,7 @@ DirectX::ComputeInputLayout(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl
             continue;
         }
 
-        const size_t bpe = BytesPerElement(vbDecl[j].Format);
+        size_t const bpe = BytesPerElement(vbDecl[j].Format);
         if (!bpe)
         {
             // ignore invalid format
@@ -304,7 +304,7 @@ DirectX::ComputeInputLayout(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl
 
         if (strides)
         {
-            const uint32_t istride = uint32_t(alignedByteOffset + bpe);
+            uint32_t const istride = uint32_t(alignedByteOffset + bpe);
             strides[slot]          = std::max<uint32_t>(strides[slot], istride);
         }
 
@@ -381,7 +381,7 @@ DirectX::ComputeInputLayout(const D3D12_INPUT_LAYOUT_DESC& vbDecl, uint32_t* off
 //=====================================================================================
 // Attribute Utilities
 //=====================================================================================
-_Use_decl_annotations_ std::vector<std::pair<size_t, size_t>> DirectX::ComputeSubsets(const uint32_t* attributes, size_t nFaces)
+_Use_decl_annotations_ std::vector<std::pair<size_t, size_t>> DirectX::ComputeSubsets(uint32_t const* attributes, size_t nFaces)
 {
     std::vector<std::pair<size_t, size_t>> subsets;
 
@@ -496,13 +496,13 @@ namespace
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_ void
-DirectX::ComputeVertexCacheMissRate(const uint16_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize, float& acmr, float& atvr)
+DirectX::ComputeVertexCacheMissRate(uint16_t const* indices, size_t nFaces, size_t nVerts, size_t cacheSize, float& acmr, float& atvr)
 {
     ComputeVertexCacheMissRateImpl<uint16_t>(indices, nFaces, nVerts, cacheSize, acmr, atvr);
 }
 
 _Use_decl_annotations_ void
-DirectX::ComputeVertexCacheMissRate(const uint32_t* indices, size_t nFaces, size_t nVerts, size_t cacheSize, float& acmr, float& atvr)
+DirectX::ComputeVertexCacheMissRate(uint32_t const* indices, size_t nFaces, size_t nVerts, size_t cacheSize, float& acmr, float& atvr)
 {
     ComputeVertexCacheMissRateImpl<uint32_t>(indices, nFaces, nVerts, cacheSize, acmr, atvr);
 }

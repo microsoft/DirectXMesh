@@ -40,7 +40,7 @@ public:
     // Methods
     void Clear() noexcept;
 
-    void SetMTLFileName(const std::wstring& name) noexcept { mtlFileName = name; }
+    void SetMTLFileName(std::wstring const& name) noexcept { mtlFileName = name; }
 
     HRESULT SetIndexData(_In_ size_t           nFaces,
         _In_reads_(nFaces * 3) const uint16_t* indices,
@@ -49,7 +49,7 @@ public:
         _In_reads_(nFaces * 3) const uint32_t* indices,
         _In_reads_opt_(nFaces) const uint32_t* attributes = nullptr) noexcept;
 
-    HRESULT SetVertexData(const DirectX::VBReader& reader, _In_ size_t nVerts) noexcept;
+    HRESULT SetVertexData(DirectX::VBReader const& reader, _In_ size_t nVerts) noexcept;
 
     HRESULT Validate(_In_ DirectX::VALIDATE_FLAGS flags, _In_opt_ std::wstring* msgs) const noexcept;
 
@@ -71,23 +71,23 @@ public:
     HRESULT ReverseHandedness() noexcept;
 
     // Accessors
-    const uint32_t*          GetAttributeBuffer() const noexcept { return mAttributes.get(); }
-    const uint32_t*          GetAdjacencyBuffer() const noexcept { return mAdjacency.get(); }
-    const DirectX::XMFLOAT3* GetPositionBuffer() const noexcept { return mPositions.get(); }
-    const DirectX::XMFLOAT3* GetNormalBuffer() const noexcept { return mNormals.get(); }
-    const DirectX::XMFLOAT2* GetTexCoordBuffer() const noexcept { return mTexCoords.get(); }
-    const DirectX::XMFLOAT4* GetTangentBuffer() const noexcept { return mTangents.get(); }
-    const DirectX::XMFLOAT4* GetColorBuffer() const noexcept { return mColors.get(); }
+    uint32_t const*          GetAttributeBuffer() const noexcept { return mAttributes.get(); }
+    uint32_t const*          GetAdjacencyBuffer() const noexcept { return mAdjacency.get(); }
+    DirectX::XMFLOAT3 const* GetPositionBuffer() const noexcept { return mPositions.get(); }
+    DirectX::XMFLOAT3 const* GetNormalBuffer() const noexcept { return mNormals.get(); }
+    DirectX::XMFLOAT2 const* GetTexCoordBuffer() const noexcept { return mTexCoords.get(); }
+    DirectX::XMFLOAT4 const* GetTangentBuffer() const noexcept { return mTangents.get(); }
+    DirectX::XMFLOAT4 const* GetColorBuffer() const noexcept { return mColors.get(); }
 
     size_t GetFaceCount() const noexcept { return mnFaces; }
     size_t GetVertexCount() const noexcept { return mnVerts; }
 
     bool Is16BitIndexBuffer() const noexcept;
 
-    const uint32_t*             GetIndexBuffer() const noexcept { return mIndices.get(); }
+    uint32_t const*             GetIndexBuffer() const noexcept { return mIndices.get(); }
     std::unique_ptr<uint16_t[]> GetIndexBuffer16() const noexcept;
 
-    HRESULT GetVertexBuffer(const DirectX::VBWriter& writer) const noexcept;
+    HRESULT GetVertexBuffer(DirectX::VBWriter const& writer) const noexcept;
 
     // Save mesh to file
     struct Material
@@ -116,15 +116,15 @@ public:
               emissiveColor{}
         {}
 
-        Material(const wchar_t*      iname,
+        Material(wchar_t const*      iname,
             bool                     pvc,
             float                    power,
             float                    ialpha,
-            const DirectX::XMFLOAT3& ambient,
-            const DirectX::XMFLOAT3  diffuse,
-            const DirectX::XMFLOAT3& specular,
-            const DirectX::XMFLOAT3& emissive,
-            const wchar_t*           txtname)
+            DirectX::XMFLOAT3 const& ambient,
+            DirectX::XMFLOAT3 const  diffuse,
+            DirectX::XMFLOAT3 const& specular,
+            DirectX::XMFLOAT3 const& emissive,
+            wchar_t const*           txtname)
             : name(iname),
               perVertexColor(pvc),
               specularPower(power),
@@ -137,7 +137,7 @@ public:
         {}
     };
 
-    HRESULT ExportToOBJ(const wchar_t* szFileName, _In_ size_t nMaterials, _In_reads_opt_(nMaterials) const Material* materials) const;
+    HRESULT ExportToOBJ(wchar_t const* szFileName, _In_ size_t nMaterials, _In_reads_opt_(nMaterials) const Material* materials) const;
     HRESULT ExportToVBO(_In_z_ const wchar_t* szFileName) const noexcept;
     HRESULT ExportToCMO(_In_z_ const wchar_t*      szFileName,
         _In_ size_t                                nMaterials,

@@ -31,7 +31,7 @@ namespace
 
     struct InputElementDesc
     {
-        const char*          SemanticName;
+        char const*          SemanticName;
         unsigned int         SemanticIndex;
         DXGI_FORMAT          Format;
         unsigned int         InputSlot;
@@ -68,8 +68,8 @@ public:
           mTempSize(0)
     {}
 
-    Impl(const Impl&)            = delete;
-    Impl& operator=(const Impl&) = delete;
+    Impl(Impl const&)            = delete;
+    Impl& operator=(Impl const&) = delete;
 
     Impl(Impl&&)            = default;
     Impl& operator=(Impl&&) = default;
@@ -93,7 +93,7 @@ public:
         mTempBuffer.reset();
     }
 
-    const InputElementDesc* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
+    InputElementDesc const* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
     {
         auto range = mSemantics.equal_range(semanticName);
 
@@ -146,7 +146,7 @@ private:
 };
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT VBWriter::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
+_Use_decl_annotations_ HRESULT VBWriter::Impl::Initialize(InputElementDesc const* vbDecl, size_t nDecl)
 {
     Release();
 
@@ -255,7 +255,7 @@ _Use_decl_annotations_ HRESULT VBWriter::Impl::AddStream(void* vb, size_t nVerts
     break;
 
 _Use_decl_annotations_ HRESULT
-VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBWriter::Impl::Write(const XMVECTOR* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     if (!buffer || !semanticName || !count)
         return E_INVALIDARG;
@@ -285,7 +285,7 @@ VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, unsigned
     if (!stride)
         return E_UNEXPECTED;
 
-    const uint8_t* eptr = vb + stride * mVerts[inputSlot];
+    uint8_t const* eptr = vb + stride * mVerts[inputSlot];
     uint8_t*       ptr  = vb + mInputDesc[it->second].AlignedByteOffset;
 
     switch (static_cast<int>(mInputDesc[it->second].Format))
@@ -394,7 +394,7 @@ VBWriter::Impl::Write(const XMVECTOR* buffer, const char* semanticName, unsigned
         {
             if ((ptr + sizeof(HALF)) > eptr)
                 return E_UNEXPECTED;
-            const float f                 = XMVectorGetX(*buffer++);
+            float const f                 = XMVectorGetX(*buffer++);
             *reinterpret_cast<HALF*>(ptr) = XMConvertFloatToHalf(f);
             ptr += stride;
         }
@@ -646,14 +646,14 @@ VBWriter::~VBWriter()                              = default;
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 _Use_decl_annotations_ HRESULT VBWriter::Initialize(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl)
 {
-    return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl), nDecl);
+    return pImpl->Initialize(reinterpret_cast<InputElementDesc const*>(vbDecl), nDecl);
 }
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
 HRESULT VBWriter::Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl)
 {
-    return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl.pInputElementDescs), vbDecl.NumElements);
+    return pImpl->Initialize(reinterpret_cast<InputElementDesc const*>(vbDecl.pInputElementDescs), vbDecl.NumElements);
 }
 #endif
 
@@ -665,21 +665,21 @@ _Use_decl_annotations_ HRESULT VBWriter::AddStream(void* vb, size_t nVerts, size
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_ HRESULT
-VBWriter::Write(const XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBWriter::Write(const XMVECTOR* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     return pImpl->Write(buffer, semanticName, semanticIndex, count, x2bias);
 }
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_ HRESULT
-VBWriter::Write(const float* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBWriter::Write(float const* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
         return E_OUTOFMEMORY;
 
     XMVECTOR*    dptr = temp;
-    const float* sptr = buffer;
+    float const* sptr = buffer;
     for (size_t j = 0; j < count; ++j)
     {
         XMVECTOR v = XMLoadFloat(sptr++);
@@ -690,7 +690,7 @@ VBWriter::Write(const float* buffer, const char* semanticName, unsigned int sema
 }
 
 _Use_decl_annotations_ HRESULT
-VBWriter::Write(const XMFLOAT2* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBWriter::Write(const XMFLOAT2* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
@@ -708,7 +708,7 @@ VBWriter::Write(const XMFLOAT2* buffer, const char* semanticName, unsigned int s
 }
 
 _Use_decl_annotations_ HRESULT
-VBWriter::Write(const XMFLOAT3* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBWriter::Write(const XMFLOAT3* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
@@ -726,7 +726,7 @@ VBWriter::Write(const XMFLOAT3* buffer, const char* semanticName, unsigned int s
 }
 
 _Use_decl_annotations_ HRESULT
-VBWriter::Write(const XMFLOAT4* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBWriter::Write(const XMFLOAT4* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
@@ -751,14 +751,14 @@ void VBWriter::Release() noexcept
 
 //-------------------------------------------------------------------------------------
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-_Use_decl_annotations_ const D3D11_INPUT_ELEMENT_DESC* VBWriter::GetElement11(const char* semanticName, unsigned int semanticIndex) const
+_Use_decl_annotations_ const D3D11_INPUT_ELEMENT_DESC* VBWriter::GetElement11(char const* semanticName, unsigned int semanticIndex) const
 {
     return reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
 }
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-_Use_decl_annotations_ const D3D12_INPUT_ELEMENT_DESC* VBWriter::GetElement12(const char* semanticName, unsigned int semanticIndex) const
+_Use_decl_annotations_ const D3D12_INPUT_ELEMENT_DESC* VBWriter::GetElement12(char const* semanticName, unsigned int semanticIndex) const
 {
     return reinterpret_cast<const D3D12_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
 }

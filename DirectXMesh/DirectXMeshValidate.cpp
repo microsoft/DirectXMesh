@@ -21,7 +21,7 @@ namespace
 {
 #ifndef _WIN32
     template<size_t sizeOfBuffer>
-    inline int swprintf_s(wchar_t (&buffer)[sizeOfBuffer], const wchar_t* format, ...)
+    inline int swprintf_s(wchar_t (&buffer)[sizeOfBuffer], wchar_t const* format, ...)
     {
         // This is adapter code. It is not a full implementation of swprintf_s!
         va_list ap;
@@ -87,7 +87,7 @@ namespace
 
                 if (adjacency)
                 {
-                    const uint32_t j = adjacency[face * 3 + point];
+                    uint32_t const j = adjacency[face * 3 + point];
                     if (j >= nFaces && j != UNUSED32)
                     {
                         if (!msgs)
@@ -126,7 +126,7 @@ namespace
                     {
                         for (size_t point = 0; point < 3; ++point)
                         {
-                            const uint32_t k = adjacency[face * 3 + point];
+                            uint32_t const k = adjacency[face * 3 + point];
                             if (k != UNUSED32)
                             {
                                 if (!msgs)
@@ -172,7 +172,7 @@ namespace
                     {
                         for (size_t point = 0; point < 3; ++point)
                         {
-                            const uint32_t k = adjacency[face * 3 + point];
+                            uint32_t const k = adjacency[face * 3 + point];
                             if (k != UNUSED32)
                             {
                                 result = false;
@@ -193,7 +193,7 @@ namespace
             {
                 for (size_t point = 0; point < 3; ++point)
                 {
-                    const uint32_t k = adjacency[face * 3 + point];
+                    uint32_t const k = adjacency[face * 3 + point];
                     if (k == UNUSED32)
                         continue;
 
@@ -203,7 +203,7 @@ namespace
                         continue;
                     }
 
-                    const uint32_t edge = find_edge<uint32_t>(&adjacency[k * 3], uint32_t(face));
+                    uint32_t const edge = find_edge<uint32_t>(&adjacency[k * 3], uint32_t(face));
                     if (edge >= 3)
                     {
                         if (!msgs)
@@ -221,9 +221,9 @@ namespace
             // Check for duplicate neighbor
             if ((flags & VALIDATE_BACKFACING) && adjacency)
             {
-                const uint32_t j0 = adjacency[face * 3];
-                const uint32_t j1 = adjacency[face * 3 + 1];
-                const uint32_t j2 = adjacency[face * 3 + 2];
+                uint32_t const j0 = adjacency[face * 3];
+                uint32_t const j1 = adjacency[face * 3 + 1];
+                uint32_t const j2 = adjacency[face * 3 + 2];
 
                 if ((j0 == j1 && j0 != UNUSED32) || (j0 == j2 && j0 != UNUSED32) || (j1 == j2 && j1 != UNUSED32))
                 {
@@ -273,7 +273,7 @@ namespace
             return E_INVALIDARG;
         }
 
-        const size_t               tsize = (sizeof(bool) * nFaces * 3) + (sizeof(index_t) * nVerts * 2) + (sizeof(bool) * nVerts);
+        size_t const               tsize = (sizeof(bool) * nFaces * 3) + (sizeof(index_t) * nVerts * 2) + (sizeof(bool) * nVerts);
         std::unique_ptr<uint8_t[]> temp(new (std::nothrow) uint8_t[tsize]);
         if (!temp)
             return E_OUTOFMEMORY;
@@ -373,10 +373,10 @@ namespace
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::Validate(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::Validate(uint16_t const* indices,
     size_t                                                       nFaces,
     size_t                                                       nVerts,
-    const uint32_t*                                              adjacency,
+    uint32_t const*                                              adjacency,
     VALIDATE_FLAGS                                               flags,
     std::wstring*                                                msgs)
 {
@@ -407,10 +407,10 @@ _Use_decl_annotations_ HRESULT DirectX::Validate(const uint16_t* indices,
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::Validate(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::Validate(uint32_t const* indices,
     size_t                                                       nFaces,
     size_t                                                       nVerts,
-    const uint32_t*                                              adjacency,
+    uint32_t const*                                              adjacency,
     VALIDATE_FLAGS                                               flags,
     std::wstring*                                                msgs)
 {
