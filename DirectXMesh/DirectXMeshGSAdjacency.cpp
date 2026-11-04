@@ -60,7 +60,7 @@ namespace
                 assert(outputi < (nFaces * 6));
                 _Analysis_assume_(outputi < (nFaces * 6));
 
-                const uint32_t a = adjacency[face * 3 + point];
+                uint32_t const a = adjacency[face * 3 + point];
                 if (a == UNUSED32)
                 {
                     indicesAdj[outputi] = indices[face * 3 + ((point + 2) % 3)];
@@ -96,7 +96,7 @@ namespace
                         {
                             assert(a < nFaces);
                             _Analysis_assume_(a < nFaces);
-                            const uint32_t ak = indices[a * 3 + k];
+                            uint32_t const ak = indices[a * 3 + k];
                             if (ak == index_t(-1))
                                 break;
 
@@ -138,10 +138,10 @@ namespace
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::GenerateGSAdjacency(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::GenerateGSAdjacency(uint16_t const* indices,
     size_t                                                                  nFaces,
-    const uint32_t*                                                         pointRep,
-    const uint32_t*                                                         adjacency,
+    uint32_t const*                                                         pointRep,
+    uint32_t const*                                                         adjacency,
     size_t                                                                  nVerts,
     uint16_t*                                                               indicesAdj) noexcept
 {
@@ -149,10 +149,10 @@ _Use_decl_annotations_ HRESULT DirectX::GenerateGSAdjacency(const uint16_t* indi
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::GenerateGSAdjacency(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::GenerateGSAdjacency(uint32_t const* indices,
     size_t                                                                  nFaces,
-    const uint32_t*                                                         pointRep,
-    const uint32_t*                                                         adjacency,
+    uint32_t const*                                                         pointRep,
+    uint32_t const*                                                         adjacency,
     size_t                                                                  nVerts,
     uint32_t*                                                               indicesAdj) noexcept
 {

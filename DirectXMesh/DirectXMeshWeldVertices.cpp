@@ -21,7 +21,7 @@ namespace
         size_t                                                        nVerts,
         _In_reads_(nVerts) const uint32_t*                            pointRep,
         _Out_writes_opt_(nVerts) uint32_t*                            vertexRemap,
-        const std::function<bool __cdecl(uint32_t v0, uint32_t v1)>&  weldTest)
+        std::function<bool __cdecl(uint32_t v0, uint32_t v1)> const&  weldTest)
     {
         std::unique_ptr<uint32_t[]> temp(new (std::nothrow) uint32_t[nVerts * 2]);
         if (!temp)
@@ -150,7 +150,7 @@ namespace
 _Use_decl_annotations_ HRESULT DirectX::WeldVertices(uint16_t* indices,
     size_t                                                     nFaces,
     size_t                                                     nVerts,
-    const uint32_t*                                            pointRep,
+    uint32_t const*                                            pointRep,
     uint32_t*                                                  vertexRemap,
     std::function<bool __cdecl(uint32_t v0, uint32_t v1)>      weldTest)
 {
@@ -169,7 +169,7 @@ _Use_decl_annotations_ HRESULT DirectX::WeldVertices(uint16_t* indices,
 _Use_decl_annotations_ HRESULT DirectX::WeldVertices(uint32_t* indices,
     size_t                                                     nFaces,
     size_t                                                     nVerts,
-    const uint32_t*                                            pointRep,
+    uint32_t const*                                            pointRep,
     uint32_t*                                                  vertexRemap,
     std::function<bool __cdecl(uint32_t v0, uint32_t v1)>      weldTest)
 {

@@ -52,7 +52,7 @@ namespace
                 // Percolate down
                 uint32_t       iulI = vert;
                 uint32_t       iulJ = vert + vert + 1;
-                const uint32_t ulT  = index[iulI];
+                uint32_t const ulT  = index[iulI];
 
                 while (iulJ < iulLim)
                 {
@@ -60,7 +60,7 @@ namespace
 
                     if (iulJ + 1 < iulLim)
                     {
-                        const uint32_t ulJ1 = index[iulJ + 1];
+                        uint32_t const ulJ1 = index[iulJ + 1];
                         if (positions[ulJ1].x <= positions[ulJ].x)
                         {
                             iulJ++;
@@ -82,7 +82,7 @@ namespace
             // Sort the heap
             while (--iulLim != uint32_t(-1))
             {
-                const uint32_t ulT = index[iulLim];
+                uint32_t const ulT = index[iulLim];
                 index[iulLim]      = index[0];
 
                 // Percolate down
@@ -96,7 +96,7 @@ namespace
 
                     if (iulJ + 1 < iulLim)
                     {
-                        const uint32_t ulJ1 = index[iulJ + 1];
+                        uint32_t const ulJ1 = index[iulJ + 1];
                         if (positions[ulJ1].x <= positions[ulJ].x)
                         {
                             iulJ++;
@@ -172,10 +172,10 @@ namespace
 
             for (size_t vert = 0; vert < nVerts; ++vert)
             {
-                auto           px      = reinterpret_cast<const uint32_t*>(&positions[vert].x);
-                auto           py      = reinterpret_cast<const uint32_t*>(&positions[vert].y);
-                auto           pz      = reinterpret_cast<const uint32_t*>(&positions[vert].z);
-                const uint32_t hashKey = (*px + *py + *pz) % uint32_t(hashSize);
+                auto           px      = reinterpret_cast<uint32_t const*>(&positions[vert].x);
+                auto           py      = reinterpret_cast<uint32_t const*>(&positions[vert].y);
+                auto           pz      = reinterpret_cast<uint32_t const*>(&positions[vert].z);
+                uint32_t const hashKey = (*px + *py + *pz) % uint32_t(hashSize);
 
                 uint32_t found = UNUSED32;
 
@@ -189,7 +189,7 @@ namespace
 
                         while (head != UNUSED32)
                         {
-                            const uint32_t face = head / 3;
+                            uint32_t const face = head / 3;
                             assert(face < nFaces);
                             _Analysis_assume_(face < nFaces);
 
@@ -293,7 +293,7 @@ namespace
 
                                 while (headvc != UNUSED32)
                                 {
-                                    const uint32_t face = headvc / 3;
+                                    uint32_t const face = headvc / 3;
                                     assert(face < nFaces);
                                     _Analysis_assume_(face < nFaces);
 
@@ -364,9 +364,9 @@ namespace
             if (i0 >= nVerts || i1 >= nVerts || i2 >= nVerts)
                 return E_UNEXPECTED;
 
-            const uint32_t v1 = pointRep[i0];
-            const uint32_t v2 = pointRep[i1];
-            const uint32_t v3 = pointRep[i2];
+            uint32_t const v1 = pointRep[i0];
+            uint32_t const v2 = pointRep[i1];
+            uint32_t const v3 = pointRep[i2];
 
             if (v1 >= nVerts || v2 >= nVerts || v3 >= nVerts)
                 return E_UNEXPECTED;
@@ -377,11 +377,11 @@ namespace
 
             for (uint32_t point = 0; point < 3; ++point)
             {
-                const uint32_t va     = pointRep[indices[face * 3 + point]];
-                const uint32_t vb     = pointRep[indices[face * 3 + ((point + 1) % 3)]];
-                const uint32_t vOther = pointRep[indices[face * 3 + ((point + 2) % 3)]];
+                uint32_t const va     = pointRep[indices[face * 3 + point]];
+                uint32_t const vb     = pointRep[indices[face * 3 + ((point + 1) % 3)]];
+                uint32_t const vOther = pointRep[indices[face * 3 + ((point + 2) % 3)]];
 
-                const uint32_t hashKey = va % hashSize;
+                uint32_t const hashKey = va % hashSize;
 
                 assert(freeEntry < (3 * nFaces));
                 _Analysis_assume_(freeEntry < (3 * nFaces));
@@ -420,9 +420,9 @@ namespace
             _Analysis_assume_(i1 < nVerts);
             _Analysis_assume_(i2 < nVerts);
 
-            const uint32_t v1 = pointRep[i0];
-            const uint32_t v2 = pointRep[i1];
-            const uint32_t v3 = pointRep[i2];
+            uint32_t const v1 = pointRep[i0];
+            uint32_t const v2 = pointRep[i1];
+            uint32_t const v3 = pointRep[i2];
 
             // filter out degenerate triangles
             if (v1 == v2 || v1 == v3 || v2 == v3)
@@ -434,11 +434,11 @@ namespace
                     continue;
 
                 // see if edge already entered, if not then enter it
-                const uint32_t va     = pointRep[indices[face * 3 + ((point + 1) % 3)]];
-                const uint32_t vb     = pointRep[indices[face * 3 + point]];
-                const uint32_t vOther = pointRep[indices[face * 3 + ((point + 2) % 3)]];
+                uint32_t const va     = pointRep[indices[face * 3 + ((point + 1) % 3)]];
+                uint32_t const vb     = pointRep[indices[face * 3 + point]];
+                uint32_t const vOther = pointRep[indices[face * 3 + ((point + 2) % 3)]];
 
-                const uint32_t hashKey = va % hashSize;
+                uint32_t const hashKey = va % hashSize;
 
                 edgeHashEntry* current = hashTable[hashKey];
                 edgeHashEntry* prev    = nullptr;
@@ -505,7 +505,7 @@ namespace
 
                             const XMVECTOR anormal = XMVector3Normalize(XMVector3Cross(v12, v13));
 
-                            const float diff = XMVectorGetX(XMVector3Dot(anormal, bnormal));
+                            float const diff = XMVectorGetX(XMVector3Dot(anormal, bnormal));
 
                             // if face normals are closer, use new match
                             if (diff > bestDiff)
@@ -540,7 +540,7 @@ namespace
                     adjacency[face * 3 + point] = foundFace;
 
                     // Check for other edge
-                    const uint32_t hashKey2 = vb % hashSize;
+                    uint32_t const hashKey2 = vb % hashSize;
 
                     current = hashTable[hashKey2];
                     prev    = nullptr;
@@ -620,7 +620,7 @@ namespace
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(uint16_t const* indices,
     size_t                                                                            nFaces,
     const XMFLOAT3*                                                                   positions,
     size_t                                                                            nVerts,
@@ -660,7 +660,7 @@ _Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(const uint
     return ConvertPointRepsToAdjacencyImpl<uint16_t>(indices, nFaces, positions, nVerts, pointRep, adjacency);
 }
 
-_Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(uint32_t const* indices,
     size_t                                                                            nFaces,
     const XMFLOAT3*                                                                   positions,
     size_t                                                                            nVerts,
@@ -701,11 +701,11 @@ _Use_decl_annotations_ HRESULT DirectX::GenerateAdjacencyAndPointReps(const uint
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ConvertPointRepsToAdjacency(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ConvertPointRepsToAdjacency(uint16_t const* indices,
     size_t                                                                          nFaces,
     const XMFLOAT3*                                                                 positions,
     size_t                                                                          nVerts,
-    const uint32_t*                                                                 pointRep,
+    uint32_t const*                                                                 pointRep,
     uint32_t*                                                                       adjacency)
 {
     if (!indices || !nFaces || !positions || !nVerts || !adjacency)
@@ -735,11 +735,11 @@ _Use_decl_annotations_ HRESULT DirectX::ConvertPointRepsToAdjacency(const uint16
     return ConvertPointRepsToAdjacencyImpl<uint16_t>(indices, nFaces, positions, nVerts, pointRep, adjacency);
 }
 
-_Use_decl_annotations_ HRESULT DirectX::ConvertPointRepsToAdjacency(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ConvertPointRepsToAdjacency(uint32_t const* indices,
     size_t                                                                          nFaces,
     const XMFLOAT3*                                                                 positions,
     size_t                                                                          nVerts,
-    const uint32_t*                                                                 pointRep,
+    uint32_t const*                                                                 pointRep,
     uint32_t*                                                                       adjacency)
 {
     if (!indices || !nFaces || !positions || !nVerts || !adjacency)

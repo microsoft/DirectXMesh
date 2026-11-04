@@ -33,7 +33,7 @@ namespace
         dupVerts.clear();
         size_t curNewVert = nVerts;
 
-        const size_t               tsize = (sizeof(bool) * nFaces * 3) + (sizeof(uint32_t) * nVerts) + (sizeof(index_t) * nFaces * 3);
+        size_t const               tsize = (sizeof(bool) * nFaces * 3) + (sizeof(uint32_t) * nVerts) + (sizeof(index_t) * nFaces * 3);
         std::unique_ptr<uint8_t[]> temp(new (std::nothrow) uint8_t[tsize]);
         if (!temp)
             return E_OUTOFMEMORY;
@@ -120,13 +120,13 @@ namespace
                 {
                     for (uint32_t point = 0; point < 3; ++point)
                     {
-                        const uint32_t k = adjacency[face * 3 + point];
+                        uint32_t const k = adjacency[face * 3 + point];
                         if (k != UNUSED32)
                         {
                             assert(k < nFaces);
                             _Analysis_assume_(k < nFaces);
 
-                            const uint32_t edge = find_edge<uint32_t>(&adjacency[k * 3], face);
+                            uint32_t const edge = find_edge<uint32_t>(&adjacency[k * 3], face);
                             if (edge >= 3)
                             {
                                 unlinked                    = true;
@@ -166,9 +166,9 @@ namespace
                     continue;
                 }
 
-                const uint32_t j0 = adjacency[face * 3];
-                const uint32_t j1 = adjacency[face * 3 + 1];
-                const uint32_t j2 = adjacency[face * 3 + 2];
+                uint32_t const j0 = adjacency[face * 3];
+                uint32_t const j1 = adjacency[face * 3 + 1];
+                uint32_t const j2 = adjacency[face * 3 + 2];
 
                 if ((j0 == j1 && j0 != UNUSED32) || (j0 == j2 && j0 != UNUSED32) || (j1 == j2 && j1 != UNUSED32))
                 {
@@ -314,7 +314,7 @@ namespace
                 {
                     uint32_t j = indicesNew[face * 3 + point];
 
-                    const uint32_t k = (j >= nVerts) ? dupAttr[j - nVerts] : ids[j];
+                    uint32_t const k = (j >= nVerts) ? dupAttr[j - nVerts] : ids[j];
 
                     if (k == UNUSED32)
                     {
@@ -330,7 +330,7 @@ namespace
                         auto it    = range.first;
                         for (; it != range.second; ++it)
                         {
-                            const uint32_t m = (it->second >= nVerts) ? dupAttr[it->second - nVerts] : ids[it->second];
+                            uint32_t const m = (it->second >= nVerts) ? dupAttr[it->second - nVerts] : ids[it->second];
                             if (m == a)
                             {
                                 indicesNew[face * 3 + point] = index_t(it->second);
@@ -367,7 +367,7 @@ namespace
             assert((nVerts + dupVerts.size()) == curNewVert);
 
 #ifndef NDEBUG
-            for (const auto it : dupVerts)
+            for (auto const it : dupVerts)
             {
                 assert(it < nVerts);
             }
@@ -395,7 +395,7 @@ _Use_decl_annotations_ HRESULT DirectX::Clean(uint16_t* indices,
     size_t                                              nFaces,
     size_t                                              nVerts,
     uint32_t*                                           adjacency,
-    const uint32_t*                                     attributes,
+    uint32_t const*                                     attributes,
     std::vector<uint32_t>&                              dupVerts,
     bool                                                breakBowties)
 {
@@ -411,7 +411,7 @@ _Use_decl_annotations_ HRESULT DirectX::Clean(uint32_t* indices,
     size_t                                              nFaces,
     size_t                                              nVerts,
     uint32_t*                                           adjacency,
-    const uint32_t*                                     attributes,
+    uint32_t const*                                     attributes,
     std::vector<uint32_t>&                              dupVerts,
     bool                                                breakBowties)
 {
