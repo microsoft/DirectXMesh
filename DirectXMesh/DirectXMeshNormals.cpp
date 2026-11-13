@@ -256,7 +256,7 @@ namespace
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeNormals(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeNormals(uint16_t const* indices,
     size_t                                                             nFaces,
     const XMFLOAT3*                                                    positions,
     size_t                                                             nVerts,
@@ -272,7 +272,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeNormals(const uint16_t* indices,
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-    const bool cw = (flags & CNORM_WIND_CW) ? true : false;
+    bool const cw = (flags & CNORM_WIND_CW) ? true : false;
 
     if (flags & CNORM_WEIGHT_BY_AREA)
     {
@@ -288,7 +288,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeNormals(const uint16_t* indices,
     }
 }
 
-_Use_decl_annotations_ HRESULT DirectX::ComputeNormals(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeNormals(uint32_t const* indices,
     size_t                                                             nFaces,
     const XMFLOAT3*                                                    positions,
     size_t                                                             nVerts,
@@ -304,7 +304,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeNormals(const uint32_t* indices,
     if ((uint64_t(nFaces) * 3) >= UINT32_MAX)
         return HRESULT_E_ARITHMETIC_OVERFLOW;
 
-    const bool cw = (flags & CNORM_WIND_CW) ? true : false;
+    bool const cw = (flags & CNORM_WIND_CW) ? true : false;
 
     if (flags & CNORM_WEIGHT_BY_AREA)
     {

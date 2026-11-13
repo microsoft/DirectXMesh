@@ -117,8 +117,8 @@ namespace
             b2                  = XMVector3Normalize(b2);
 
             // handle degenerate vectors
-            const float len1 = XMVectorGetX(XMVector3Length(b1));
-            const float len2 = XMVectorGetY(XMVector3Length(b2));
+            float const len1 = XMVectorGetX(XMVector3Length(b1));
+            float const len2 = XMVectorGetY(XMVector3Length(b2));
 
             if ((len1 <= EPSILON) || (len2 <= EPSILON))
             {
@@ -137,9 +137,9 @@ namespace
                     // Reset both tangent and bi-tangent from normal
                     XMVECTOR axis;
 
-                    const float d0 = fabsf(XMVectorGetX(XMVector3Dot(g_XMIdentityR0, b0)));
-                    const float d1 = fabsf(XMVectorGetX(XMVector3Dot(g_XMIdentityR1, b0)));
-                    const float d2 = fabsf(XMVectorGetX(XMVector3Dot(g_XMIdentityR2, b0)));
+                    float const d0 = fabsf(XMVectorGetX(XMVector3Dot(g_XMIdentityR0, b0)));
+                    float const d1 = fabsf(XMVectorGetX(XMVector3Dot(g_XMIdentityR1, b0)));
+                    float const d2 = fabsf(XMVectorGetX(XMVector3Dot(g_XMIdentityR2, b0)));
                     if (d0 < d1)
                     {
                         axis = (d0 < d2) ? g_XMIdentityR0 : g_XMIdentityR2;
@@ -166,7 +166,7 @@ namespace
             if (tangents4)
             {
                 XMVECTOR    bi = XMVector3Cross(b0, tan1);
-                const float w  = XMVector3Less(XMVector3Dot(bi, tan2), g_XMZero) ? -1.f : 1.f;
+                float const w  = XMVector3Less(XMVector3Dot(bi, tan2), g_XMZero) ? -1.f : 1.f;
 
                 bi = XMVectorSetW(b1, w);
                 XMStoreFloat4(&tangents4[j], bi);
@@ -187,7 +187,7 @@ namespace
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(uint16_t const* indices,
     size_t                                                                  nFaces,
     const XMFLOAT3*                                                         positions,
     const XMFLOAT3*                                                         normals,
@@ -203,7 +203,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indi
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(uint32_t const* indices,
     size_t                                                                  nFaces,
     const XMFLOAT3*                                                         positions,
     const XMFLOAT3*                                                         normals,
@@ -219,7 +219,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indi
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(uint16_t const* indices,
     size_t                                                                  nFaces,
     const XMFLOAT3*                                                         positions,
     const XMFLOAT3*                                                         normals,
@@ -235,7 +235,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indi
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(uint32_t const* indices,
     size_t                                                                  nFaces,
     const XMFLOAT3*                                                         positions,
     const XMFLOAT3*                                                         normals,
@@ -251,7 +251,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indi
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(uint16_t const* indices,
     size_t                                                                  nFaces,
     const XMFLOAT3*                                                         positions,
     const XMFLOAT3*                                                         normals,
@@ -266,7 +266,7 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint16_t* indi
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeTangentFrame(uint32_t const* indices,
     size_t                                                                  nFaces,
     const XMFLOAT3*                                                         positions,
     const XMFLOAT3*                                                         normals,

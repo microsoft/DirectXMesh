@@ -37,7 +37,7 @@ namespace
         StaticVector(StaticVector const&)            = default;
         StaticVector& operator=(StaticVector const&) = default;
 
-        void push_back(const T& value) noexcept
+        void push_back(T const& value) noexcept
         {
             assert(m_size < N);
             m_data[m_size++] = value;
@@ -60,14 +60,14 @@ namespace
         bool   empty() const noexcept { return m_size == 0; }
 
         T*       data() noexcept { return m_data.data(); }
-        const T* data() const noexcept { return m_data.data(); }
+        T const* data() const noexcept { return m_data.data(); }
 
         T& operator[](size_t index) noexcept
         {
             assert(index < m_size);
             return m_data[index];
         }
-        const T& operator[](size_t index) const noexcept
+        T const& operator[](size_t index) const noexcept
         {
             assert(index < m_size);
             return m_data[index];
@@ -107,7 +107,7 @@ namespace
     // Computes number of triangle vertices already exist in the meshlet
     //---------------------------------------------------------------------------------
     template<typename T>
-    uint8_t ComputeReuse(const InlineMeshlet<T>& meshlet, _In_reads_(3) const T* triIndices) noexcept
+    uint8_t ComputeReuse(InlineMeshlet<T> const& meshlet, _In_reads_(3) const T* triIndices) noexcept
     {
         uint8_t count = 0;
         for (size_t i = 0; i < meshlet.UniqueVertexIndices.size(); ++i)
@@ -131,7 +131,7 @@ namespace
     // and vertex re-use within a meshlet.
     //---------------------------------------------------------------------------------
     template<typename T>
-    float XM_CALLCONV ComputeScore(const InlineMeshlet<T>& meshlet,
+    float XM_CALLCONV ComputeScore(InlineMeshlet<T> const& meshlet,
         FXMVECTOR                                          sphere,
         FXMVECTOR                                          normal,
         _In_reads_(3) const T*                             triIndices,
@@ -143,8 +143,8 @@ namespace
         constexpr float c_wtOrientation = 1.0f - (c_wtReuse + c_wtLocation);
 
         // Vertex reuse -
-        const uint8_t reuse    = ComputeReuse(meshlet, triIndices);
-        const float   scrReuse = 1.0f - (float(reuse) / 3.0f);
+        uint8_t const reuse    = ComputeReuse(meshlet, triIndices);
+        float const   scrReuse = 1.0f - (float(reuse) / 3.0f);
 
         // Distance from center point - log falloff to preserve normalization where it needs it
         float maxSq = 0;
@@ -153,18 +153,18 @@ namespace
             const XMVECTOR pos = XMLoadFloat3(&triVerts[i]);
             const XMVECTOR v   = XMVectorSubtract(sphere, pos);
 
-            const float distSq = XMVectorGetX(XMVector3Dot(v, v));
+            float const distSq = XMVectorGetX(XMVector3Dot(v, v));
             maxSq              = std::max(maxSq, distSq);
         }
 
-        const float r           = XMVectorGetW(sphere);
-        const float r2          = r * r;
-        const float scrLocation = std::max(0.0f, log2f(maxSq / (r2 + FLT_EPSILON) + FLT_EPSILON));
+        float const r           = XMVectorGetW(sphere);
+        float const r2          = r * r;
+        float const scrLocation = std::max(0.0f, log2f(maxSq / (r2 + FLT_EPSILON) + FLT_EPSILON));
 
         // Angle between normal and meshlet cone axis - cosine falloff
         const XMVECTOR n              = ComputeNormal(triVerts);
-        const float    d              = XMVectorGetX(XMVector3Dot(n, normal));
-        const float    scrOrientation = (1.0f - d) * 0.5f;
+        float const    d              = XMVectorGetX(XMVector3Dot(n, normal));
+        float const    scrOrientation = (1.0f - d) * 0.5f;
 
         // Weighted sum of scores
         return c_wtReuse * scrReuse + c_wtLocation * scrLocation + c_wtOrientation * scrOrientation;
@@ -229,7 +229,7 @@ namespace
     // Determines whether a meshlet contains the maximum number of vertices/primitives
     //---------------------------------------------------------------------------------
     template<typename T>
-    inline bool IsMeshletFull(size_t maxVerts, size_t maxPrims, const InlineMeshlet<T>& meshlet) noexcept
+    inline bool IsMeshletFull(size_t maxVerts, size_t maxPrims, InlineMeshlet<T> const& meshlet) noexcept
     {
         assert(meshlet.UniqueVertexIndices.size() <= maxVerts);
         assert(meshlet.PrimitiveIndices.size() <= maxPrims);
@@ -247,7 +247,7 @@ namespace
         size_t                                 nFaces,
         _In_reads_(nVerts) const XMFLOAT3*     positions,
         size_t                                 nVerts,
-        const std::pair<size_t, size_t>&       subset,
+        std::pair<size_t, size_t> const&       subset,
         _In_reads_(nFaces * 3) const uint32_t* adjacency,
         std::vector<InlineMeshlet<T>>&         meshlets)
     {
@@ -272,8 +272,8 @@ namespace
         std::vector<XMFLOAT3> normals;
 
         // Seed the candidate list with the first triangle of the subset
-        const uint32_t startIndex = static_cast<uint32_t>(subset.first);
-        const uint32_t endIndex   = static_cast<uint32_t>(subset.first + subset.second);
+        uint32_t const startIndex = static_cast<uint32_t>(subset.first);
+        uint32_t const endIndex   = static_cast<uint32_t>(subset.first + subset.second);
 
         uint32_t triIndex = static_cast<uint32_t>(subset.first);
 
@@ -338,7 +338,7 @@ namespace
                 const XMVECTOR normal  = XMVector3Normalize(XMLoadFloat4(reinterpret_cast<XMFLOAT4*>(&normalBounds)));
 
                 // Find and add all applicable adjacent triangles to candidate list
-                const uint32_t adjIndex = index * 3;
+                uint32_t const adjIndex = index * 3;
 
                 uint32_t adj[3] = {
                     adjacency[adjIndex],
@@ -521,7 +521,7 @@ namespace
             size_t primitiveIndexCount    = startPrimCount;
 
             // Resize the meshlet output array to hold the newly formed meshlets.
-            const size_t meshletCount = meshlets.size();
+            size_t const meshletCount = meshlets.size();
             meshlets.resize(meshletCount + newMeshlets.size());
 
             Meshlet* dest = &meshlets[meshletCount];
@@ -600,7 +600,7 @@ namespace
                     return E_UNEXPECTED;
                 }
 
-                const uint32_t vIndex = uniqueVertexIndices[m.VertOffset + i];
+                uint32_t const vIndex = uniqueVertexIndices[m.VertOffset + i];
 
                 if (vIndex >= nVerts)
                 {
@@ -668,15 +668,15 @@ namespace
                     return E_UNEXPECTED;
                 }
 
-                const auto primitive = primitiveIndices[m.PrimOffset + i];
+                auto const primitive = primitiveIndices[m.PrimOffset + i];
 
                 const XMVECTOR p0 = XMLoadFloat3(&vertices[primitive.i0]);
 
                 const XMVECTOR center = XMVectorSubtract(positionBounds, p0);
                 const XMVECTOR normal = XMLoadFloat3(&normals[i]);
 
-                const float dc = XMVectorGetX(XMVector3Dot(center, normal));
-                const float dn = XMVectorGetX(XMVector3Dot(axis, normal));
+                float const dc = XMVectorGetX(XMVector3Dot(center, normal));
+                float const dn = XMVectorGetX(XMVector3Dot(axis, normal));
 
                 // dn should be larger than mindp cutoff above
                 if (dn <= 0.0f)
@@ -684,7 +684,7 @@ namespace
                     return E_UNEXPECTED;
                 }
 
-                const float t = dc / dn;
+                float const t = dc / dn;
                 maxt          = (t > maxt) ? t : maxt;
             }
 
@@ -727,18 +727,18 @@ namespace
 //=====================================================================================
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(uint16_t const* indices,
     size_t                                                              nFaces,
     const XMFLOAT3*                                                     positions,
     size_t                                                              nVerts,
-    const uint32_t*                                                     adjacency,
+    uint32_t const*                                                     adjacency,
     std::vector<Meshlet>&                                               meshlets,
     std::vector<uint8_t>&                                               uniqueVertexIB,
     std::vector<MeshletTriangle>&                                       primitiveIndices,
     size_t                                                              maxVerts,
     size_t                                                              maxPrims)
 {
-    const std::pair<size_t, size_t> s = { 0, nFaces };
+    std::pair<size_t, size_t> const s = { 0, nFaces };
     std::pair<size_t, size_t>       subset;
 
     return ComputeMeshletsInternal<uint16_t>(indices,
@@ -756,18 +756,18 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint16_t* indices,
         maxPrims);
 }
 
-_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(uint32_t const* indices,
     size_t                                                              nFaces,
     const XMFLOAT3*                                                     positions,
     size_t                                                              nVerts,
-    const uint32_t*                                                     adjacency,
+    uint32_t const*                                                     adjacency,
     std::vector<Meshlet>&                                               meshlets,
     std::vector<uint8_t>&                                               uniqueVertexIB,
     std::vector<MeshletTriangle>&                                       primitiveIndices,
     size_t                                                              maxVerts,
     size_t                                                              maxPrims)
 {
-    const std::pair<size_t, size_t> s = { 0, nFaces };
+    std::pair<size_t, size_t> const s = { 0, nFaces };
     std::pair<size_t, size_t>       subset;
 
     return ComputeMeshletsInternal<uint32_t>(indices,
@@ -785,13 +785,13 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint32_t* indices,
         maxPrims);
 }
 
-_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint16_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(uint16_t const* indices,
     size_t                                                              nFaces,
     const XMFLOAT3*                                                     positions,
     size_t                                                              nVerts,
-    const std::pair<size_t, size_t>*                                    subsets,
+    std::pair<size_t, size_t> const*                                    subsets,
     size_t                                                              nSubsets,
-    const uint32_t*                                                     adjacency,
+    uint32_t const*                                                     adjacency,
     std::vector<Meshlet>&                                               meshlets,
     std::vector<uint8_t>&                                               uniqueVertexIB,
     std::vector<MeshletTriangle>&                                       primitiveIndices,
@@ -814,13 +814,13 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint16_t* indices,
         maxPrims);
 }
 
-_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint32_t* indices,
+_Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(uint32_t const* indices,
     size_t                                                              nFaces,
     const XMFLOAT3*                                                     positions,
     size_t                                                              nVerts,
-    const std::pair<size_t, size_t>*                                    subsets,
+    std::pair<size_t, size_t> const*                                    subsets,
     size_t                                                              nSubsets,
-    const uint32_t*                                                     adjacency,
+    uint32_t const*                                                     adjacency,
     std::vector<Meshlet>&                                               meshlets,
     std::vector<uint8_t>&                                               uniqueVertexIB,
     std::vector<MeshletTriangle>&                                       primitiveIndices,
@@ -845,11 +845,11 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeMeshlets(const uint32_t* indices,
 
 _Use_decl_annotations_ HRESULT DirectX::ComputeCullData(const XMFLOAT3* positions,
     size_t                                                              nVerts,
-    const Meshlet*                                                      meshlets,
+    Meshlet const*                                                      meshlets,
     size_t                                                              nMeshlets,
-    const uint16_t*                                                     uniqueVertexIndices,
+    uint16_t const*                                                     uniqueVertexIndices,
     size_t                                                              nVertIndices,
-    const MeshletTriangle*                                              primitiveIndices,
+    MeshletTriangle const*                                              primitiveIndices,
     size_t                                                              nPrimIndices,
     CullData*                                                           cullData,
     MESHLET_FLAGS                                                       flags) noexcept
@@ -868,11 +868,11 @@ _Use_decl_annotations_ HRESULT DirectX::ComputeCullData(const XMFLOAT3* position
 
 _Use_decl_annotations_ HRESULT DirectX::ComputeCullData(const XMFLOAT3* positions,
     size_t                                                              nVerts,
-    const Meshlet*                                                      meshlets,
+    Meshlet const*                                                      meshlets,
     size_t                                                              nMeshlets,
-    const uint32_t*                                                     uniqueVertexIndices,
+    uint32_t const*                                                     uniqueVertexIndices,
     size_t                                                              nVertIndices,
-    const MeshletTriangle*                                              primitiveIndices,
+    MeshletTriangle const*                                              primitiveIndices,
     size_t                                                              nPrimIndices,
     CullData*                                                           cullData,
     MESHLET_FLAGS                                                       flags) noexcept

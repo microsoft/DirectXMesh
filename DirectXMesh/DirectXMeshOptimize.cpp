@@ -112,7 +112,7 @@ _Use_decl_annotations_ HRESULT DirectX::AttributeSort(size_t nFaces, uint32_t* a
 
     std::stable_sort(list.begin(),
         list.end(),
-        [](const intpair_t& a, const intpair_t& b) noexcept -> bool
+        [](intpair_t const& a, intpair_t const& b) noexcept -> bool
         {
             return (a.first < b.first);
         });
@@ -129,13 +129,13 @@ _Use_decl_annotations_ HRESULT DirectX::AttributeSort(size_t nFaces, uint32_t* a
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_ HRESULT
-DirectX::OptimizeVertices(const uint16_t* indices, size_t nFaces, size_t nVerts, uint32_t* vertexRemap, size_t* trailingUnused) noexcept
+DirectX::OptimizeVertices(uint16_t const* indices, size_t nFaces, size_t nVerts, uint32_t* vertexRemap, size_t* trailingUnused) noexcept
 {
     return OptimizeVerticesImpl<uint16_t>(indices, nFaces, nVerts, vertexRemap, trailingUnused);
 }
 
 _Use_decl_annotations_ HRESULT
-DirectX::OptimizeVertices(const uint32_t* indices, size_t nFaces, size_t nVerts, uint32_t* vertexRemap, size_t* trailingUnused) noexcept
+DirectX::OptimizeVertices(uint32_t const* indices, size_t nFaces, size_t nVerts, uint32_t* vertexRemap, size_t* trailingUnused) noexcept
 {
     return OptimizeVerticesImpl<uint32_t>(indices, nFaces, nVerts, vertexRemap, trailingUnused);
 }

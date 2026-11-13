@@ -62,7 +62,7 @@ namespace
     }
 
     template<typename T>
-    inline HRESULT write_file(HANDLE hFile, const T& value)
+    inline HRESULT write_file(HANDLE hFile, T const& value)
     {
         DWORD bytesWritten;
         if (!WriteFile(hFile, &value, static_cast<DWORD>(sizeof(T)), &bytesWritten, nullptr))
@@ -74,7 +74,7 @@ namespace
         return S_OK;
     }
 
-    inline HRESULT write_file_string(HANDLE hFile, const wchar_t* value)
+    inline HRESULT write_file_string(HANDLE hFile, wchar_t const* value)
     {
         const UINT length = (value) ? static_cast<UINT>(wcslen(value) + 1) : 1;
 
@@ -87,7 +87,7 @@ namespace
 
         if (length > 0)
         {
-            const auto bytes = static_cast<DWORD>(sizeof(wchar_t) * length);
+            auto const bytes = static_cast<DWORD>(sizeof(wchar_t) * length);
 
             if (!WriteFile(hFile, value, bytes, &bytesWritten, nullptr))
                 return HRESULT_FROM_WIN32(GetLastError());
@@ -113,7 +113,7 @@ namespace
         return ((value + 4095) / 4096) * 4096;
     }
 
-    static const uint8_t g_padding[4096] = {};
+    static uint8_t const g_padding[4096] = {};
 } // namespace
 
 // Move constructor
@@ -168,7 +168,7 @@ void Mesh::Clear() noexcept
 }
 
 //--------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT Mesh::SetIndexData(size_t nFaces, const uint16_t* indices, const uint32_t* attributes) noexcept
+_Use_decl_annotations_ HRESULT Mesh::SetIndexData(size_t nFaces, uint16_t const* indices, uint32_t const* attributes) noexcept
 {
     if (!nFaces || !indices)
         return E_INVALIDARG;
@@ -214,7 +214,7 @@ _Use_decl_annotations_ HRESULT Mesh::SetIndexData(size_t nFaces, const uint16_t*
     return S_OK;
 }
 
-_Use_decl_annotations_ HRESULT Mesh::SetIndexData(size_t nFaces, const uint32_t* indices, const uint32_t* attributes) noexcept
+_Use_decl_annotations_ HRESULT Mesh::SetIndexData(size_t nFaces, uint32_t const* indices, uint32_t const* attributes) noexcept
 {
     if (!nFaces || !indices)
         return E_INVALIDARG;
@@ -250,7 +250,7 @@ _Use_decl_annotations_ HRESULT Mesh::SetIndexData(size_t nFaces, const uint32_t*
 }
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::SetVertexData(const DirectX::VBReader& reader, _In_ size_t nVerts) noexcept
+HRESULT Mesh::SetVertexData(DirectX::VBReader const& reader, _In_ size_t nVerts) noexcept
 {
     if (!nVerts)
         return E_INVALIDARG;
@@ -413,7 +413,7 @@ HRESULT Mesh::Clean() noexcept
         return S_OK;
     }
 
-    const size_t nNewVerts = mnVerts + dups.size();
+    size_t const nNewVerts = mnVerts + dups.size();
 
     std::unique_ptr<XMFLOAT3[]> pos(new (std::nothrow) XMFLOAT3[nNewVerts]);
     if (!pos)
@@ -844,10 +844,10 @@ bool Mesh::Is16BitIndexBuffer() const noexcept
     if ((uint64_t(mnFaces) * 3) >= UINT32_MAX)
         return false;
 
-    const uint32_t* iptr = mIndices.get();
+    uint32_t const* iptr = mIndices.get();
     for (size_t j = 0; j < (mnFaces * 3); ++j)
     {
-        const uint32_t index = *(iptr++);
+        uint32_t const index = *(iptr++);
         if (index != uint32_t(-1) && (index >= UINT16_MAX))
         {
             return false;
@@ -868,13 +868,13 @@ std::unique_ptr<uint16_t[]> Mesh::GetIndexBuffer16() const noexcept
     if ((uint64_t(mnFaces) * 3) >= UINT32_MAX)
         return ib;
 
-    const size_t count = mnFaces * 3;
+    size_t const count = mnFaces * 3;
 
     ib.reset(new (std::nothrow) uint16_t[count]);
     if (!ib)
         return ib;
 
-    const uint32_t* iptr = mIndices.get();
+    uint32_t const* iptr = mIndices.get();
     for (size_t j = 0; j < count; ++j)
     {
         uint32_t index = *(iptr++);
@@ -897,7 +897,7 @@ std::unique_ptr<uint16_t[]> Mesh::GetIndexBuffer16() const noexcept
 }
 
 //--------------------------------------------------------------------------------------
-HRESULT Mesh::GetVertexBuffer(const DirectX::VBWriter& writer) const noexcept
+HRESULT Mesh::GetVertexBuffer(DirectX::VBWriter const& writer) const noexcept
 {
     if (!mnVerts || !mPositions)
         return E_UNEXPECTED;
@@ -911,7 +911,7 @@ HRESULT Mesh::GetVertexBuffer(const DirectX::VBWriter& writer) const noexcept
         auto e = writer.GetElement11("NORMAL", 0);
         if (e)
         {
-            const bool x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
+            bool const x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
             hr                = writer.Write(mNormals.get(), "NORMAL", 0, mnVerts, x2bias);
             if (FAILED(hr))
                 return hr;
@@ -923,7 +923,7 @@ HRESULT Mesh::GetVertexBuffer(const DirectX::VBWriter& writer) const noexcept
         auto e = writer.GetElement11("TANGENT", 0);
         if (e)
         {
-            const bool x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
+            bool const x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
             hr                = writer.Write(mTangents.get(), "TANGENT", 0, mnVerts, x2bias);
             if (FAILED(hr))
                 return hr;
@@ -935,7 +935,7 @@ HRESULT Mesh::GetVertexBuffer(const DirectX::VBWriter& writer) const noexcept
         auto e = writer.GetElement11("BINORMAL", 0);
         if (e)
         {
-            const bool x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
+            bool const x2bias = (e->Format == DXGI_FORMAT_R11G11B10_FLOAT);
             hr                = writer.Write(mBiTangents.get(), "BINORMAL", 0, mnVerts, x2bias);
             if (FAILED(hr))
                 return hr;
@@ -994,7 +994,7 @@ HRESULT Mesh::GetVertexBuffer(const DirectX::VBWriter& writer) const noexcept
 //======================================================================================
 
 //--------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) const noexcept
+_Use_decl_annotations_ HRESULT Mesh::ExportToVBO(wchar_t const* szFileName) const noexcept
 {
     using namespace VBO;
 
@@ -1059,7 +1059,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) cons
     if (FAILED(hr))
         return hr;
 
-    const auto vertSize = static_cast<DWORD>(sizeof(vertex_t) * header.numVertices);
+    auto const vertSize = static_cast<DWORD>(sizeof(vertex_t) * header.numVertices);
 
     DWORD bytesWritten;
     if (!WriteFile(hFile.get(), vb.get(), vertSize, &bytesWritten, nullptr))
@@ -1068,7 +1068,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) cons
     if (bytesWritten != vertSize)
         return E_FAIL;
 
-    const auto indexSize = static_cast<DWORD>(sizeof(uint16_t) * header.numIndices);
+    auto const indexSize = static_cast<DWORD>(sizeof(uint16_t) * header.numIndices);
 
     if (!WriteFile(hFile.get(), ib.get(), indexSize, &bytesWritten, nullptr))
         return HRESULT_FROM_WIN32(GetLastError());
@@ -1080,7 +1080,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToVBO(const wchar_t* szFileName) cons
 }
 
 //--------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, std::unique_ptr<Mesh>& result) noexcept
+_Use_decl_annotations_ HRESULT Mesh::CreateFromVBO(wchar_t const* szFileName, std::unique_ptr<Mesh>& result) noexcept
 {
     using namespace VBO;
 
@@ -1129,13 +1129,13 @@ _Use_decl_annotations_ HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, st
     if (!result)
         return E_OUTOFMEMORY;
 
-    const uint64_t vertSizeBytes = static_cast<uint64_t>(header.numVertices) * sizeof(vertex_t);
+    uint64_t const vertSizeBytes = static_cast<uint64_t>(header.numVertices) * sizeof(vertex_t);
     if (vertSizeBytes > UINT32_MAX)
     {
         return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
     }
 
-    const uint64_t indexSizeBytes = static_cast<uint64_t>(header.numIndices) * sizeof(uint16_t);
+    uint64_t const indexSizeBytes = static_cast<uint64_t>(header.numIndices) * sizeof(uint16_t);
     if (indexSizeBytes > UINT32_MAX)
     {
         return HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW);
@@ -1147,7 +1147,7 @@ _Use_decl_annotations_ HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, st
     if (!vb || !ib)
         return E_OUTOFMEMORY;
 
-    const auto vertSize = static_cast<DWORD>(vertSizeBytes);
+    auto const vertSize = static_cast<DWORD>(vertSizeBytes);
     if (!ReadFile(hFile.get(), vb.get(), vertSize, &bytesRead, nullptr))
     {
         return HRESULT_FROM_WIN32(GetLastError());
@@ -1156,7 +1156,7 @@ _Use_decl_annotations_ HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, st
     if (bytesRead != vertSize)
         return E_FAIL;
 
-    const auto indexSize = static_cast<DWORD>(indexSizeBytes);
+    auto const indexSize = static_cast<DWORD>(indexSizeBytes);
     if (!ReadFile(hFile.get(), ib.get(), indexSize, &bytesRead, nullptr))
     {
         return HRESULT_FROM_WIN32(GetLastError());
@@ -1210,7 +1210,7 @@ _Use_decl_annotations_ HRESULT Mesh::CreateFromVBO(const wchar_t* szFileName, st
 //======================================================================================
 
 //--------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const noexcept
+_Use_decl_annotations_ HRESULT Mesh::ExportToCMO(wchar_t const* szFileName, size_t nMaterials, Material const* materials) const noexcept
 {
     using namespace VSD3DStarter;
 
@@ -1322,7 +1322,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size
     }
 
     // Write materials
-    static const Mesh::Material s_defCMOMaterial = { L"default",
+    static Mesh::Material const s_defCMOMaterial = { L"default",
         false,
         1.f,
         1.f,
@@ -1439,7 +1439,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size
             return hr;
 
         size_t startIndex = 0;
-        for (const auto& it : subsets)
+        for (auto const& it : subsets)
         {
             SubMesh smesh;
             smesh.MaterialIndex = mAttributes[it.first];
@@ -1489,7 +1489,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size
     if (FAILED(hr))
         return hr;
 
-    const auto indexSize = static_cast<DWORD>(sizeof(uint16_t) * nIndices);
+    auto const indexSize = static_cast<DWORD>(sizeof(uint16_t) * nIndices);
 
     DWORD bytesWritten;
     if (!WriteFile(hFile.get(), ib.get(), indexSize, &bytesWritten, nullptr))
@@ -1509,7 +1509,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size
     if (FAILED(hr))
         return hr;
 
-    const auto vertSize = static_cast<DWORD>(sizeof(Vertex) * mnVerts);
+    auto const vertSize = static_cast<DWORD>(sizeof(Vertex) * mnVerts);
 
     if (!WriteFile(hFile.get(), vb.get(), vertSize, &bytesWritten, nullptr))
         return HRESULT_FROM_WIN32(GetLastError());
@@ -1530,7 +1530,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size
         if (FAILED(hr))
             return hr;
 
-        const auto skinVertSize = static_cast<DWORD>(sizeof(SkinningVertex) * mnVerts);
+        auto const skinVertSize = static_cast<DWORD>(sizeof(SkinningVertex) * mnVerts);
 
         if (!WriteFile(hFile.get(), vbSkin.get(), skinVertSize, &bytesWritten, nullptr))
             return HRESULT_FROM_WIN32(GetLastError());
@@ -1582,9 +1582,9 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToCMO(const wchar_t* szFileName, size
 // SDKMESH
 //======================================================================================
 
-_Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
+_Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(wchar_t const* szFileName,
     size_t                                                          nMaterials,
-    const Material*                                                 materials,
+    Material const*                                                 materials,
     bool                                                            force32bit,
     bool                                                            version2,
     DXGI_FORMAT                                                     normalFormat,
@@ -1864,7 +1864,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
 
                 if (!m0->name.empty())
                 {
-                    const int result = WideCharToMultiByte(CP_UTF8,
+                    int const result = WideCharToMultiByte(CP_UTF8,
                         WC_NO_BEST_FIT_CHARS,
                         m0->name.c_str(),
                         -1,
@@ -1882,7 +1882,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
 
                 if (!m0->texture.empty())
                 {
-                    const int result = WideCharToMultiByte(CP_UTF8,
+                    int const result = WideCharToMultiByte(CP_UTF8,
                         WC_NO_BEST_FIT_CHARS,
                         m0->texture.c_str(),
                         -1,
@@ -1905,7 +1905,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
                     _splitpath_s(m2->AlbedoTexture, drive, dir, fname, ext);
 
                     std::string  basename = fname;
-                    const size_t pos      = basename.find_last_of('_');
+                    size_t const pos      = basename.find_last_of('_');
                     if (pos != std::string::npos)
                     {
                         basename = basename.substr(0, pos);
@@ -1933,7 +1933,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
                 // Allow normal texture material property to override derived name
                 if (!m0->normalTexture.empty())
                 {
-                    const int result = WideCharToMultiByte(CP_UTF8,
+                    int const result = WideCharToMultiByte(CP_UTF8,
                         WC_NO_BEST_FIT_CHARS,
                         m0->normalTexture.c_str(),
                         -1,
@@ -1950,7 +1950,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
                 // Allow emissive texture material property to override drived name
                 if (!m0->emissiveTexture.empty())
                 {
-                    const int result = WideCharToMultiByte(CP_UTF8,
+                    int const result = WideCharToMultiByte(CP_UTF8,
                         WC_NO_BEST_FIT_CHARS,
                         m0->emissiveTexture.c_str(),
                         -1,
@@ -1967,7 +1967,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
                 // Allow RMA texture material property to override drived name
                 if (!m0->rmaTexture.empty())
                 {
-                    const int result = WideCharToMultiByte(CP_UTF8,
+                    int const result = WideCharToMultiByte(CP_UTF8,
                         WC_NO_BEST_FIT_CHARS,
                         m0->rmaTexture.c_str(),
                         -1,
@@ -2011,7 +2011,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
 
             if (!m0->name.empty())
             {
-                const int result
+                int const result
                     = WideCharToMultiByte(CP_UTF8, WC_NO_BEST_FIT_CHARS, m0->name.c_str(), -1, m->Name, MAX_MATERIAL_NAME, nullptr, FALSE);
                 if (!result)
                 {
@@ -2021,7 +2021,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
 
             if (!m0->texture.empty())
             {
-                const int result = WideCharToMultiByte(CP_UTF8,
+                int const result = WideCharToMultiByte(CP_UTF8,
                     WC_NO_BEST_FIT_CHARS,
                     m0->texture.c_str(),
                     -1,
@@ -2037,7 +2037,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
 
             if (!m0->normalTexture.empty())
             {
-                const int result = WideCharToMultiByte(CP_UTF8,
+                int const result = WideCharToMultiByte(CP_UTF8,
                     WC_NO_BEST_FIT_CHARS,
                     m0->normalTexture.c_str(),
                     -1,
@@ -2053,7 +2053,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
 
             if (!m0->specularTexture.empty())
             {
-                const int result = WideCharToMultiByte(CP_UTF8,
+                int const result = WideCharToMultiByte(CP_UTF8,
                     WC_NO_BEST_FIT_CHARS,
                     m0->specularTexture.c_str(),
                     -1,
@@ -2103,7 +2103,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
         auto subsets = ComputeSubsets(mAttributes.get(), mnFaces);
 
         UINT64 startIndex = 0;
-        for (const auto& it : subsets)
+        for (auto const& it : subsets)
         {
             subsetArray.push_back(static_cast<UINT>(submeshes.size()));
 
@@ -2153,7 +2153,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToSDKMESH(const wchar_t* szFileName,
 
     header.HeaderSize = sizeof(SDKMESH_HEADER) + sizeof(SDKMESH_VERTEX_BUFFER_HEADER) + sizeof(SDKMESH_INDEX_BUFFER_HEADER);
 
-    const size_t staticDataSize = sizeof(SDKMESH_MESH) + header.NumTotalSubsets * sizeof(SDKMESH_SUBSET) + sizeof(SDKMESH_FRAME)
+    size_t const staticDataSize = sizeof(SDKMESH_MESH) + header.NumTotalSubsets * sizeof(SDKMESH_SUBSET) + sizeof(SDKMESH_FRAME)
                                   + header.NumMaterials * sizeof(SDKMESH_MATERIAL);
 
     header.NonBufferDataSize = uint64_t(staticDataSize) + uint64_t(subsetArray.size()) * sizeof(UINT) + sizeof(UINT);

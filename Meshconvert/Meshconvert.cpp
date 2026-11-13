@@ -58,9 +58,9 @@ using namespace DirectX;
 
 namespace
 {
-    const wchar_t* g_ToolName    = L"meshconvert";
-    const wchar_t* g_Description = L"Microsoft (R) MeshConvert Command-line Tool [DirectXMesh]";
-    const wchar_t* g_FeedbackURL = L"https://github.com/microsoft/DirectXMesh/issues";
+    wchar_t const* g_ToolName    = L"meshconvert";
+    wchar_t const* g_Description = L"Microsoft (R) MeshConvert Command-line Tool [DirectXMesh]";
+    wchar_t const* g_FeedbackURL = L"https://github.com/microsoft/DirectXMesh/issues";
 
     enum OPTIONS : uint32_t
     {
@@ -231,7 +231,7 @@ namespace
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial, bool ccw, bool dds);
+HRESULT LoadFromOBJ(wchar_t const* szFilename, std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial, bool ccw, bool dds);
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -243,9 +243,9 @@ namespace
     {
         PrintLogo(false, g_ToolName, g_Description);
 
-        static const wchar_t* const s_usage = L"Usage: meshconvert <options> [--] <files>\n\n";
+        static wchar_t const* const s_usage = L"Usage: meshconvert <options> [--] <files>\n\n";
 
-        static const wchar_t* const s_fullUsage
+        static wchar_t const* const s_fullUsage
             = L"   Input file type must be Wavefront Object (.obj)\n"
               L"\n"
               L"   -ft <filetype>, --file-type <filetype>  output file type\n"
@@ -614,7 +614,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
         else if (wcspbrk(pArg, L"?*") != nullptr)
         {
-            const size_t          count = conversion.size();
+            size_t const          count = conversion.size();
             std::filesystem::path path(pArg);
             SearchForFiles(path.make_preferred(), conversion, (dwOptions & (UINT32_C(1) << OPT_RECURSIVE)) != 0, nullptr);
             if (conversion.size() <= count)
@@ -654,7 +654,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
     for (auto pConv = conversion.begin(); pConv != conversion.end(); ++pConv)
     {
         std::filesystem::path curpath(pConv->szSrc);
-        const auto            ext = curpath.extension();
+        auto const            ext = curpath.extension();
 
         if (pConv != conversion.begin())
             wprintf(L"\n");
@@ -704,7 +704,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         }
 
         size_t       nVerts = inMesh->GetVertexCount();
-        const size_t nFaces = inMesh->GetFaceCount();
+        size_t const nFaces = inMesh->GetFaceCount();
 
         if (!nVerts || !nFaces)
         {
@@ -751,7 +751,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
         if (dwOptions & ((UINT32_C(1) << OPT_OPTIMIZE) | (UINT32_C(1) << OPT_CLEAN)))
         {
             // Adjacency
-            const float epsilon = (dwOptions & (UINT32_C(1) << OPT_GEOMETRIC_ADJ)) ? 1e-5f : 0.f;
+            float const epsilon = (dwOptions & (UINT32_C(1) << OPT_GEOMETRIC_ADJ)) ? 1e-5f : 0.f;
 
             hr = inMesh->GenerateAdjacency(epsilon);
             if (FAILED(hr))
@@ -778,7 +778,7 @@ int __cdecl wmain(_In_ int argc, _In_z_count_(argc) wchar_t* argv[])
             }
             else
             {
-                const size_t nNewVerts = inMesh->GetVertexCount();
+                size_t const nNewVerts = inMesh->GetVertexCount();
                 if (nVerts != nNewVerts)
                 {
                     wprintf(L" [%zu vertex dups] ", nNewVerts - nVerts);

@@ -37,7 +37,7 @@ using namespace DirectX;
 
 namespace
 {
-    std::wstring ProcessTextureFileName(const wchar_t* inName, bool dds)
+    std::wstring ProcessTextureFileName(wchar_t const* inName, bool dds)
     {
         if (!inName || !*inName)
             return std::wstring();
@@ -58,7 +58,7 @@ namespace
 } // namespace
 
 //--------------------------------------------------------------------------------------
-HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial, bool ccw, bool dds)
+HRESULT LoadFromOBJ(wchar_t const* szFilename, std::unique_ptr<Mesh>& inMesh, std::vector<Mesh::Material>& inMaterial, bool ccw, bool dds)
 {
     using Vertex = DX::WaveFrontReader<uint32_t>::Vertex;
 
@@ -109,7 +109,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
     const D3D11_INPUT_ELEMENT_DESC* layout = s_vboLayout;
     size_t                          nDecl  = std::size(s_vboLayout);
 
-    const bool hasColors = wfReader.hasVertexColors && (wfReader.vertexColors.size() == wfReader.vertices.size());
+    bool const hasColors = wfReader.hasVertexColors && (wfReader.vertexColors.size() == wfReader.vertices.size());
 
     if (hasColors)
     {
@@ -146,7 +146,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
     {
         // OBJ vertex colors have no alpha, so use opaque
         colors.reserve(wfReader.vertexColors.size());
-        for (const auto& c : wfReader.vertexColors)
+        for (auto const& c : wfReader.vertexColors)
         {
             colors.emplace_back(c.x, c.y, c.z, 1.f);
         }
@@ -165,7 +165,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
         inMaterial.clear();
         inMaterial.reserve(wfReader.materials.size());
 
-        for (const auto& it : wfReader.materials)
+        for (auto const& it : wfReader.materials)
         {
             Mesh::Material mtl = {};
 
@@ -199,7 +199,7 @@ HRESULT LoadFromOBJ(const wchar_t* szFilename, std::unique_ptr<Mesh>& inMesh, st
 }
 
 //--------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT Mesh::ExportToOBJ(const wchar_t* szFileName, size_t nMaterials, const Material* materials) const
+_Use_decl_annotations_ HRESULT Mesh::ExportToOBJ(wchar_t const* szFileName, size_t nMaterials, Material const* materials) const
 {
     if (!szFileName)
         return E_INVALIDARG;
@@ -221,7 +221,7 @@ _Use_decl_annotations_ HRESULT Mesh::ExportToOBJ(const wchar_t* szFileName, size
     return (os.bad()) ? E_FAIL : S_OK;
 }
 
-_Use_decl_annotations_ void Mesh::ExportToOBJ(std::wostream& os, size_t nMaterials, const Material* materials) const
+_Use_decl_annotations_ void Mesh::ExportToOBJ(std::wostream& os, size_t nMaterials, Material const* materials) const
 {
     os.imbue(std::locale::classic());
 
@@ -274,7 +274,7 @@ _Use_decl_annotations_ void Mesh::ExportToOBJ(std::wostream& os, size_t nMateria
         os << L"f ";
         for (size_t point = 0; point < 3; ++point)
         {
-            const uint32_t i = mIndices[face * 3 + point] + 1;
+            uint32_t const i = mIndices[face * 3 + point] + 1;
 
             os << i << L"/";
             if (mTexCoords)

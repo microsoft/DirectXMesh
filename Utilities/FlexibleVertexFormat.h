@@ -41,12 +41,12 @@ namespace FVF
 
     static_assert(std::size(g_declTypeSizes) == D3DDECLTYPE_UNUSED, "Mismatch of array size");
 
-    constexpr size_t ComputeVertexSize(const uint32_t fvfCode) noexcept
+    constexpr size_t ComputeVertexSize(uint32_t const fvfCode) noexcept
     {
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
             return 0;
 
-        const size_t numCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+        size_t const numCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
         if (numCoords > 8)
             return 0;
 
@@ -106,7 +106,7 @@ namespace FVF
         return vertexSize;
     }
 
-    constexpr size_t ComputeVertexSize(const D3DVERTEXELEMENT9* pDecl, const uint32_t stream) noexcept
+    constexpr size_t ComputeVertexSize(const D3DVERTEXELEMENT9* pDecl, uint32_t const stream) noexcept
     {
         if (!pDecl || stream >= 16u /*D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT*/)
             return 0;
@@ -129,7 +129,7 @@ namespace FVF
                 if (pDecl->Type >= std::size(g_declTypeSizes))
                     return 0;
 
-                const size_t slotSize = g_declTypeSizes[pDecl->Type];
+                size_t const slotSize = g_declTypeSizes[pDecl->Type];
                 if (currentSize < slotSize + pDecl->Offset)
                     currentSize = slotSize + pDecl->Offset;
             }
@@ -142,7 +142,7 @@ namespace FVF
 
     // More secure version
     constexpr size_t
-    ComputeVertexSize(_In_reads_(maxDeclLength) const D3DVERTEXELEMENT9* pDecl, const size_t maxDeclLength, const uint32_t stream) noexcept
+    ComputeVertexSize(_In_reads_(maxDeclLength) const D3DVERTEXELEMENT9* pDecl, size_t const maxDeclLength, uint32_t const stream) noexcept
     {
         if (!pDecl || stream >= 16u /*D3D10_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT*/)
             return 0;
@@ -168,7 +168,7 @@ namespace FVF
                 if (pDecl->Type >= std::size(g_declTypeSizes))
                     return 0;
 
-                const size_t slotSize = g_declTypeSizes[pDecl->Type];
+                size_t const slotSize = g_declTypeSizes[pDecl->Type];
                 if (currentSize < slotSize + pDecl->Offset)
                     currentSize = slotSize + pDecl->Offset;
             }
@@ -205,7 +205,7 @@ namespace FVF
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
             return false;
 
-        const uint32_t nTexCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+        uint32_t const nTexCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
         if (nTexCoords > 8)
             return false;
 
@@ -316,7 +316,7 @@ namespace FVF
         {
             for (uint32_t t = 0; t < nTexCoords; ++t)
             {
-                const size_t texCoordSize = s_texCoordSizes[(fvfCode >> (16 + t * 2)) & 0x3];
+                size_t const texCoordSize = s_texCoordSizes[(fvfCode >> (16 + t * 2)) & 0x3];
 
                 // D3DDECLTYPE_FLOAT1 = 0, D3DDECLTYPE_FLOAT4 = 3
                 decl.emplace_back(D3DVERTEXELEMENT9{ 0,
@@ -352,7 +352,7 @@ namespace FVF
         if ((fvfCode & ((D3DFVF_RESERVED0 | D3DFVF_RESERVED2) & ~D3DFVF_POSITION_MASK)) != 0)
             return false;
 
-        const uint32_t nTexCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
+        uint32_t const nTexCoords = (fvfCode & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT;
         if (nTexCoords > 8)
             return false;
 
@@ -482,7 +482,7 @@ namespace FVF
         {
             for (uint32_t t = 0; t < nTexCoords; ++t)
             {
-                const size_t index = (fvfCode >> (16 + t * 2)) & 0x3;
+                size_t const index = (fvfCode >> (16 + t * 2)) & 0x3;
                 il.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD",
                     static_cast<UINT>(t),
                     s_texCoordFormats[index],

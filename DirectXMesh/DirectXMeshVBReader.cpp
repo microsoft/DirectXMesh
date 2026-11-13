@@ -31,7 +31,7 @@ namespace
 
     struct InputElementDesc
     {
-        const char*          SemanticName;
+        char const*          SemanticName;
         unsigned int         SemanticIndex;
         DXGI_FORMAT          Format;
         unsigned int         InputSlot;
@@ -68,8 +68,8 @@ public:
           mTempSize(0)
     {}
 
-    Impl(const Impl&)            = delete;
-    Impl& operator=(const Impl&) = delete;
+    Impl(Impl const&)            = delete;
+    Impl& operator=(Impl const&) = delete;
 
     Impl(Impl&&)            = default;
     Impl& operator=(Impl&&) = default;
@@ -93,7 +93,7 @@ public:
         mTempBuffer.reset();
     }
 
-    const InputElementDesc* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
+    InputElementDesc const* GetElement(_In_z_ const char* semanticName, _In_ unsigned int semanticIndex) const
     {
         auto range = mSemantics.equal_range(semanticName);
 
@@ -138,7 +138,7 @@ private:
     std::vector<InputElementDesc>      mInputDesc;
     SemanticMap                        mSemantics;
     uint32_t                           mStrides[c_MaxSlot];
-    const void*                        mBuffers[c_MaxSlot];
+    void const*                        mBuffers[c_MaxSlot];
     size_t                             mVerts[c_MaxSlot];
     uint32_t                           mDefaultStrides[c_MaxSlot];
     mutable size_t                     mTempSize;
@@ -146,7 +146,7 @@ private:
 };
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT VBReader::Impl::Initialize(const InputElementDesc* vbDecl, size_t nDecl)
+_Use_decl_annotations_ HRESULT VBReader::Impl::Initialize(InputElementDesc const* vbDecl, size_t nDecl)
 {
     Release();
 
@@ -206,7 +206,7 @@ _Use_decl_annotations_ HRESULT VBReader::Impl::Initialize(const InputElementDesc
 }
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT VBReader::Impl::AddStream(const void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
+_Use_decl_annotations_ HRESULT VBReader::Impl::AddStream(void const* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
 {
     if (!vb || !nVerts)
         return E_INVALIDARG;
@@ -286,7 +286,7 @@ _Use_decl_annotations_ HRESULT VBReader::Impl::AddStream(const void* vb, size_t 
     break;
 
 _Use_decl_annotations_
-    HRESULT VBReader::Impl::Read(XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+    HRESULT VBReader::Impl::Read(XMVECTOR* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     if (!buffer || !semanticName || !count)
         return E_INVALIDARG;
@@ -303,21 +303,21 @@ _Use_decl_annotations_
     if (it == range.second)
         return HRESULT_E_INVALID_NAME;
 
-    const uint32_t inputSlot = mInputDesc[it->second].InputSlot;
+    uint32_t const inputSlot = mInputDesc[it->second].InputSlot;
 
-    auto vb = static_cast<const uint8_t*>(mBuffers[inputSlot]);
+    auto vb = static_cast<uint8_t const*>(mBuffers[inputSlot]);
     if (!vb)
         return E_FAIL;
 
     if (count > mVerts[inputSlot])
         return E_BOUNDS;
 
-    const uint32_t stride = mStrides[inputSlot];
+    uint32_t const stride = mStrides[inputSlot];
     if (!stride)
         return E_UNEXPECTED;
 
-    const uint8_t* eptr = vb + stride * mVerts[inputSlot];
-    const uint8_t* ptr  = vb + mInputDesc[it->second].AlignedByteOffset;
+    uint8_t const* eptr = vb + stride * mVerts[inputSlot];
+    uint8_t const* ptr  = vb + mInputDesc[it->second].AlignedByteOffset;
 
     switch (static_cast<int>(mInputDesc[it->second].Format))
     {
@@ -380,7 +380,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(uint32_t)) > eptr)
                 return E_UNEXPECTED;
-            const XMVECTOR v = XMLoadInt(reinterpret_cast<const uint32_t*>(ptr));
+            const XMVECTOR v = XMLoadInt(reinterpret_cast<uint32_t const*>(ptr));
             *buffer++        = XMConvertVectorUIntToFloat(v, 0);
             ptr += stride;
         }
@@ -391,7 +391,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(int32_t)) > eptr)
                 return E_UNEXPECTED;
-            const XMVECTOR v = XMLoadInt(reinterpret_cast<const uint32_t*>(ptr));
+            const XMVECTOR v = XMLoadInt(reinterpret_cast<uint32_t const*>(ptr));
             *buffer++        = XMConvertVectorIntToFloat(v, 0);
             ptr += stride;
         }
@@ -410,7 +410,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(HALF)) > eptr)
                 return E_UNEXPECTED;
-            const float v = XMConvertHalfToFloat(*reinterpret_cast<const HALF*>(ptr));
+            float const v = XMConvertHalfToFloat(*reinterpret_cast<const HALF*>(ptr));
             *buffer++     = XMVectorSet(v, 0.f, 0.f, 0.f);
             ptr += stride;
         }
@@ -421,7 +421,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(uint16_t)) > eptr)
                 return E_UNEXPECTED;
-            const auto i = *reinterpret_cast<const uint16_t*>(ptr);
+            auto const i = *reinterpret_cast<uint16_t const*>(ptr);
             float      f = static_cast<float>(i) / 65535.f;
             if (x2bias)
             {
@@ -438,7 +438,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(uint16_t)) > eptr)
                 return E_UNEXPECTED;
-            const auto i = *reinterpret_cast<const uint16_t*>(ptr);
+            auto const i = *reinterpret_cast<uint16_t const*>(ptr);
             *buffer++    = XMVectorSet(static_cast<float>(i), 0.f, 0.f, 0.f);
             ptr += stride;
         }
@@ -449,7 +449,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(int16_t)) > eptr)
                 return E_UNEXPECTED;
-            const auto i = *reinterpret_cast<const int16_t*>(ptr);
+            auto const i = *reinterpret_cast<int16_t const*>(ptr);
             *buffer++    = XMVectorSet(static_cast<float>(i) / 32767.f, 0.f, 0.f, 0.f);
             ptr += stride;
         }
@@ -460,7 +460,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(int16_t)) > eptr)
                 return E_UNEXPECTED;
-            const auto i = *reinterpret_cast<const int16_t*>(ptr);
+            auto const i = *reinterpret_cast<int16_t const*>(ptr);
             *buffer++    = XMVectorSet(static_cast<float>(i), 0.f, 0.f, 0.f);
             ptr += stride;
         }
@@ -471,7 +471,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(uint8_t)) > eptr)
                 return E_UNEXPECTED;
-            const uint8_t i = *ptr;
+            uint8_t const i = *ptr;
             float         f = static_cast<float>(i) / 255.f;
             if (x2bias)
             {
@@ -488,7 +488,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(uint8_t)) > eptr)
                 return E_UNEXPECTED;
-            const uint8_t i = *ptr;
+            uint8_t const i = *ptr;
             *buffer++       = XMVectorSet(static_cast<float>(i), 0.f, 0.f, 0.f);
             ptr += stride;
         }
@@ -499,7 +499,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(int8_t)) > eptr)
                 return E_UNEXPECTED;
-            const auto i = *reinterpret_cast<const int8_t*>(ptr);
+            auto const i = *reinterpret_cast<int8_t const*>(ptr);
             *buffer++    = XMVectorSet(static_cast<float>(i) / 127.f, 0.f, 0.f, 0.f);
             ptr += stride;
         }
@@ -510,7 +510,7 @@ _Use_decl_annotations_
         {
             if ((ptr + sizeof(int8_t)) > eptr)
                 return E_UNEXPECTED;
-            const auto i = *reinterpret_cast<const int8_t*>(ptr);
+            auto const i = *reinterpret_cast<int8_t const*>(ptr);
             *buffer++    = XMVectorSet(static_cast<float>(i), 0.f, 0.f, 0.f);
             ptr += stride;
         }
@@ -631,33 +631,33 @@ VBReader::~VBReader()                              = default;
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 _Use_decl_annotations_ HRESULT VBReader::Initialize(const D3D11_INPUT_ELEMENT_DESC* vbDecl, size_t nDecl)
 {
-    return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl), nDecl);
+    return pImpl->Initialize(reinterpret_cast<InputElementDesc const*>(vbDecl), nDecl);
 }
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
 HRESULT VBReader::Initialize(const D3D12_INPUT_LAYOUT_DESC& vbDecl)
 {
-    return pImpl->Initialize(reinterpret_cast<const InputElementDesc*>(vbDecl.pInputElementDescs), vbDecl.NumElements);
+    return pImpl->Initialize(reinterpret_cast<InputElementDesc const*>(vbDecl.pInputElementDescs), vbDecl.NumElements);
 }
 #endif
 
 //-------------------------------------------------------------------------------------
-_Use_decl_annotations_ HRESULT VBReader::AddStream(const void* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
+_Use_decl_annotations_ HRESULT VBReader::AddStream(void const* vb, size_t nVerts, size_t inputSlot, size_t stride) noexcept
 {
     return pImpl->AddStream(vb, nVerts, inputSlot, stride);
 }
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_ HRESULT
-VBReader::Read(XMVECTOR* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBReader::Read(XMVECTOR* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     return pImpl->Read(buffer, semanticName, semanticIndex, count, x2bias);
 }
 
 //-------------------------------------------------------------------------------------
 _Use_decl_annotations_ HRESULT
-VBReader::Read(float* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBReader::Read(float* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
@@ -678,7 +678,7 @@ VBReader::Read(float* buffer, const char* semanticName, unsigned int semanticInd
 }
 
 _Use_decl_annotations_ HRESULT
-VBReader::Read(XMFLOAT2* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBReader::Read(XMFLOAT2* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
@@ -699,7 +699,7 @@ VBReader::Read(XMFLOAT2* buffer, const char* semanticName, unsigned int semantic
 }
 
 _Use_decl_annotations_ HRESULT
-VBReader::Read(XMFLOAT3* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBReader::Read(XMFLOAT3* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
@@ -720,7 +720,7 @@ VBReader::Read(XMFLOAT3* buffer, const char* semanticName, unsigned int semantic
 }
 
 _Use_decl_annotations_ HRESULT
-VBReader::Read(XMFLOAT4* buffer, const char* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
+VBReader::Read(XMFLOAT4* buffer, char const* semanticName, unsigned int semanticIndex, size_t count, bool x2bias) const
 {
     XMVECTOR* temp = pImpl->GetTemporaryBuffer(count);
     if (!temp)
@@ -748,14 +748,14 @@ void VBReader::Release() noexcept
 
 //-------------------------------------------------------------------------------------
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
-_Use_decl_annotations_ const D3D11_INPUT_ELEMENT_DESC* VBReader::GetElement11(const char* semanticName, unsigned int semanticIndex) const
+_Use_decl_annotations_ const D3D11_INPUT_ELEMENT_DESC* VBReader::GetElement11(char const* semanticName, unsigned int semanticIndex) const
 {
     return reinterpret_cast<const D3D11_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
 }
 #endif
 
 #if defined(__d3d12_h__) || defined(__d3d12_x_h__) || defined(__XBOX_D3D12_X__)
-_Use_decl_annotations_ const D3D12_INPUT_ELEMENT_DESC* VBReader::GetElement12(const char* semanticName, unsigned int semanticIndex) const
+_Use_decl_annotations_ const D3D12_INPUT_ELEMENT_DESC* VBReader::GetElement12(char const* semanticName, unsigned int semanticIndex) const
 {
     return reinterpret_cast<const D3D12_INPUT_ELEMENT_DESC*>(pImpl->GetElement(semanticName, semanticIndex));
 }

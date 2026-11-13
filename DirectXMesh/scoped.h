@@ -63,7 +63,7 @@ using ScopedAlignedArrayFloat = std::unique_ptr<float[], aligned_deleter>;
 
 inline ScopedAlignedArrayFloat make_AlignedArrayFloat(uint64_t count)
 {
-    const uint64_t size = sizeof(float) * count;
+    uint64_t const size = sizeof(float) * count;
     if (size > static_cast<uint64_t>(UINT32_MAX))
         return nullptr;
     auto ptr = _aligned_malloc(static_cast<size_t>(size), 16);
@@ -74,7 +74,7 @@ using ScopedAlignedArrayXMVECTOR = std::unique_ptr<DirectX::XMVECTOR[], aligned_
 
 inline ScopedAlignedArrayXMVECTOR make_AlignedArrayXMVECTOR(uint64_t count)
 {
-    const uint64_t size = sizeof(DirectX::XMVECTOR) * count;
+    uint64_t const size = sizeof(DirectX::XMVECTOR) * count;
     if (size > static_cast<uint64_t>(UINT32_MAX))
         return nullptr;
     auto ptr = _aligned_malloc(static_cast<size_t>(size), 16);
@@ -120,8 +120,8 @@ public:
         : m_handle(hFile)
     {}
 
-    auto_delete_file(const auto_delete_file&)            = delete;
-    auto_delete_file& operator=(const auto_delete_file&) = delete;
+    auto_delete_file(auto_delete_file const&)            = delete;
+    auto_delete_file& operator=(auto_delete_file const&) = delete;
 
     ~auto_delete_file()
     {
